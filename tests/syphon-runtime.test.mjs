@@ -98,6 +98,41 @@ test("rejects a declared response larger than 64 KiB before parsing", async () =
   );
 });
 
+test("rejects a streamed response larger than 64 KiB without a content-length header", async () => {
+  globalThis.fetch = async () => {
+    const chunk = new TextEncoder().encode("x".repeat(40 * 1024));
+    const body = new ReadableStream({
+      start(controller) {
+        controller.enqueue(chunk);
+        controller.enqueue(chunk);
+        controller.close();
+      },
+    });
+    return new Response(body, {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
+  };
+
+  await assert.rejects(
+    runAllsparxPrimeTask("find cloud credits", "https://example.com/ai"),
+    /exceeded the 64 KiB safety limit/,
+  );
+});
+
+test("rejects invalid UTF-8 response bytes", async () => {
+  globalThis.fetch = async () =>
+    new Response(new Uint8Array([0xff, 0xfe, 0x7b, 0x7d]), {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
+
+  await assert.rejects(
+    runAllsparxPrimeTask("find cloud credits", "https://example.com/ai"),
+    /invalid JSON or non-UTF-8 content/,
+  );
+});
+
 test("rejects malformed response contracts", async () => {
   globalThis.fetch = async () => jsonResponse({ summary: 42, programs: "not-an-array" });
 
@@ -105,6 +140,24 @@ test("rejects malformed response contracts", async () => {
     runAllsparxPrimeTask("find cloud credits", "https://example.com/ai"),
     /invalid response format/,
   );
+});
+
+test("rejects blank and oversized prompts before making a request", async () => {
+  let called = false;
+  globalThis.fetch = async () => {
+    called = true;
+    return jsonResponse({ summary: "unexpected", programs: [] });
+  };
+
+  await assert.rejects(
+    runAllsparxPrimeTask("   ", "https://example.com/ai"),
+    /Enter a request/,
+  );
+  await assert.rejects(
+    runAllsparxPrimeTask("x".repeat(501), "https://example.com/ai"),
+    /500 characters or fewer/,
+  );
+  assert.equal(called, false);
 });
 
 test("allows localhost HTTP for development", async () => {
