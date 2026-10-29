@@ -115,8 +115,12 @@ export default function AssistantClient({
     setMatchedPrograms([]);
 
     try {
-      const aiEndpoint =
-        import.meta.env.PUBLIC_AI_CHAT_ENDPOINT || "http://localhost:8000/chat";
+      const aiEndpoint = import.meta.env.PUBLIC_AI_CHAT_ENDPOINT;
+      if (!aiEndpoint) {
+        throw new Error(
+          "Ask AI is not configured for this deployment. Set PUBLIC_AI_CHAT_ENDPOINT to the approved AI service endpoint, then rebuild the site.",
+        );
+      }
       const apiResponse = await runAllsparxPrimeTask(inputPrompt, aiEndpoint);
 
       setSummary(apiResponse.summary);
