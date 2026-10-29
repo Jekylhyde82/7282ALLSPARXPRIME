@@ -30,8 +30,8 @@ jobs:
             console.error("FAIL: AI_CHAT_ENDPOINT is not an absolute URL.");
             process.exit(1);
           }
-          if (url.protocol !== "https:") {
-            console.error("FAIL: live verification requires an HTTPS endpoint.");
+          if (url.protocol !== "https:" || url.username || url.password || url.hash) {
+            console.error("FAIL: endpoint must use HTTPS and must not contain URL credentials or a fragment.");
             process.exit(1);
           }
 
@@ -40,6 +40,7 @@ jobs:
           try {
             const response = await fetch(url, {
               method: "POST",
+              redirect: "error",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 prompt: "SYPHON endpoint contract check. Return a short summary and an empty programs array."
@@ -52,11 +53,53 @@ jobs:
               process.exit(1);
             }
 
+            const contentType = response.headers.get("content-type") ?? "";
+            if (!contentType.toLowerCase().includes("application/json")) {
+              console.error("FAIL: endpoint did not declare a JSON content type.");
+              process.exit(1);
+            }
+
+            const declaredLength = Number(response.headers.get("content-length") ?? "0");
+            const maxBytes = 64 * 1024;
+            if (declaredLength > maxBytes) {
+              console.error("FAIL: endpoint response exceeded the 64 KiB safety limit.");
+              process.exit(1);
+            }
+
+            let text = "";
+            if (response.body) {
+              const reader = response.body.getReader();
+              const chunks = [];
+              let totalBytes = 0;
+              try {
+                while (true) {
+                  const { done, value } = await reader.read();
+                  if (done) break;
+                  totalBytes += value.byteLength;
+                  if (totalBytes > maxBytes) {
+                    await reader.cancel();
+                    console.error("FAIL: endpoint response exceeded the 64 KiB safety limit.");
+                    process.exit(1);
+                  }
+                  chunks.push(value);
+                }
+              } finally {
+                reader.releaseLock();
+              }
+              const combined = new Uint8Array(totalBytes);
+              let offset = 0;
+              for (const chunk of chunks) {
+                combined.set(chunk, offset);
+                offset += chunk.byteLength;
+              }
+              text = new TextDecoder("utf-8", { fatal: true }).decode(combined);
+            }
+
             let body;
             try {
-              body = await response.json();
+              body = JSON.parse(text);
             } catch {
-              console.error("FAIL: endpoint returned a non-JSON response.");
+              console.error("FAIL: endpoint returned invalid JSON or non-UTF-8 content.");
               process.exit(1);
             }
 
@@ -72,11 +115,11 @@ jobs:
                   )));
 
             if (!body || typeof body.summary !== "string" || !validPrograms) {
-              console.error("FAIL: JSON response does not match the Ask AI contract (summary string and optional programs array of title strings).");
+              console.error("FAIL: JSON response does not match the Ask AI response contract.");
               process.exit(1);
             }
 
-            console.log("PASS: live HTTPS endpoint responded successfully and its JSON matches the Ask AI response contract.");
+            console.log("PASS: live HTTPS endpoint responded successfully and its bounded JSON matches the Ask AI response contract.");
             console.log(`Validated summary field; ${(body.programs ?? []).length} program match(es) returned. Response text and endpoint URL were not logged.`);
           } catch (error) {
             if (controller.signal.aborted) {
