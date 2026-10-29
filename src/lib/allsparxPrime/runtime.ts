@@ -174,16 +174,8 @@ export async function runAllsparxPrimeTask(
       throw new Error(message);
     }
 
-    let body: unknown;
-    try {
-      // The timeout remains active while the response body is being read.
-      body = await readBoundedJson(response);
-    } catch {
-      if (controller.signal.aborted) {
-        throw new Error("The AI service timed out after 30 seconds. Please try again.");
-      }
-      throw new Error("The AI service returned an invalid JSON response.");
-    }
+    // Keep the timeout active while reading and validating the bounded response.
+    const body: unknown = await readBoundedJson(response);
 
     if (!isAssistantApiResponse(body)) {
       throw new Error("The AI service returned an invalid response format.");
