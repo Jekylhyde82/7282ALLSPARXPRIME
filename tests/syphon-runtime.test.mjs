@@ -184,3 +184,27 @@ test("does not expose provider-supplied error details to the client", async () =
     },
   );
 });
+
+test("rejects JSON-like but invalid media types such as application/jsonp", async () => {
+  globalThis.fetch = async () =>
+    new Response(JSON.stringify({ summary: "should not parse", programs: [] }), {
+      status: 200,
+      headers: { "content-type": "application/jsonp" },
+    });
+
+  await assert.rejects(
+    runAllsparxPrimeTask("find cloud credits", "https://example.com/ai"),
+    /did not return JSON/,
+  );
+});
+
+test("accepts a structured-suffix JSON media type", async () => {
+  globalThis.fetch = async () =>
+    new Response(JSON.stringify({ summary: "valid vendor JSON", programs: [] }), {
+      status: 200,
+      headers: { "content-type": "application/vnd.allsparx+json; charset=utf-8" },
+    });
+
+  const result = await runAllsparxPrimeTask("find cloud credits", "https://example.com/ai");
+  assert.equal(result.summary, "valid vendor JSON");
+});
