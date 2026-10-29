@@ -76,18 +76,9 @@ export async function runAllsparxPrimeTask(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-ALLSPARX-REQUEST-ID": requestId,
     },
-    body: JSON.stringify({
-      prompt: normalizedPrompt,
-      orchestration: {
-        engine: "ALLSPARX PRIME",
-        controller: "SYPHON",
-        protocolVersion: 1,
-        task: "startup-deal-recommendation",
-        requestId,
-      },
-    }),
+    // Keep the existing provider contract unchanged; orchestration is local.
+    body: JSON.stringify({ prompt: normalizedPrompt }),
   });
 
   if (!response.ok) {
