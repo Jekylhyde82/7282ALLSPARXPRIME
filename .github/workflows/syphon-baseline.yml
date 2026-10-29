@@ -37,6 +37,10 @@ jobs:
         id: install
         run: pnpm install --frozen-lockfile
 
+      - name: Run SYPHON runtime contract tests
+        id: syphon-tests
+        run: pnpm test:syphon
+
       - name: Run Astro type and content checks
         id: check
         run: pnpm check
