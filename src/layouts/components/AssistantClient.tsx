@@ -14,7 +14,7 @@ interface Program {
     max_value: number;
     value_type: string;
     currency: string;
-    status: string;
+    status: "Active" | "Discontinued" | "Beta" | "Upcoming";
     tags: string[];
     url: string;
     provider_slug: string;
