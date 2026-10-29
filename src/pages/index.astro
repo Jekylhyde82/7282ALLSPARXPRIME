@@ -110,8 +110,8 @@ const canonical = getCanonicalFromAstroURL(Astro.url);
             <motion.div
               client:load
               key={program.id}
-              class="relative"
-              style={`top: ${index % 3 === 0 ? "0" : index % 3 === 1 ? "1rem" : "-1rem"};`}
+              className="relative"
+              style={{ top: index % 3 === 0 ? "0" : index % 3 === 1 ? "1rem" : "-1rem" }}
               initial={{
                 opacity: 0,
                 y: 50,

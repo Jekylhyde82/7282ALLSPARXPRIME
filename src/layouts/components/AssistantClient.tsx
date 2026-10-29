@@ -4,10 +4,14 @@ import ProgramCard from "./ProgramCard";
 import LoadingIndicator from "./LoadingIndicator";
 import StarCTADialog from "./StarCTADialog";
 import { useStarCTA } from "./useStarCTA";
+import {
+  runAllsparxPrimeTask,
+  type AllsparxTaskEvidence,
+} from "@/lib/allsparxPrime/runtime";
 
 interface Program {
   id: string;
-  slug: string;
+  slug?: string;
   collection: string;
   data: {
     title: string;
@@ -15,7 +19,7 @@ interface Program {
     max_value: number;
     value_type: string;
     currency: string;
-    status: string;
+    status: "Active" | "Discontinued" | "Beta" | "Upcoming";
     tags: string[];
     url: string;
     provider_slug: string;
@@ -27,14 +31,14 @@ interface Program {
 
 interface Provider {
   id: string;
-  slug: string;
+  slug?: string;
   collection: string;
   data: {
-    title: string;
+    title?: string;
     slug: string;
     color: string;
-    logo: string;
-    website: string;
+    logo?: string;
+    website?: string;
   };
 }
 
@@ -55,6 +59,8 @@ export default function AssistantClient({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [summary, setSummary] = useState("");
+  const [runtimeEvidence, setRuntimeEvidence] =
+    useState<AllsparxTaskEvidence | null>(null);
   const [matchedPrograms, setMatchedPrograms] = useState<Program[]>([]);
   const [prompt, setPrompt] = useState("");
   const [hasProcessedUrlPrompt, setHasProcessedUrlPrompt] = useState(false);
@@ -105,41 +111,19 @@ export default function AssistantClient({
     setIsLoading(true);
     setError("");
     setSummary("");
+    setRuntimeEvidence(null);
     setMatchedPrograms([]);
 
     try {
       const aiEndpoint =
         import.meta.env.PUBLIC_AI_CHAT_ENDPOINT || "http://localhost:8000/chat";
-      const response = await fetch(aiEndpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt: inputPrompt }),
-      });
-
-      if (!response.ok) {
-        let msg = `:/ AI can't handle this right now. Please try again later.`;
-        if (response.status >= 400 && response.status < 500) {
-          try {
-            const errData = await response.json();
-            if (errData && typeof errData.message === "string")
-              msg = errData.message;
-          } catch {}
-        }
-        throw new Error(msg);
-      }
-
-      const apiResponse: APIResponse = await response.json();
-
-      if (!apiResponse || typeof apiResponse.summary !== "string") {
-        throw new Error("Invalid API response format");
-      }
+      const apiResponse = await runAllsparxPrimeTask(inputPrompt, aiEndpoint);
 
       setSummary(apiResponse.summary);
+      setRuntimeEvidence(apiResponse.evidence);
 
       // Find programs by title from the collection
-      if (apiResponse.programs && Array.isArray(apiResponse.programs)) {
+      if (apiResponse.programs.length > 0) {
         const matched = apiResponse.programs
           .map((program: { title: string }) => {
             return allPrograms.find((p) => p.data.title === program.title);
@@ -241,6 +225,17 @@ export default function AssistantClient({
                     }}
                   />
                 </div>
+              )}
+
+              {runtimeEvidence && (
+                <p
+                  className="mb-6 text-center text-xs text-gray-500 dark:text-gray-400"
+                  role="status"
+                  data-syphon-evidence
+                >
+                  ALLSPARX PRIME · SYPHON task {runtimeEvidence.status.toLowerCase()} ·
+                  request {runtimeEvidence.requestId} · independent verification pending
+                </p>
               )}
 
               {/* Programs - Full width grid */}

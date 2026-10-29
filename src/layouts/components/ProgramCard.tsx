@@ -6,7 +6,7 @@ import { slugify } from "@/lib/utils/textConverter";
 
 interface Program {
   id: string;
-  slug: string;
+  slug?: string;
   collection: string;
   data: {
     title: string;
@@ -14,7 +14,7 @@ interface Program {
     max_value: number;
     value_type: string;
     currency: string;
-    status: string;
+    status: "Active" | "Discontinued" | "Beta" | "Upcoming";
     tags: string[];
     url: string;
     provider_slug: string;
@@ -26,14 +26,14 @@ interface Program {
 
 interface Provider {
   id: string;
-  slug: string;
+  slug?: string;
   collection: string;
   data: {
-    title: string;
+    title?: string;
     slug: string;
     color: string;
-    logo: string;
-    website: string;
+    logo?: string;
+    website?: string;
   };
 }
 
@@ -131,7 +131,7 @@ export default function ProgramCard({ program, allProviders }: Props) {
               <div className="mt-2">
                 <span
                   className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                    status === "active"
+                    status === "Active"
                       ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                       : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
                   }`}
