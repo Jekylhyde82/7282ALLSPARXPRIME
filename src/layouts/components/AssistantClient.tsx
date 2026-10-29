@@ -7,7 +7,7 @@ import { useStarCTA } from "./useStarCTA";
 
 interface Program {
   id: string;
-  slug: string;
+  slug?: string;
   collection: string;
   data: {
     title: string;
@@ -15,7 +15,7 @@ interface Program {
     max_value: number;
     value_type: string;
     currency: string;
-    status: string;
+    status: "Active" | "Discontinued" | "Beta" | "Upcoming";
     tags: string[];
     url: string;
     provider_slug: string;
@@ -30,11 +30,11 @@ interface Provider {
   slug: string;
   collection: string;
   data: {
-    title: string;
+    title?: string;
     slug: string;
     color: string;
-    logo: string;
-    website: string;
+    logo?: string;
+    website?: string;
   };
 }
 
