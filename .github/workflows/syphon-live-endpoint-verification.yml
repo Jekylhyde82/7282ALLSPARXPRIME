@@ -54,8 +54,12 @@ jobs:
             }
 
             const contentType = response.headers.get("content-type") ?? "";
-            if (!contentType.toLowerCase().includes("application/json")) {
-              console.error("FAIL: endpoint did not declare a JSON content type.");
+            const mediaType = contentType.split(";")[0].trim().toLowerCase();
+            if (
+              mediaType !== "application/json" &&
+              !/^application\/[a-z0-9.+-]+\+json$/.test(mediaType)
+            ) {
+              console.error("FAIL: endpoint did not declare a valid JSON media type.");
               process.exit(1);
             }
 
