@@ -6,8 +6,7 @@ import { slugify } from "@/lib/utils/textConverter";
 
 interface Program {
   id: string;
-  slug: string;
-  collection: string;
+  collection: "programs";
   data: {
     title: string;
     intro: string;
@@ -26,8 +25,7 @@ interface Program {
 
 interface Provider {
   id: string;
-  slug: string;
-  collection: string;
+  collection: "providers";
   data: {
     title: string;
     slug: string;
