@@ -15,7 +15,8 @@ Use the ELITE UNIFIED EVOLVED UNIVERSAL FUSION SYNERGY ARCHITECTURE / ALLSPARX P
 - `package.json` identifies the package as `cloudcredits.io`; scripts include `dev`, `build`, `preview`, `check`, and `format`.
 - `AGENTS.md` documents a specific provider/program content-update workflow using `scripts/scrape-clean-text.js` and a `BROWSERLESS_API_KEY` environment variable.
 - The build script runs Astro, Pagefind, and copies generated Pagefind assets into `public/`.
-- A source inspection alone does not establish that dependencies install, tests pass, or a production build succeeds. Capture a clean baseline before changing runtime code.
+- A source inspection alone does not establish that checks pass. The first GitHub Actions run installed the locked dependencies successfully, then `pnpm check` failed with **18 errors, 0 warnings, and 64 hints across 87 files**. The production build was initially skipped because the check step failed; the workflow now runs the build independently after a successful install so its result can also be captured.
+- Initial diagnostic examples include a status-type mismatch in `src/layouts/components/ProgramCard.tsx`, a conflicting `Logo` import in `src/layouts/components/Logo.astro`, logo-existence checks that TypeScript reports as always true in the card components, a `draft` property mismatch in `src/lib/contentParser.astro`, a motion-style type mismatch in `src/pages/index.astro`, implicit `tool` types in two startup pages, and missing `slug` properties in `src/pages/deals/assistant.astro`. These are baseline findings from files outside this PR's intended integration scope; no unrelated application code has been changed.
 
 ## Proposed integration boundary
 
@@ -54,4 +55,4 @@ Record evidence for each result. Use these statuses accurately: **PLANNED / IMPL
 
 ## Immediate next action
 
-Audit the source tree and CI/deployment workflows, then run the existing checks to establish a baseline. Do not claim a functional ALLSPARX PRIME integration until a specific implementation is made and independently verified.
+Continue the source-tree audit and capture the production-build result. Triage the existing Astro/type-check failures as a separate, reviewable baseline-repair scope before implementing runtime integration. Do not claim a functional ALLSPARX PRIME integration until a specific implementation is made and independently verified.
