@@ -59,7 +59,14 @@ const MAX_RESPONSE_BYTES = 64 * 1024;
 
 async function readBoundedJson(response: Response): Promise<unknown> {
   const contentType = response.headers.get("content-type") ?? "";
+  const mediaType = contentType.split(";")[0].trim().toLowerCase();
+  if (
+    mediaType !== "application/json" &&
+    !/^application\/[a-z0-9!#  const contentType = response.headers.get("content-type") ?? "";
   if (!contentType.toLowerCase().includes("application/json")) {
+    throw new Error("The AI service did not return JSON.");
+  }^_.+-]+\+json$/.test(mediaType)
+  ) {
     throw new Error("The AI service did not return JSON.");
   }
 
