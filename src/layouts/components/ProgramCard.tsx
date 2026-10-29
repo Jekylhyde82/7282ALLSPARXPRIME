@@ -26,7 +26,7 @@ interface Program {
 
 interface Provider {
   id: string;
-  slug: string;
+  slug?: string;
   collection: string;
   data: {
     title?: string;
