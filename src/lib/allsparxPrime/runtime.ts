@@ -2,7 +2,7 @@
  * ALLSPARX PRIME runtime adapter for CloudCredits.io's Ask AI workflow.
  *
  * This is a local orchestration boundary, not a claim that a remote ALLSPARX
- * PRIME service is connected. The existing AI endpoint remains the execution
+ * PRIME service is connected. The configured AI endpoint remains the execution
  * provider until a separately authenticated service contract is configured.
  */
 
@@ -57,7 +57,7 @@ function isAssistantApiResponse(value: unknown): value is AssistantApiResponse {
 
 /**
  * Run one bounded Ask AI task through the ALLSPARX PRIME/SYPHON adapter.
- * The adapter validates the provider response and emits an evidence envelope.
+ * Provider response validation is not independent verification of its claims.
  */
 export async function runAllsparxPrimeTask(
   prompt: string,
@@ -67,19 +67,46 @@ export async function runAllsparxPrimeTask(
   if (!normalizedPrompt) {
     throw new Error("Enter a request before starting an ALLSPARX PRIME task.");
   }
-  if (!endpoint || !/^https?:\/\//i.test(endpoint)) {
+  if (normalizedPrompt.length > 500) {
+    throw new Error("Requests must be 500 characters or fewer.");
+  }
+
+  let endpointUrl: URL;
+  try {
+    endpointUrl = new URL(endpoint);
+  } catch {
     throw new Error("The Ask AI endpoint must be an absolute HTTP(S) URL.");
+  }
+  if (
+    endpointUrl.protocol !== "http:" &&
+    endpointUrl.protocol !== "https:"
+  ) {
+    throw new Error("The Ask AI endpoint must use HTTP or HTTPS.");
   }
 
   const requestId = createRequestId();
-  const response = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    // Keep the existing provider contract unchanged; orchestration is local.
-    body: JSON.stringify({ prompt: normalizedPrompt }),
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30_000);
+  let response: Response;
+
+  try {
+    response = await fetch(endpointUrl.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      signal: controller.signal,
+      // Preserve the existing provider request contract.
+      body: JSON.stringify({ prompt: normalizedPrompt }),
+    });
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new Error("The AI service timed out after 30 seconds. Please try again.");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
 
   if (!response.ok) {
     let message = "The AI service could not complete this request.";
@@ -100,7 +127,12 @@ export async function runAllsparxPrimeTask(
     throw new Error(message);
   }
 
-  const body: unknown = await response.json();
+  let body: unknown;
+  try {
+    body = await response.json();
+  } catch {
+    throw new Error("The AI service returned an invalid JSON response.");
+  }
   if (!isAssistantApiResponse(body)) {
     throw new Error("The AI service returned an invalid response format.");
   }
@@ -117,7 +149,7 @@ export async function runAllsparxPrimeTask(
       provider: "configured-ai-endpoint",
       verified: false,
       verificationNote:
-        "Provider response validated; downstream recommendation accuracy and durable evidence have not been independently verified.",
+        "Provider response validated; recommendation accuracy, downstream outcomes, and durable evidence have not been independently verified.",
     },
   };
 }
