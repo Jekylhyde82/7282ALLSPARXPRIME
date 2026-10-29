@@ -222,12 +222,12 @@ export default function AssistantClient({
                   className="mb-10 prose prose-lg dark:prose-invert max-w-5xl mx-auto bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 dark:border-gray-700/50"
                   data-summary
                 >
-                  <div
+                  <p
                     id="summary-container"
-                    dangerouslySetInnerHTML={{
-                      __html: summary.replace(/\n/g, "<br>"),
-                    }}
-                  />
+                    className="whitespace-pre-wrap break-words"
+                  >
+                    {summary}
+                  </p>
                 </div>
               )}
 
