@@ -1,7 +1,7 @@
 ---
 import config from "@/config/config.json";
 import ImageMod from "./ImageMod.astro";
-import { Logo } from "./Logo";
+import { Logo as LogoComponent } from "./Logo";
 
 const { src, srcDarkmode }: { src?: string; srcDarkmode?: string } =
   Astro.props;
@@ -27,7 +27,7 @@ const { theme_switcher }: { theme_switcher: boolean } = config.settings;
 <a href="/" class="navbar-brand group inline-flex items-center">
   {
     src || srcDarkmode || logo || logo_darkmode ? (
-      <Logo
+      <LogoComponent
         client:load
         src={src ? src : logo}
         srcDarkmode={srcDarkmode ? srcDarkmode : logo_darkmode}
