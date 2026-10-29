@@ -2,9 +2,9 @@ name: SYPHON baseline checks
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, syphon/allsparx-prime-integration-plan]
   push:
-    branches: [syphon/allsparx-prime-integration-plan]
+    branches: [syphon/allsparx-prime-integration-plan, syphon/codex-runtime-integration]
 
 permissions:
   contents: read
