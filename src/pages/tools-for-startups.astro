@@ -357,7 +357,7 @@ const canonical = getCanonicalFromAstroURL(Astro.url);
                         {category}
                       </h4>
                       <div class="space-y-2">
-                        {tools.map((tool) => (
+                        {tools.map((tool: string) => (
                           <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
                             <span class="w-1.5 h-1.5 bg-primary rounded-full mr-2" />
                             {tool}
