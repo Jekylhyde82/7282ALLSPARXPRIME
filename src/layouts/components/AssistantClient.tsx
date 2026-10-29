@@ -4,7 +4,10 @@ import ProgramCard from "./ProgramCard";
 import LoadingIndicator from "./LoadingIndicator";
 import StarCTADialog from "./StarCTADialog";
 import { useStarCTA } from "./useStarCTA";
-import { runAllsparxPrimeTask } from "@/lib/allsparxPrime/runtime";
+import {
+  runAllsparxPrimeTask,
+  type AllsparxTaskEvidence,
+} from "@/lib/allsparxPrime/runtime";
 
 interface Program {
   id: string;
@@ -56,6 +59,8 @@ export default function AssistantClient({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [summary, setSummary] = useState("");
+  const [runtimeEvidence, setRuntimeEvidence] =
+    useState<AllsparxTaskEvidence | null>(null);
   const [matchedPrograms, setMatchedPrograms] = useState<Program[]>([]);
   const [prompt, setPrompt] = useState("");
   const [hasProcessedUrlPrompt, setHasProcessedUrlPrompt] = useState(false);
@@ -106,6 +111,7 @@ export default function AssistantClient({
     setIsLoading(true);
     setError("");
     setSummary("");
+    setRuntimeEvidence(null);
     setMatchedPrograms([]);
 
     try {
@@ -114,6 +120,7 @@ export default function AssistantClient({
       const apiResponse = await runAllsparxPrimeTask(inputPrompt, aiEndpoint);
 
       setSummary(apiResponse.summary);
+      setRuntimeEvidence(apiResponse.evidence);
 
       // Find programs by title from the collection
       if (apiResponse.programs.length > 0) {
@@ -218,6 +225,17 @@ export default function AssistantClient({
                     }}
                   />
                 </div>
+              )}
+
+              {runtimeEvidence && (
+                <p
+                  className="mb-6 text-center text-xs text-gray-500 dark:text-gray-400"
+                  role="status"
+                  data-syphon-evidence
+                >
+                  ALLSPARX PRIME · SYPHON task {runtimeEvidence.status.toLowerCase()} ·
+                  request {runtimeEvidence.requestId} · independent verification pending
+                </p>
               )}
 
               {/* Programs - Full width grid */}
