@@ -192,7 +192,7 @@ const canonical = getCanonicalFromAstroURL(Astro.url);
                   Popular Tools:
                 </h4>
                 <div class="flex flex-wrap gap-1">
-                  {cat.tools.slice(0, 3).map((tool) => (
+                  {cat.tools.slice(0, 3).map((tool: string) => (
                     <span class="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-gray-600 dark:text-gray-400">
                       {tool}
                     </span>
