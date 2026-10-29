@@ -11,7 +11,7 @@ export interface AllsparxTaskEvidence {
   engine: "ALLSPARX PRIME";
   controller: "SYPHON";
   task: "startup-deal-recommendation";
-  status: "COMPLETED";
+  status: "PROVIDER_RESPONSE_VALIDATED";
   provider: "configured-ai-endpoint";
   verified: false;
   verificationNote: string;
@@ -113,7 +113,7 @@ export async function runAllsparxPrimeTask(
       engine: "ALLSPARX PRIME",
       controller: "SYPHON",
       task: "startup-deal-recommendation",
-      status: "COMPLETED",
+      status: "PROVIDER_RESPONSE_VALIDATED",
       provider: "configured-ai-endpoint",
       verified: false,
       verificationNote:

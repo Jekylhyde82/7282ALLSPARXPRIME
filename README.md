@@ -74,7 +74,15 @@ pnpm dev
 
 This starts the development server at `http://localhost:4321` (or another available port).
 
-### Building for Production
+### ALLSPARX PRIME / SYPHON runtime configuration
+
+The Ask AI interface uses the local SYPHON adapter at `src/lib/allsparxPrime/runtime.ts`. It preserves the existing provider request contract (`POST` with `{ "prompt": "..." }`) and expects a JSON response containing a string `summary` and an optional `programs` array of objects with string `title` values.
+
+Configure `PUBLIC_AI_CHAT_ENDPOINT` in the build environment to the approved, reachable HTTP(S) endpoint before building or deploying. The application deliberately does not fall back to `localhost`, which would point visitors at their own devices. Because `PUBLIC_` variables are bundled into browser code, never put API keys, bearer tokens, or other credentials in this variable. If the provider requires secrets, route requests through an authenticated server-side proxy and keep credentials in server-only environment variables.
+
+The UI reports provider-response validation separately from independent task verification. A valid JSON response is not proof of recommendation accuracy, successful outcomes, or durable audit storage. Remote ALLSPARX PRIME connectivity remains unverified until a real endpoint is configured and tested.
+
+## Building for Production
 
 ```bash
 # Build the site
