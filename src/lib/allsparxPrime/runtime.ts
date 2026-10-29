@@ -87,10 +87,9 @@ export async function runAllsparxPrimeTask(
   const requestId = createRequestId();
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 30_000);
-  let response: Response;
 
   try {
-    response = await fetch(endpointUrl.toString(), {
+    const response = await fetch(endpointUrl.toString(), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -99,6 +98,56 @@ export async function runAllsparxPrimeTask(
       // Preserve the existing provider request contract.
       body: JSON.stringify({ prompt: normalizedPrompt }),
     });
+
+    if (!response.ok) {
+      let message = "The AI service could not complete this request.";
+      if (response.status >= 400 && response.status < 500) {
+        try {
+          const errorBody: unknown = await response.json();
+          if (
+            typeof errorBody === "object" &&
+            errorBody !== null &&
+            typeof (errorBody as Record<string, unknown>).message === "string"
+          ) {
+            message = (errorBody as Record<string, string>).message;
+          }
+        } catch {
+          // Keep the safe default when the service does not return JSON.
+        }
+      }
+      throw new Error(message);
+    }
+
+    let body: unknown;
+    try {
+      // The timeout remains active while the response body is being read.
+      body = await response.json();
+    } catch {
+      if (controller.signal.aborted) {
+        throw new Error("The AI service timed out after 30 seconds. Please try again.");
+      }
+      throw new Error("The AI service returned an invalid JSON response.");
+    }
+
+    if (!isAssistantApiResponse(body)) {
+      throw new Error("The AI service returned an invalid response format.");
+    }
+
+    return {
+      summary: body.summary,
+      programs: body.programs ?? [],
+      evidence: {
+        requestId,
+        engine: "ALLSPARX PRIME",
+        controller: "SYPHON",
+        task: "startup-deal-recommendation",
+        status: "PROVIDER_RESPONSE_VALIDATED",
+        provider: "configured-ai-endpoint",
+        verified: false,
+        verificationNote:
+          "Provider response validated; recommendation accuracy, downstream outcomes, and durable evidence have not been independently verified.",
+      },
+    };
   } catch (error) {
     if (controller.signal.aborted) {
       throw new Error("The AI service timed out after 30 seconds. Please try again.");
@@ -107,49 +156,4 @@ export async function runAllsparxPrimeTask(
   } finally {
     clearTimeout(timeout);
   }
-
-  if (!response.ok) {
-    let message = "The AI service could not complete this request.";
-    if (response.status >= 400 && response.status < 500) {
-      try {
-        const body: unknown = await response.json();
-        if (
-          typeof body === "object" &&
-          body !== null &&
-          typeof (body as Record<string, unknown>).message === "string"
-        ) {
-          message = (body as Record<string, string>).message;
-        }
-      } catch {
-        // Keep the safe default when the service does not return JSON.
-      }
-    }
-    throw new Error(message);
-  }
-
-  let body: unknown;
-  try {
-    body = await response.json();
-  } catch {
-    throw new Error("The AI service returned an invalid JSON response.");
-  }
-  if (!isAssistantApiResponse(body)) {
-    throw new Error("The AI service returned an invalid response format.");
-  }
-
-  return {
-    summary: body.summary,
-    programs: body.programs ?? [],
-    evidence: {
-      requestId,
-      engine: "ALLSPARX PRIME",
-      controller: "SYPHON",
-      task: "startup-deal-recommendation",
-      status: "PROVIDER_RESPONSE_VALIDATED",
-      provider: "configured-ai-endpoint",
-      verified: false,
-      verificationNote:
-        "Provider response validated; recommendation accuracy, downstream outcomes, and durable evidence have not been independently verified.",
-    },
-  };
 }
