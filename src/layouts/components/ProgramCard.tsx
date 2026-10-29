@@ -131,7 +131,7 @@ export default function ProgramCard({ program, allProviders }: Props) {
               <div className="mt-2">
                 <span
                   className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                    status === "active"
+                    status === "Active"
                       ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                       : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
                   }`}
