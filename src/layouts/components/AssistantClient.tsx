@@ -4,6 +4,7 @@ import ProgramCard from "./ProgramCard";
 import LoadingIndicator from "./LoadingIndicator";
 import StarCTADialog from "./StarCTADialog";
 import { useStarCTA } from "./useStarCTA";
+import { runAllsparxPrimeTask } from "@/lib/allsparxPrime/runtime";
 
 interface Program {
   id: string;
@@ -110,36 +111,12 @@ export default function AssistantClient({
     try {
       const aiEndpoint =
         import.meta.env.PUBLIC_AI_CHAT_ENDPOINT || "http://localhost:8000/chat";
-      const response = await fetch(aiEndpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt: inputPrompt }),
-      });
-
-      if (!response.ok) {
-        let msg = `:/ AI can't handle this right now. Please try again later.`;
-        if (response.status >= 400 && response.status < 500) {
-          try {
-            const errData = await response.json();
-            if (errData && typeof errData.message === "string")
-              msg = errData.message;
-          } catch {}
-        }
-        throw new Error(msg);
-      }
-
-      const apiResponse: APIResponse = await response.json();
-
-      if (!apiResponse || typeof apiResponse.summary !== "string") {
-        throw new Error("Invalid API response format");
-      }
+      const apiResponse = await runAllsparxPrimeTask(inputPrompt, aiEndpoint);
 
       setSummary(apiResponse.summary);
 
       // Find programs by title from the collection
-      if (apiResponse.programs && Array.isArray(apiResponse.programs)) {
+      if (apiResponse.programs.length > 0) {
         const matched = apiResponse.programs
           .map((program: { title: string }) => {
             return allPrograms.find((p) => p.data.title === program.title);
