@@ -156,22 +156,9 @@ export async function runAllsparxPrimeTask(
     });
 
     if (!response.ok) {
-      let message = "The AI service could not complete this request.";
-      if (response.status >= 400 && response.status < 500) {
-        try {
-          const errorBody: unknown = await readBoundedJson(response);
-          if (
-            typeof errorBody === "object" &&
-            errorBody !== null &&
-            typeof (errorBody as Record<string, unknown>).message === "string"
-          ) {
-            message = (errorBody as Record<string, string>).message;
-          }
-        } catch {
-          // Keep the safe default when the service does not return JSON.
-        }
-      }
-      throw new Error(message);
+      // Do not expose arbitrary provider error bodies to the client. They may
+      // contain internal details, credentials, or reflected request content.
+      throw new Error("The AI service could not complete this request.");
     }
 
     // Keep the timeout active while reading and validating the bounded response.
