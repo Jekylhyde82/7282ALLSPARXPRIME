@@ -55,6 +55,58 @@ function isAssistantApiResponse(value: unknown): value is AssistantApiResponse {
   );
 }
 
+const MAX_RESPONSE_BYTES = 64 * 1024;
+
+async function readBoundedJson(response: Response): Promise<unknown> {
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.toLowerCase().includes("application/json")) {
+    throw new Error("The AI service did not return JSON.");
+  }
+
+  const declaredLength = response.headers.get("content-length");
+  if (declaredLength !== null) {
+    const length = Number(declaredLength);
+    if (Number.isFinite(length) && length > MAX_RESPONSE_BYTES) {
+      throw new Error("The AI service response exceeded the 64 KiB safety limit.");
+    }
+  }
+
+  if (!response.body) {
+    throw new Error("The AI service returned an empty response.");
+  }
+
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      totalBytes += value.byteLength;
+      if (totalBytes > MAX_RESPONSE_BYTES) {
+        await reader.cancel();
+        throw new Error("The AI service response exceeded the 64 KiB safety limit.");
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  const bytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  try {
+    return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
+  } catch {
+    throw new Error("The AI service returned invalid JSON or non-UTF-8 content.");
+  }
+}
+
 /**
  * Run one bounded Ask AI task through the ALLSPARX PRIME/SYPHON adapter.
  * Provider response validation is not independent verification of its claims.
@@ -77,11 +129,14 @@ export async function runAllsparxPrimeTask(
   } catch {
     throw new Error("The Ask AI endpoint must be an absolute HTTP(S) URL.");
   }
-  if (
-    endpointUrl.protocol !== "http:" &&
-    endpointUrl.protocol !== "https:"
-  ) {
-    throw new Error("The Ask AI endpoint must use HTTP or HTTPS.");
+  const isLocalHttp =
+    endpointUrl.protocol === "http:" &&
+    ["localhost", "127.0.0.1", "[::1]"].includes(endpointUrl.hostname);
+  if (endpointUrl.protocol !== "https:" && !isLocalHttp) {
+    throw new Error("The Ask AI endpoint must use HTTPS (HTTP is allowed only for localhost development).");
+  }
+  if (endpointUrl.username || endpointUrl.password || endpointUrl.hash) {
+    throw new Error("The Ask AI endpoint must not contain URL credentials or a fragment.");
   }
 
   const requestId = createRequestId();
@@ -91,6 +146,7 @@ export async function runAllsparxPrimeTask(
   try {
     const response = await fetch(endpointUrl.toString(), {
       method: "POST",
+      redirect: "error",
       headers: {
         "Content-Type": "application/json",
       },
@@ -103,7 +159,7 @@ export async function runAllsparxPrimeTask(
       let message = "The AI service could not complete this request.";
       if (response.status >= 400 && response.status < 500) {
         try {
-          const errorBody: unknown = await response.json();
+          const errorBody: unknown = await readBoundedJson(response);
           if (
             typeof errorBody === "object" &&
             errorBody !== null &&
@@ -121,7 +177,7 @@ export async function runAllsparxPrimeTask(
     let body: unknown;
     try {
       // The timeout remains active while the response body is being read.
-      body = await response.json();
+      body = await readBoundedJson(response);
     } catch {
       if (controller.signal.aborted) {
         throw new Error("The AI service timed out after 30 seconds. Please try again.");
