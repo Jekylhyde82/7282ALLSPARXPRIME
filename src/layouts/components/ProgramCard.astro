@@ -56,9 +56,9 @@ const miniSvgImages = import.meta.glob("/public/images/providers/*.mini.svg");
 const svgImages = import.meta.glob("/public/images/providers/*.svg");
 const pngImages = import.meta.glob("/public/images/providers/*.png");
 
-const miniSvgExists = miniSvgImages[`/public${miniSvgLogo}`];
-const svgExists = svgImages[`/public${svgLogo}`];
-const pngExists = pngImages[`/public${pngLogo}`];
+const miniSvgExists = Object.prototype.hasOwnProperty.call(miniSvgImages, `/public${miniSvgLogo}`);
+const svgExists = Object.prototype.hasOwnProperty.call(svgImages, `/public${svgLogo}`);
+const pngExists = Object.prototype.hasOwnProperty.call(pngImages, `/public${pngLogo}`);
 
 const logo = miniSvgExists
   ? miniSvgLogo
