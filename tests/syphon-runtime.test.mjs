@@ -166,3 +166,21 @@ test("allows localhost HTTP for development", async () => {
   const result = await runAllsparxPrimeTask("test local", "http://localhost:4321/ai");
   assert.equal(result.summary, "local ok");
 });
+
+test("does not expose provider-supplied error details to the client", async () => {
+  globalThis.fetch = async () =>
+    jsonResponse(
+      { message: "internal-token=secret; stack trace and private upstream detail" },
+      { status: 400 },
+    );
+
+  await assert.rejects(
+    runAllsparxPrimeTask("find cloud credits", "https://example.com/ai"),
+    (error) => {
+      assert.equal(error.message, "The AI service could not complete this request.");
+      assert.equal(error.message.includes("secret"), false);
+      assert.equal(error.message.includes("stack trace"), false);
+      return true;
+    },
+  );
+});
