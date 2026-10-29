@@ -13,7 +13,8 @@
     "build:local": "pnpm run clean:pagefind && pnpm run build",
     "clean:pagefind": "rm -rf public/pagefind",
     "check": "astro check",
-    "format": "prettier -w ./src"
+    "format": "prettier -w ./src",
+    "test:syphon": "node --test tests/syphon-runtime.test.mjs"
   },
   "dependencies": {
     "@astrojs/check": "0.9.4",
