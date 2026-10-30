@@ -48,6 +48,9 @@ function env(overrides = {}) {
     SPEND_BUDGET: stubNamespace(),
     EVIDENCE_LEDGER: stubNamespace(async () => Response.json({ stored: true }, { status: 201 })),
     EVIDENCE_HMAC_KEY: "test-evidence-hmac-key",
+    OPENAI_MODEL: "test-openai-model",
+    ANTHROPIC_MODEL: "test-anthropic-model",
+    GOOGLE_MODEL: "test-google-model",
     TURNSTILE_SECRET_KEY: "test-secret",
     ...overrides,
   };
@@ -142,6 +145,14 @@ test("does not reserve budget when the requested provider is unavailable", async
   assert.equal(response.status, 503);
   assert.equal(reservations, 0);
 });
+test("does not treat an API key without an explicit model ID as a configured provider", async () => {
+  const response = await worker.fetch(request("/v1/ask", {
+    body: JSON.stringify({ prompt: "x", task: "startup-deal-recommendation", provider: "openai", contractVersion: 1 }),
+  }), env({ OPENAI_API_KEY: "test-openai-key", OPENAI_MODEL: undefined }));
+  assert.equal(response.status, 503);
+  assert.deepEqual(await response.json(), { error: "PROVIDER_UNAVAILABLE" });
+});
+
 test("does not route local Ollama through the public Worker", async () => {
   const response = await worker.fetch(request("/v1/ask", {
     body: JSON.stringify({ prompt: "x", task: "startup-deal-recommendation", provider: "ollama", contractVersion: 1 }),
