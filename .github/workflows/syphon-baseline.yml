@@ -40,6 +40,9 @@ jobs:
       - name: Run capability manifest schema validation tests
         id: capability-manifest-validation-tests
         run: pnpm test:capability-manifest-validation
+      - name: Run read-only capability discovery tests
+        id: capability-discovery-tests
+        run: pnpm test:capability-discovery
       - name: Run source repository inventory contract tests
         id: source-repository-record-tests
         run: pnpm test:source-repository-record
