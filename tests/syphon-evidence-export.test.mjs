@@ -79,3 +79,27 @@ test("offline verifier rejects non-canonical or invalid month metadata", () => {
   bundle.records[0].timestamp = "not-a-timestamp";
   assert.throws(() => verifyEvidenceExport(bundle, checkpoint), /LEDGER_MONTH_MISMATCH/);
 });
+
+
+function reseal(record) {
+  const { eventHash, ...payload } = record;
+  record.eventHash = createHash("sha256").update(JSON.stringify(payload)).digest("hex");
+}
+
+test("offline verifier rejects semantically invalid records even when their hashes are recomputed", () => {
+  const mutations = [
+    (record) => { record.status = "PROVIDER_RESPONSE_RETURNED"; },
+    (record) => { record.actor.origin = "https://user@cloudcredits.io"; },
+    (record) => { record.provenance.deploymentId = "invalid deployment id"; },
+    (record) => { record.provider = "ollama"; },
+    (record) => { record.operationId = "not-a-uuid"; },
+    (record) => { record.outcomeCode = "not-canonical"; },
+  ];
+
+  for (const mutate of mutations) {
+    const { bundle, checkpoint } = fixture();
+    mutate(bundle.records[0]);
+    reseal(bundle.records[0]);
+    assert.throws(() => verifyEvidenceExport(bundle, checkpoint), /INVALID_RECORD_CONTENT/);
+  }
+});
