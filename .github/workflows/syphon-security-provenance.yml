@@ -38,6 +38,11 @@ jobs:
           node-version: '20'
           cache: pnpm
 
+      - name: Install and run GitHub Actions security policy analyzer
+        run: |
+          cargo install zizmor --locked
+          zizmor .github/workflows
+
       - name: Scan repository history for exposed secrets
         run: |
           docker run --rm -v "$PWD:/path" zricethezav/gitleaks:v8.24.2 detect \
