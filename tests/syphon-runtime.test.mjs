@@ -8,7 +8,8 @@ const compiled = ts.transpileModule(source, {
   compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext },
 }).outputText;
 const runtimeUrl = `data:text/javascript;base64,${Buffer.from(compiled).toString("base64")}`;
-const { runAllsparxPrimeTask } = await import(runtimeUrl);
+const { runAllsparxPrimeTask: runRuntime } = await import(runtimeUrl);
+const runAllsparxPrimeTask = (...args) => runRuntime(args[0], args[1], args[2] ?? "auto", "test-access-token", args[3] ?? []);
 const originalFetch = globalThis.fetch;
 afterEach(() => { globalThis.fetch = originalFetch; });
 function jsonResponse(body, init = {}) {
@@ -33,8 +34,9 @@ test("sends one POST, rejects redirects, and accepts valid bounded JSON", async 
   const result = await runAllsparxPrimeTask("find credits", "https://example.com/ai");
   assert.equal(captured.method, "POST");
   assert.equal(captured.redirect, "error");
+  assert.equal(captured.headers.Authorization, "Bearer test-access-token");
   assert.deepEqual(JSON.parse(captured.body), {
-    prompt: "find credits", task: "startup-deal-recommendation", provider: "auto", contractVersion: 1,
+    prompt: "find credits", task: "startup-deal-recommendation", provider: "auto", contractVersion: 1, catalog: [],
   });
   assert.equal(result.summary, "Found.");
   assert.deepEqual(result.programs, [{ title: "Starter" }]);
@@ -133,4 +135,11 @@ test("rejects JSON-like but invalid media types", async () => {
 test("accepts a structured-suffix JSON media type", async () => {
   globalThis.fetch = async () => new Response('{"summary":"vendor JSON","programs":[]}', { headers: { "content-type": "application/vnd.allsparx+json; charset=utf-8" } });
   assert.equal((await runAllsparxPrimeTask("find credits", "https://example.com/ai")).summary, "vendor JSON");
+});
+
+test("requires an access token before sending a gateway request", async () => {
+  let called = false;
+  globalThis.fetch = async () => { called = true; return jsonResponse({ summary: "unexpected" }); };
+  await assert.rejects(runRuntime("find credits", "https://gateway.example/v1/ask", "auto", ""), /Sign in before/);
+  assert.equal(called, false);
 });
