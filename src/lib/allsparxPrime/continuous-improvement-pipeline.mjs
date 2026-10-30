@@ -46,6 +46,8 @@ export async function runContinuousImprovementCycle({
   for (const discoveredCandidate of discovered) {
     const identity = discoveredCandidate?.candidate_id ?? null;
     let outcome;
+    let mergeAttempted = false;
+    let confirmedMerge = null;
     try {
       const inspected = await adapters.inspect(discoveredCandidate);
       if (!inspected || typeof inspected !== "object" || Array.isArray(inspected)) {
@@ -83,6 +85,7 @@ export async function runContinuousImprovementCycle({
               snapshot_status: "not_applicable",
             });
           } else {
+            mergeAttempted = true;
             const mergeResult = await adapters.merge({ inspected, prepared, verified, assessment });
             if (!mergeResult || mergeResult.merged !== true ||
                 !/^[a-f0-9]{40}$/.test(mergeResult.merge_commit_sha ?? "") ||
@@ -98,6 +101,7 @@ export async function runContinuousImprovementCycle({
                 snapshot_status: "not_started",
               });
             } else {
+              confirmedMerge = mergeResult;
               const snapshot = await adapters.acquireSnapshot({
                 repository: mergeResult.repository,
                 mergeEvent: {
@@ -107,7 +111,10 @@ export async function runContinuousImprovementCycle({
                   pull_request_number: mergeResult.pull_request_number,
                   merge_commit_sha: mergeResult.merge_commit_sha,
                   source_commit_sha: mergeResult.source_commit_sha,
-                  license_decision: verified.candidate.source.license_decision,
+                  license_decision: {
+                    status: "approved",
+                    expression: verified.candidate.source.license_expression,
+                  },
                 },
               });
               const snapshotMatches = snapshot &&
@@ -133,10 +140,12 @@ export async function runContinuousImprovementCycle({
     } catch (error) {
       outcome = immutableOutcome({
         candidate_id: identity,
-        status: "error",
+        status: confirmedMerge ? "snapshot_failed" : mergeAttempted ? "merge_outcome_unknown" : "error",
         reason: typeof error?.code === "string" ? error.code : "PIPELINE_STEP_FAILED",
-        merged: false,
-        snapshot_status: "not_applicable",
+        merged: confirmedMerge ? true : mergeAttempted ? null : false,
+        merge_commit_sha: confirmedMerge?.merge_commit_sha ?? null,
+        source_commit_sha: confirmedMerge?.source_commit_sha ?? null,
+        snapshot_status: confirmedMerge ? "failed" : "not_applicable",
       });
     }
 
