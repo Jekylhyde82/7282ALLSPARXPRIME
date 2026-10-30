@@ -1,0 +1,27 @@
+description: "ALLSPARX PRIME deterministic evaluation baseline (no model calls)"
+prompts:
+  - |
+    ALLSPARX PRIME verification fixture
+    Task: {{task}}
+    Evidence state: {{evidence_state}}
+providers:
+  - echo
+tests:
+  - vars:
+      task: gateway-contract
+      evidence_state: VERIFIED
+    assert:
+      - type: contains
+        value: "ALLSPARX PRIME verification fixture"
+      - type: contains
+        value: "Task: gateway-contract"
+      - type: contains
+        value: "Evidence state: VERIFIED"
+  - vars:
+      task: deployment-readiness
+      evidence_state: PLANNED
+    assert:
+      - type: contains
+        value: "Task: deployment-readiness"
+      - type: contains
+        value: "Evidence state: PLANNED"
