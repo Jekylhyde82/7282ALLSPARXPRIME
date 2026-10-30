@@ -9,7 +9,8 @@ The Worker currently pins these API model IDs: OpenAI `gpt-6-luna`, Anthropic `c
 ## Request path
 
 - Browser: HTTPS POST to `/v1/ask`, with a one-time Cloudflare Turnstile token and request ID.
-- Worker: exact origin allowlist, bounded JSON input, Turnstile Siteverify hostname validation, per-IP Durable Object rate limit, provider allowlist, monthly admission reservation, bounded provider output, and normalized JSON response.
+- Worker: exact origin allowlist, bounded JSON input, Turnstile Siteverify hostname validation, per-IP Durable Object rate limit, provider allowlist, monthly admission reservation, bounded provider output, durable evidence append, and normalized JSON response.
+- Evidence: a separate monthly Durable Object ledger stores request IDs, lifecycle events, anonymous origin, deployment provenance, task identifier, provider outcome, and a SHA-256 hash of the prompt. Raw prompts and provider credentials are never written to the ledger. Each event links to the prior event hash; the internal verification endpoint recomputes the chain.
 - Provider credentials: Worker secrets only. Never place provider secrets in Astro `PUBLIC_*` variables or browser bundles.
 
 ## Required configuration
@@ -36,7 +37,7 @@ Create a Turnstile widget restricted to the production site hostnames. Configure
 - `PUBLIC_ALLSPARX_TURNSTILE_SITE_KEY=<Turnstile site key>`
 - `PUBLIC_ALLSPARX_PROVIDER=auto` (or an explicitly configured provider)
 
-The site key and gateway URL are public. The Turnstile secret and provider keys are not.
+The site key and gateway URL are public. The Turnstile secret and provider keys are not. The evidence Durable Object is created by the v2 Wrangler migration and is required for request execution; if evidence storage is unavailable, the gateway fails closed.
 
 ## Deploy and verify
 
@@ -45,7 +46,11 @@ npx wrangler@4 deploy --dry-run --config workers/allsparx-gateway/wrangler.toml
 npx wrangler@4 deploy --config workers/allsparx-gateway/wrangler.toml
 ```
 
-The `GET /healthz` endpoint is a liveness check only; it does not prove provider credentials, Durable Objects, Turnstile, or provider connectivity are ready. Live verification must separately test approved and rejected origins, challenge failure, invalid input, rate limiting, budget exhaustion, a real provider response, response headers, and absence of secret leakage.
+The internal evidence Durable Object supports `POST /append` and `GET /verify`; it is not exposed as a public Worker route. Hash chaining detects accidental or partial record alteration, but it is not a substitute for an independently controlled external checkpoint, WORM retention, or signed audit export. The `GET /healthz` endpoint is a liveness check only; it does not prove provider credentials, Durable Objects, Turnstile, or provider connectivity are ready. Live verification must separately test approved and rejected origins, challenge failure, invalid input, rate limiting, budget exhaustion, a real provider response, response headers, and absence of secret leakage.
+
+## Evidence ledger limitations
+
+The ledger is durable within Cloudflare Durable Object storage and records append-only hash-linked events. It does not yet provide cross-account immutable retention, external timestamping, signed exports, retention/backup policy, or an independent verifier outside the same Cloudflare trust boundary. Request identity is anonymous origin context, not authenticated end-user identity. The prompt is represented by SHA-256 only; raw prompt content is deliberately excluded.
 
 ## Admission-budget limitation
 
