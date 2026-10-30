@@ -184,6 +184,28 @@ async function runTask(body, env) {
   }
   throw lastError || new Error("provider_unavailable");
 }
+export class UserRateLimiter {
+  constructor(state) { this.state = state; }
+  async fetch(request) {
+    if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405);
+    const now = Date.now();
+    const result = await this.state.blockConcurrencyWhile(async () => {
+      const bucket = await this.state.storage.get("user-rate-limit");
+      if (!bucket || now >= bucket.resetAt) {
+        const next = { count: 1, resetAt: now + 60_000 };
+        await this.state.storage.put("user-rate-limit", next);
+        return { success: true, retryAfter: 60 };
+      }
+      if (bucket.count >= 12) {
+        return { success: false, retryAfter: Math.max(1, Math.ceil((bucket.resetAt - now) / 1000)) };
+      }
+      await this.state.storage.put("user-rate-limit", { ...bucket, count: bucket.count + 1 });
+      return { success: true, retryAfter: Math.max(1, Math.ceil((bucket.resetAt - now) / 1000)) };
+    });
+    return json(result);
+  }
+}
+
 export async function handleRequest(request, env) {
   const url = new URL(request.url);
   const origin = request.headers.get("origin") || "";
@@ -195,14 +217,23 @@ export async function handleRequest(request, env) {
   }
   if (url.pathname !== API_PATH) return env.ASSETS.fetch(request);
   if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, cors);
-  if (!env.SUPABASE_URL || !env.ALLOWED_ORIGINS || !env.USER_RATE_LIMITER) return json({ error: "gateway_not_configured" }, 503, cors);
+  if (!env.SUPABASE_URL || !env.ALLOWED_ORIGINS || !env.USER_RATE_LIMITER_DO) return json({ error: "gateway_not_configured" }, 503, cors);
   let userId;
   try { userId = await verifySupabaseToken(request, env); }
   catch (error) {
     return json({ error: error.message === "auth_not_configured" || error.message === "jwks_unavailable" || error.message === "jwks_empty" ? "authentication_unavailable" : "unauthorized" }, 401, cors);
   }
-  const limit = await env.USER_RATE_LIMITER.limit({ key: userId });
-  if (!limit.success) return json({ error: "rate_limited" }, 429, { ...cors, "retry-after": "60" });
+  let limit;
+  try {
+    const limiterId = env.USER_RATE_LIMITER_DO.idFromName(userId);
+    const limiter = env.USER_RATE_LIMITER_DO.get(limiterId);
+    const limiterResponse = await limiter.fetch("https://rate-limiter/check", { method: "POST" });
+    if (!limiterResponse.ok) throw new Error("rate_limiter_unavailable");
+    limit = await limiterResponse.json();
+  } catch {
+    return json({ error: "rate_limit_unavailable" }, 503, cors);
+  }
+  if (!limit.success) return json({ error: "rate_limited" }, 429, { ...cors, "retry-after": String(limit.retryAfter || 60) });
   const declared = Number(request.headers.get("content-length") || "0");
   if (declared > MAX_BODY_BYTES) return json({ error: "request_too_large" }, 413, cors);
   const contentType = (request.headers.get("content-type") || "").split(";")[0].trim().toLowerCase();
