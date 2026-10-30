@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Send one bounded contract smoke test
         env:
-          AI_CHAT_ENDPOINT: ${{ secrets.AI_CHAT_ENDPOINT }}
+          ALLSPARX_GATEWAY_URL: ${{ secrets.AI_CHAT_ENDPOINT }}
         run: |
           node --input-type=module <<'NODE'
           const endpoint = process.env.AI_CHAT_ENDPOINT;
@@ -35,7 +35,7 @@ jobs:
             const response = await fetch(url, {
               method: "POST", redirect: "error",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ prompt: "SYPHON endpoint contract check. Return a short summary and an empty programs array." }),
+              body: JSON.stringify({\n                prompt: "SYPHON endpoint contract check. Return a short summary and an empty programs array.",\n                task: "startup-deal-recommendation", provider: "auto", contractVersion: 1\n              }),
               signal: controller.signal
             });
             if (!response.ok) {
@@ -73,11 +73,11 @@ jobs:
             let body;
             try { body = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)); }
             catch { console.error("FAIL: invalid JSON or non-UTF-8 response."); process.exit(1); }
-            const validPrograms = body && (body.programs === undefined ||
+            const validProvider = body && (body.provider === undefined ||\n              ["openai", "anthropic", "google", "ollama"].includes(body.provider));\n            const validPrograms = body && (body.programs === undefined ||
               (Array.isArray(body.programs) && body.programs.every(
                 (program) => program && typeof program === "object" && typeof program.title === "string"
               )));
-            if (!body || typeof body.summary !== "string" || !validPrograms) {
+            if (!body || typeof body.summary !== "string" || !validPrograms || !validProvider) {
               console.error("FAIL: response does not match the Ask AI response contract.");
               process.exit(1);
             }
