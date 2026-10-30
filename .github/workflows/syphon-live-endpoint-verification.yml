@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Send one bounded contract smoke test
         env:
-          AI_CHAT_ENDPOINT: \${{ secrets.AI_CHAT_ENDPOINT }}
+          AI_CHAT_ENDPOINT: ${{ secrets.AI_CHAT_ENDPOINT }}
         run: |
           node --input-type=module <<'NODE'
           const endpoint = process.env.AI_CHAT_ENDPOINT;
@@ -39,11 +39,11 @@ jobs:
               signal: controller.signal
             });
             if (!response.ok) {
-              console.error(\`FAIL: endpoint returned HTTP \${response.status}; URL and response content are not logged.\`);
+              console.error(`FAIL: endpoint returned HTTP ${response.status}; URL and response content are not logged.`);
               process.exit(1);
             }
             const mediaType = (response.headers.get("content-type") ?? "").split(";")[0].trim().toLowerCase();
-            if (mediaType !== "application/json" && !/^application\\/[a-z0-9.+-]+\\+json$/.test(mediaType)) {
+            if (mediaType !== "application/json" && !/^application\/[a-z0-9.+-]+\\+json$/.test(mediaType)) {
               console.error("FAIL: endpoint did not declare a valid JSON media type.");
               process.exit(1);
             }
@@ -84,7 +84,7 @@ jobs:
             console.log("PASS: live HTTPS endpoint returned the expected bounded JSON contract.");
           } catch (error) {
             console.error(controller.signal.aborted ? "FAIL: endpoint exceeded 30-second timeout." :
-              \`FAIL: request failed (\${error instanceof Error ? error.name : "unknown"}); URL and response content are not logged.\`);
+              `FAIL: request failed (${error instanceof Error ? error.name : "unknown"}); URL and response content are not logged.`);
             process.exit(1);
           } finally { clearTimeout(timeout); }
           NODE
