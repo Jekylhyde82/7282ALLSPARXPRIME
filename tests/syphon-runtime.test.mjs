@@ -7,7 +7,7 @@ const source = await readFile("src/lib/allsparxPrime/runtime.ts", "utf8");
 const compiled = ts.transpileModule(source, {
   compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext },
 }).outputText;
-const runtimeUrl = \`data:text/javascript;base64,\${Buffer.from(compiled).toString("base64")}\`;
+const runtimeUrl = `data:text/javascript;base64,${Buffer.from(compiled).toString("base64")}`;
 const { runAllsparxPrimeTask } = await import(runtimeUrl);
 const originalFetch = globalThis.fetch;
 afterEach(() => { globalThis.fetch = originalFetch; });
