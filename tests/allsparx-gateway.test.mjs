@@ -154,7 +154,7 @@ test("does not treat an API key without an explicit model ID as a configured pro
 });
 
 test("rejects blank, padded, control-character, and oversized provider model IDs", async () => {
-  for (const model of ["   ", " test-model", "test-model\\n", "m".repeat(129)]) {
+  for (const model of ["   ", " test-model", "test-model" + String.fromCharCode(10), "m".repeat(129)]) {
     const response = await worker.fetch(request("/v1/ask", {
       body: JSON.stringify({ prompt: "x", task: "startup-deal-recommendation", provider: "openai", contractVersion: 1 }),
     }), env({ OPENAI_API_KEY: "test-openai-key", OPENAI_MODEL: model }));
