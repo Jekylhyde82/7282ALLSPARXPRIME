@@ -52,6 +52,36 @@ Before exposing a gateway publicly, configure authentication/abuse controls, ori
 
 A passing live check proves only that the gateway responded to the bounded request with the expected shape at that time. It does not prove recommendation accuracy, provider fallback quality, downstream action success, or production deployment health.
 
+
+## Evidence ledger scope and verification limits
+
+The gateway ledger is an **accepted-operation and provider-execution ledger**, not a complete perimeter security log. This distinction is intentional and must remain visible in every operational report.
+
+### Events currently recorded
+
+- An accepted, schema-valid request with an allowlisted origin and successful Turnstile validation is recorded as `ATTEMPTED` before any provider call.
+- Provider attempts that fail, successful provider responses, and monthly-budget exhaustion after the initial attempt are recorded with lifecycle-consistent status labels.
+- The ledger stores a keyed prompt fingerprint, not the raw prompt or provider credentials.
+- Evidence append failure blocks provider execution or prevents a successful response from being returned.
+
+### Events not currently recorded in this ledger
+
+- Requests rejected before admission, including disallowed/missing origins, rate-limit rejection, Turnstile failure/unavailability, malformed or oversized request bodies, invalid request contracts/IDs, and requests for providers that are not configured.
+- Failures that occur before the gateway can construct a valid evidence event, and failures of the evidence store itself.
+
+Those rejected requests are **outside the current ledger coverage**; their absence must not be interpreted as evidence that no attack, abuse, or rejection occurred. Use Cloudflare edge/security logs and platform observability for perimeter events until a separately designed, privacy-safe rejection-event pipeline is implemented. Do not claim complete security-event audit coverage.
+
+### Ledger verification contract
+
+- Each verification request is bounded to at most 100 records.
+- Clients must verify pages sequentially from sequence 1, carrying the returned `next.from` and `next.previousHash` into the next request. A later page is anchored to the immediately preceding stored record; it is not, by itself, proof that earlier pages were valid.
+- A complete verification run must reach the current head and confirm the final calculated hash equals the stored head hash.
+- The hash chain detects record alteration relative to a trusted head, but does not protect against an actor who can rewrite both the records and the head inside the same Cloudflare trust boundary.
+
+### Independent assurance still outstanding
+
+External immutable retention/checkpoints, signed evidence export, independent verification outside the Cloudflare account/trust boundary, backup and restore testing, authenticated actor identity, usage-based provider-cost settlement, live provider/model validation, and live endpoint verification remain **NOT VERIFIED**. A passing mocked test suite or Worker dry-run does not close these gaps.
+
 ## Evidence statuses
 
 - **PLANNED** — scoped, not implemented.
