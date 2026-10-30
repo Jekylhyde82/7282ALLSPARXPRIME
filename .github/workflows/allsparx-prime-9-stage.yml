@@ -1,0 +1,431 @@
+name: ALLSPARX PRIME — 9-stage gated pipeline
+
+on:
+  pull_request:
+    branches: [main, syphon/permanent-evidence-ledger]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: allsparx-9-stage-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  stage-1:
+    name: "Stage 1 — Recover and establish baseline"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.8.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+      - name: Verify immutable source and locked baseline
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -s pnpm-lock.yaml
+          test -s package.json
+          test -s README.md
+          pnpm install --frozen-lockfile
+      - name: Record stage evidence
+        run: node scripts/allsparx-pipeline-evidence.mjs write stage-1 PASS source-sha-locked-dependencies-baseline-files
+      - uses: actions/upload-artifact@v4
+        with:
+          name: allsparx-stage-1
+          path: .allsparx-evidence/stage-1.json
+          if-no-files-found: error
+          retention-days: 30
+
+  verify-1:
+    name: "Independent Gate 1 — Source and baseline"
+    needs: stage-1
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: allsparx-stage-1
+          path: evidence
+      - run: node scripts/allsparx-pipeline-evidence.mjs verify evidence/stage-1.json stage-1 PASS "$GITHUB_SHA" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT"
+
+  stage-2:
+    name: "Stage 2 — Architecture and trust boundaries"
+    needs: verify-1
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Validate architecture and evidence components
+        run: |
+          test -s docs/ALLSPARX-9-STAGE-PIPELINE.md
+          test -s docs/ALLSPARX-PRIME-MULTI-PROVIDER-ARCHITECTURE.md
+          test -s docs/ALLSPARX-DEPLOYMENT-READINESS.md
+          test -s workers/allsparx-gateway/src/index.js
+          test -s workers/allsparx-gateway/src/evidence-ledger.js
+          test -s src/lib/allsparxPrime/runtime.ts
+          test -s scripts/verify-evidence-export.mjs
+          test -s scripts/verify-evidence-checkpoint.mjs
+      - run: node scripts/allsparx-pipeline-evidence.mjs write stage-2 PASS architecture-contracts-trust-boundaries-evidence-ledger
+      - uses: actions/upload-artifact@v4
+        with:
+          name: allsparx-stage-2
+          path: .allsparx-evidence/stage-2.json
+          if-no-files-found: error
+          retention-days: 30
+
+  verify-2:
+    name: "Independent Gate 2 — Architecture"
+    needs: [stage-1, verify-1, stage-2]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: allsparx-stage-2
+          path: evidence
+      - run: node scripts/allsparx-pipeline-evidence.mjs verify evidence/stage-2.json stage-2 PASS "$GITHUB_SHA" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT"
+
+  stage-3:
+    name: "Stage 3 — Build and integrate"
+    needs: verify-2
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.8.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Run SYPHON and gateway integration contracts
+        run: |
+          pnpm test:syphon
+          node --test tests/allsparx-gateway.test.mjs tests/syphon-evidence-export.test.mjs tests/syphon-provider-routing.test.mjs
+      - name: Validate Worker bundle without deployment
+        run: npx --yes wrangler@4 deploy --dry-run --config workers/allsparx-gateway/wrangler.toml
+      - run: node scripts/allsparx-pipeline-evidence.mjs write stage-3 PASS syphon-contracts-gateway-contracts-worker-bundle-dry-run
+      - uses: actions/upload-artifact@v4
+        with:
+          name: allsparx-stage-3
+          path: .allsparx-evidence/stage-3.json
+          if-no-files-found: error
+          retention-days: 30
+
+  verify-3:
+    name: "Independent Gate 3 — Integration"
+    needs: [verify-2, stage-3]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: allsparx-stage-3
+          path: evidence
+      - run: node scripts/allsparx-pipeline-evidence.mjs verify evidence/stage-3.json stage-3 PASS "$GITHUB_SHA" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT"
+
+  stage-4:
+    name: "Stage 4 — Automated quality verification"
+    needs: verify-3
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.8.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Run Astro checks and production build
+        run: |
+          pnpm check
+          pnpm build
+      - run: node scripts/allsparx-pipeline-evidence.mjs write stage-4 PASS astro-type-content-checks-production-build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: allsparx-stage-4
+          path: .allsparx-evidence/stage-4.json
+          if-no-files-found: error
+          retention-days: 30
+
+  verify-4:
+    name: "Independent Gate 4 — Quality"
+    needs: [verify-3, stage-4]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: allsparx-stage-4
+          path: evidence
+      - run: node scripts/allsparx-pipeline-evidence.mjs verify evidence/stage-4.json stage-4 PASS "$GITHUB_SHA" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT"
+
+  stage-5:
+    name: "Stage 5 — Security and identity assurance"
+    needs: verify-4
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.8.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Audit production dependency advisories
+        run: pnpm audit --prod --audit-level high
+      - name: Check patch whitespace and conflict markers
+        run: |
+          git diff --check
+          if git grep -n -E '^(<<<<<<<|=======|>>>>>>>)' -- ':!pnpm-lock.yaml'; then
+            echo "Conflict markers detected."
+            exit 1
+          fi
+      - run: node scripts/allsparx-pipeline-evidence.mjs write stage-5 PASS production-dependency-audit-conflict-marker-check
+      - uses: actions/upload-artifact@v4
+        with:
+          name: allsparx-stage-5
+          path: .allsparx-evidence/stage-5.json
+          if-no-files-found: error
+          retention-days: 30
+
+  verify-5:
+    name: "Independent Gate 5 — Security"
+    needs: [verify-4, stage-5]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: allsparx-stage-5
+          path: evidence
+      - run: node scripts/allsparx-pipeline-evidence.mjs verify evidence/stage-5.json stage-5 PASS "$GITHUB_SHA" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT"
+
+  stage-6:
+    name: "Stage 6 — Resilience, recovery and cost controls"
+    needs: verify-5
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.8.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Exercise complete automated regression and evidence tests
+        run: node --test tests/*.test.mjs
+      - name: Validate offline checkpoint and export verifier syntax
+        run: |
+          node --check scripts/verify-evidence-export.mjs
+          node --check scripts/verify-evidence-checkpoint.mjs
+          node --check scripts/sign-evidence-checkpoint.mjs
+      - run: node scripts/allsparx-pipeline-evidence.mjs write stage-6 PASS regression-suite-evidence-export-tests-checkpoint-tooling-syntax
+      - uses: actions/upload-artifact@v4
+        with:
+          name: allsparx-stage-6
+          path: .allsparx-evidence/stage-6.json
+          if-no-files-found: error
+          retention-days: 30
+
+  verify-6:
+    name: "Independent Gate 6 — Resilience"
+    needs: [verify-5, stage-6]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: allsparx-stage-6
+          path: evidence
+      - run: node scripts/allsparx-pipeline-evidence.mjs verify evidence/stage-6.json stage-6 PASS "$GITHUB_SHA" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT"
+
+  stage-7:
+    name: "Stage 7 — Staging and live-system readiness"
+    needs: verify-6
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Validate staging controls are defined (not deployed)
+        run: |
+          test -s .github/workflows/syphon-live-endpoint-verification.yml
+          test -s workers/allsparx-gateway/wrangler.toml
+          test -s workers/allsparx-gateway/README.md
+          grep -q 'workflow_dispatch:' .github/workflows/syphon-live-endpoint-verification.yml
+          grep -q 'Gate status: NO-GO' docs/ALLSPARX-DEPLOYMENT-READINESS.md
+      - run: node scripts/allsparx-pipeline-evidence.mjs write stage-7 PASS staging-controls-defined-live-deployment-not-claimed
+      - uses: actions/upload-artifact@v4
+        with:
+          name: allsparx-stage-7
+          path: .allsparx-evidence/stage-7.json
+          if-no-files-found: error
+          retention-days: 30
+
+  verify-7:
+    name: "Independent Gate 7 — Staging readiness"
+    needs: [verify-6, stage-7]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: allsparx-stage-7
+          path: evidence
+      - run: node scripts/allsparx-pipeline-evidence.mjs verify evidence/stage-7.json stage-7 PASS "$GITHUB_SHA" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT"
+
+  stage-8:
+    name: "Stage 8 — Independent evidence review"
+    needs: verify-7
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: allsparx-stage-*
+          path: evidence
+          merge-multiple: false
+      - name: Verify every preceding stage manifest independently
+        run: |
+          for stage in 1 2 3 4 5 6 7; do
+            node scripts/allsparx-pipeline-evidence.mjs verify "evidence/allsparx-stage-$stage/stage-$stage.json" "stage-$stage" PASS "$GITHUB_SHA" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT"
+          done
+          grep -q 'Gate status: NO-GO' docs/ALLSPARX-DEPLOYMENT-READINESS.md
+      - run: node scripts/allsparx-pipeline-evidence.mjs write stage-8 PASS prior-stage-evidence-integrity-cross-stage-provenance-no-go-preserved
+      - uses: actions/upload-artifact@v4
+        with:
+          name: allsparx-stage-8
+          path: .allsparx-evidence/stage-8.json
+          if-no-files-found: error
+          retention-days: 30
+
+  verify-8:
+    name: "Independent Gate 8 — Evidence integrity"
+    needs: [verify-7, stage-8]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: allsparx-stage-8
+          path: evidence
+      - run: node scripts/allsparx-pipeline-evidence.mjs verify evidence/stage-8.json stage-8 PASS "$GITHUB_SHA" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT"
+
+  stage-9:
+    name: "Stage 9 — Controlled release authorization"
+    needs: verify-8
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Enforce deployment hold until external blockers close
+        run: |
+          grep -q 'Gate status: NO-GO' docs/ALLSPARX-DEPLOYMENT-READINESS.md
+          grep -q 'independent security review' docs/ALLSPARX-DEPLOYMENT-READINESS.md
+          grep -q 'backup and restore exercises' docs/ALLSPARX-DEPLOYMENT-READINESS.md
+          echo "NO-GO preserved: this workflow does not deploy or authorize production."
+      - run: node scripts/allsparx-pipeline-evidence.mjs write stage-9 HOLD production-deployment-not-authorized-live-secrets-not-verified-independent-approval-pending
+      - uses: actions/upload-artifact@v4
+        with:
+          name: allsparx-stage-9
+          path: .allsparx-evidence/stage-9.json
+          if-no-files-found: error
+          retention-days: 30
+
+  verify-9:
+    name: "Independent Gate 9 — Release hold verification"
+    needs: [verify-8, stage-9]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: allsparx-stage-9
+          path: evidence
+      - name: Verify explicit NO-GO evidence
+        run: |
+          node scripts/allsparx-pipeline-evidence.mjs verify evidence/stage-9.json stage-9 HOLD "$GITHUB_SHA" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT"
+          grep -q 'Gate status: NO-GO' docs/ALLSPARX-DEPLOYMENT-READINESS.md
