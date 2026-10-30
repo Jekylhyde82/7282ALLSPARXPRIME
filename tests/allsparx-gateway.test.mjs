@@ -17,6 +17,30 @@ const stubNamespace = (fetchFn = async () => new Response("ok")) => ({
   idFromName: () => "test-object",
   get: () => ({ fetch: fetchFn }),
 });
+function transactionalState(store = new Map()) {
+  let tail = Promise.resolve();
+  const transact = async (callback) => {
+    const previous = tail;
+    let release;
+    tail = new Promise((resolve) => { release = resolve; });
+    await previous;
+    try {
+      return await callback({
+        get: async (key) => store.get(key),
+        put: async (key, value, options) => store.set(key, value),
+      });
+    } finally {
+      release();
+    }
+  };
+  return {
+    storage: {
+      get: async (key) => store.get(key),
+      put: async (key, value, options) => store.set(key, value),
+      transaction: transact,
+    },
+  };
+}
 function env(overrides = {}) {
   return {
     ALLOWED_ORIGINS: "https://cloudcredits.io",
@@ -150,21 +174,38 @@ test("successful OpenAI request returns the validated response contract and requ
 });
 test("rate limiter enforces a fixed one-minute window", async () => {
   const store = new Map();
-  const state = { storage: { get: async (key) => store.get(key), put: async (key, value) => store.set(key, value) } };
+  const state = transactionalState(store);
   const limiter = new RateLimiter(state, { RATE_LIMIT_PER_MINUTE: "2" });
   assert.equal((await limiter.fetch()).status, 200);
   assert.equal((await limiter.fetch()).status, 200);
   assert.equal((await limiter.fetch()).status, 429);
 });
+test("rate limiter remains within its limit under concurrent requests", async () => {
+  const state = transactionalState();
+  const limiter = new RateLimiter(state, { RATE_LIMIT_PER_MINUTE: "5" });
+  const responses = await Promise.all(Array.from({ length: 25 }, () => limiter.fetch()));
+  assert.equal(responses.filter((response) => response.status === 200).length, 5);
+  assert.equal(responses.filter((response) => response.status === 429).length, 20);
+});
 test("monthly reservation guard refuses reservations above its configured ceiling", async () => {
   const store = new Map();
-  const state = { storage: { get: async (key) => store.get(key), put: async (key, value) => store.set(key, value) } };
+  const state = transactionalState(store);
   const budget = new SpendBudget(state, {
     MAX_REQUEST_COST_MICROS: "50000",
     MONTHLY_SPEND_LIMIT_MICROS: "50000",
   });
   assert.equal((await budget.fetch()).status, 200);
   assert.equal((await budget.fetch()).status, 429);
+});
+test("monthly spend reservations cannot exceed the cap under concurrent requests", async () => {
+  const state = transactionalState();
+  const budget = new SpendBudget(state, {
+    MAX_REQUEST_COST_MICROS: "50000",
+    MONTHLY_SPEND_LIMIT_MICROS: "250000",
+  });
+  const responses = await Promise.all(Array.from({ length: 25 }, () => budget.fetch()));
+  assert.equal(responses.filter((response) => response.status === 200).length, 5);
+  assert.equal(responses.filter((response) => response.status === 429).length, 20);
 });
 
 test("fails closed when durable evidence storage is unavailable", async () => {
