@@ -22,7 +22,7 @@ export function verifyEvidenceExport(bundle, trustedCheckpoint) {
   if (!bundle || typeof bundle !== "object" || Array.isArray(bundle) ||
       bundle.format !== "allsparx-evidence-export-v1" ||
       typeof bundle.ledgerMonth !== "string" ||
-      !/^\\d{4}-(0[1-9]|1[0-2])$/.test(bundle.ledgerMonth) ||
+      !/^\d{4}-(0[1-9]|1[0-2])$/.test(bundle.ledgerMonth) ||
       !Array.isArray(bundle.records)) fail("INVALID_EXPORT");
   if (!trustedCheckpoint || !Number.isSafeInteger(trustedCheckpoint.sequence) ||
       trustedCheckpoint.sequence < 0 || !HASH.test(trustedCheckpoint.hash || "")) {
@@ -59,17 +59,17 @@ export function verifyEvidenceExport(bundle, trustedCheckpoint) {
 
 async function main() {
   const [file, sequenceText, hash] = process.argv.slice(2);
-  if (!file || !/^(0|[1-9]\\d*)$/.test(sequenceText || "") || !HASH.test(hash || "")) {
+  if (!file || !/^(0|[1-9]\d*)$/.test(sequenceText || "") || !HASH.test(hash || "")) {
     fail("USAGE: node scripts/verify-evidence-export.mjs <export.json> <trusted-sequence> <trusted-sha256>");
   }
   const bundle = JSON.parse(await readFile(file, "utf8"));
   const result = verifyEvidenceExport(bundle, { sequence: Number(sequenceText), hash });
-  process.stdout.write(JSON.stringify(result) + "\\n");
+  process.stdout.write(JSON.stringify(result) + "\n");
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((error) => {
-    process.stderr.write(error.message + "\\n");
+    process.stderr.write(error.message + "\n");
     process.exitCode = 1;
   });
 }
