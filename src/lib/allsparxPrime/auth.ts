@@ -65,10 +65,10 @@ export async function signUpWithPassword(email: string, password: string, url: s
   if (result.access_token) return saveSession(result);
   return null;
 }
-export async function getAuthAccessToken(url: string, publishableKey: string): Promise<string | null> {
+export async function getAuthAccessToken(url: string, publishableKey: string, forceRefresh = false): Promise<string | null> {
   const session = readSession();
   if (!session) return null;
-  if (session.expires_at > Date.now() + 60_000) return session.access_token;
+  if (!forceRefresh && session.expires_at > Date.now() + 60_000) return session.access_token;
   if (refreshInFlight) return refreshInFlight;
   refreshInFlight = (async () => {
     const response = await fetch(url.replace(/\/$/, "") + "/auth/v1/token?grant_type=refresh_token", {
