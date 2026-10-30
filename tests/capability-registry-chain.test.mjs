@@ -55,3 +55,43 @@ test("rejects unsupported event types and malformed records", () => {
   assert.equal(malformed.valid, false);
   assert.equal(malformed.reason, "Registry record contains an unknown field.");
 });
+
+test("rejects unknown nested actor and decision fields", () => {
+  assert.throws(() => createRegistryRecord({
+    ...base, actor: { ...base.actor, is_admin: true },
+  }), /Registry actor contains an unknown field/);
+  assert.throws(() => createRegistryRecord({
+    ...base, decision: { ...base.decision, bypass: true },
+  }), /Registry decision contains an unknown field/);
+});
+
+test("validates optional external checkpoint structure", () => {
+  assert.throws(() => createRegistryRecord({
+    ...base, external_checkpoint: { provider: "vault", reference: "checkpoint-1" },
+  }), /Invalid external checkpoint/);
+  assert.doesNotThrow(() => createRegistryRecord({
+    ...base,
+    external_checkpoint: {
+      provider: "independent-audit-store",
+      reference: "checkpoint-1",
+      signature: "signed-checkpoint",
+    },
+  }));
+});
+
+test("rejects duplicate record identifiers within a chain", () => {
+  const first = createRegistryRecord(base);
+  const second = createRegistryRecord({
+    ...base, event_type: "validated",
+  }, first);
+  const duplicateId = {
+    ...second,
+    record_id: first.record_id,
+  };
+  // Recalculate through the public creator so the digest is valid.
+  const duplicate = createRegistryRecord({
+    ...base, event_type: "validated",
+  }, first);
+  const repeated = { ...duplicate, record_id: first.record_id };
+  assert.equal(verifyRegistryChain([first, repeated]).reason, "Registry record_id is duplicated.");
+});
