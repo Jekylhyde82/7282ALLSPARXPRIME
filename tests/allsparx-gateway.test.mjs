@@ -239,6 +239,36 @@ test("records attempt and success before returning a provider response", async (
   assert.equal(JSON.stringify(events).includes("Find startup credits"), false);
   assert.equal(events[1].provider, "openai");
 });
+test("automatic provider fallback reserves budget separately for each billable attempt", async () => {
+  let reservations = 0;
+  const budgetNamespace = stubNamespace(async () => {
+    reservations += 1;
+    return new Response("reserved");
+  });
+  globalThis.fetch = async (url) => {
+    if (String(url).includes("/siteverify")) return Response.json({
+      success: true, hostname: "cloudcredits.io", action: "allsparx_assistant",
+    });
+    if (String(url) === "https://api.openai.com/v1/responses") {
+      return Response.json({ error: { message: "temporary provider failure" } }, { status: 500 });
+    }
+    if (String(url) === "https://api.anthropic.com/v1/messages") {
+      return Response.json({ content: [{ type: "text", text: "Fallback succeeded" }] });
+    }
+    throw new Error("Unexpected outbound request");
+  };
+  const response = await worker.fetch(request("/v1/ask", {
+    body: JSON.stringify({ prompt: "Find startup credits", task: "startup-deal-recommendation", provider: "auto", contractVersion: 1 }),
+  }), env({
+    OPENAI_API_KEY: "test-openai-key",
+    ANTHROPIC_API_KEY: "test-anthropic-key",
+    SPEND_BUDGET: budgetNamespace,
+  }));
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).provider, "anthropic");
+  assert.equal(reservations, 2);
+});
+
 test("hash-chained evidence ledger verifies appended records and detects tampering", async () => {
   const store = new Map();
   const storage = {
