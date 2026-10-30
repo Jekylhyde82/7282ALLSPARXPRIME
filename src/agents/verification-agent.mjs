@@ -22,7 +22,7 @@ export function evaluateEvidenceClaim(claim) {
   if (typeof claim.intendedOutcome !== "string" || !claim.intendedOutcome.trim()) {
     reasons.push("intended_outcome_missing");
   }
-  if (!Array.isArray(claim.evidence) || claim.evidence.length === 0) {
+  if (requested !== "PLANNED" && (!Array.isArray(claim.evidence) || claim.evidence.length === 0)) {
     reasons.push("evidence_missing");
   }
 
