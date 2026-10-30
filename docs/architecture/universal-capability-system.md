@@ -314,3 +314,14 @@ This rule applies across all eight architectural dimensions and the 256-cell tar
 - Do not claim an improvement has been assimilated until the change is implemented, tested, independently verified where required, and its operational state is known.
 
 The target is a continuously improving, self-evaluating and safely self-upgrading ALLSPARX PRIME—not uncontrolled self-modifying software. Automatic assimilation becomes operational only after the real deployment architecture supplies verified identity, policy enforcement, isolated execution, durable evidence, monitoring and rollback controls.
+
+### Phase 4 implementation: evidence-based improvement assessment
+
+A deterministic assessment gate now exists at `src/lib/allsparxPrime/improvement-assessment.mjs`, with automated tests in `tests/improvement-assessment.test.mjs` and a dedicated CI step.
+
+The gate returns one of three outcomes:
+- **assimilate** only when the source is authorized, provenance and licence are verified, baseline and candidate digests exist, compatibility/tests/independent review pass, measured benefit is positive, regression and duplication stay within policy, the change is low-risk, rollback is tested, and an authenticated caller's policy explicitly enables automatic integration;
+- **hold** when evidence, trust, review, rollback, or authorization is missing, or the change requires human review;
+- **reject** when the candidate is invalid, demonstrates no measured benefit, or exceeds regression/duplication limits.
+
+The evaluator is a pure decision function: it does not fetch, execute, install, merge or deploy candidate code. Its boolean trust and evidence fields are assertions supplied by its caller, not cryptographic proof. A production integration must populate those fields only from authenticated source records, verified CI attestations, trusted licence/security review records and a protected policy service. The current implementation therefore makes the decision logic testable but does not yet enable autonomous production assimilation.
