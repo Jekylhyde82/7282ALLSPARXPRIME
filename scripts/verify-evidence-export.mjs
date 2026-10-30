@@ -14,6 +14,11 @@ function fail(message) {
   throw new Error(message);
 }
 
+function isCanonicalTimestamp(value) {
+  if (typeof value !== "string") return false;
+  try { return new Date(value).toISOString() === value; } catch { return false; }
+}
+
 /**
  * Verify a complete month export against a checkpoint obtained through a
  * separate trusted channel. The checkpoint embedded in the export is ignored.
