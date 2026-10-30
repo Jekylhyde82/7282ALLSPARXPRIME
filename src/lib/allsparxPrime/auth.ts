@@ -6,13 +6,17 @@ type AuthSession = {
 
 const SESSION_KEY = "allsparx-prime-auth-session";
 
+let refreshInFlight: Promise<string | null> | null = null;
+
 function readSession(): AuthSession | null {
   try {
     const raw = sessionStorage.getItem(SESSION_KEY);
     if (!raw) return null;
-    const value = JSON.parse(raw) as AuthSession;
-    if (!value.access_token || !value.refresh_token || !value.expires_at) return null;
-    return value;
+    const value = JSON.parse(raw) as Partial<AuthSession>;
+    if (typeof value.access_token !== "string" || !value.access_token ||
+        typeof value.refresh_token !== "string" || !value.refresh_token ||
+        typeof value.expires_at !== "number" || !Number.isFinite(value.expires_at)) return null;
+    return value as AuthSession;
   } catch {
     return null;
   }
@@ -65,15 +69,21 @@ export async function getAuthAccessToken(url: string, publishableKey: string): P
   const session = readSession();
   if (!session) return null;
   if (session.expires_at > Date.now() + 60_000) return session.access_token;
-  const response = await fetch(url.replace(/\/$/, "") + "/auth/v1/token?grant_type=refresh_token", {
-    method: "POST", headers: authHeaders(publishableKey),
-    body: JSON.stringify({ refresh_token: session.refresh_token }),
-  });
-  if (!response.ok) {
-    sessionStorage.removeItem(SESSION_KEY);
-    return null;
-  }
-  return saveSession(await response.json());
+  if (refreshInFlight) return refreshInFlight;
+  refreshInFlight = (async () => {
+    const response = await fetch(url.replace(/\/$/, "") + "/auth/v1/token?grant_type=refresh_token", {
+      method: "POST", headers: authHeaders(publishableKey),
+      body: JSON.stringify({ refresh_token: session.refresh_token }),
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!response.ok) {
+      sessionStorage.removeItem(SESSION_KEY);
+      return null;
+    }
+    return saveSession(await response.json());
+  })();
+  try { return await refreshInFlight; }
+  finally { refreshInFlight = null; }
 }
 export async function restoreAuthSession(url: string, publishableKey: string): Promise<string | null> {
   return getAuthAccessToken(url, publishableKey);
