@@ -48,7 +48,7 @@ Use the Cloudflare dashboard or Wrangler to configure Worker variables and secre
 
 ## Verification
 
-The repository workflow `.github/workflows/syphon-ci.yml` runs on pull requests targeting `main` or the SYPHON foundation branch and executes the contract/security tests, Astro type check, and production build with the locked pnpm toolchain.
+The repository workflow `.github/workflows/syphon-ci.yml` runs on pull requests targeting `main` or the SYPHON foundation branch, and on pushes to the gateway implementation branch. It executes the contract/security tests, Astro type check, and production build with the locked pnpm toolchain.
 
 Run:
 ```sh
