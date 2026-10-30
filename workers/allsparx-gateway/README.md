@@ -2,6 +2,10 @@
 
 This directory contains the isolated Cloudflare Worker API boundary for the browser-based ALLSPARX PRIME assistant. It does not replace the Astro static-site deployment.
 
+## Provider models
+
+The Worker currently pins these API model IDs: OpenAI `gpt-6-luna`, Anthropic `claude-haiku-5-5`, and Google `gemini-3.8-flash`. Ollama remains in the shared provider preference vocabulary but is intentionally unavailable through this public Cloudflare Worker; a local Ollama process is not a trusted remote provider endpoint. An explicit Ollama request fails closed as unavailable.
+
 ## Request path
 
 - Browser: HTTPS POST to `/v1/ask`, with a one-time Cloudflare Turnstile token and request ID.
