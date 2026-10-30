@@ -47,6 +47,15 @@ function validHead(head) {
     /^[a-f0-9]{64}$/.test(head.hash) && (head.sequence !== 0 || head.hash === ZERO_HASH);
 }
 function validEvent(event) {
+  // Keep lifecycle labels semantically aligned so malformed producers cannot
+  // make an attempted operation look successful in the audit trail.
+  const lifecycleIsCanonical = event && (
+    (event.eventType === "ATTEMPTED" && event.status === "ATTEMPTED") ||
+    (event.eventType === "SUCCEEDED" && event.status === "PROVIDER_RESPONSE_RETURNED") ||
+    (event.eventType === "FAILED" && ["FAILED", "PROVIDER_ATTEMPT_FAILED"].includes(event.status)) ||
+    (event.eventType === "VERIFIED" && event.status === "VERIFIED") ||
+    (event.eventType === "CONTRADICTED" && event.status === "CONTRADICTED")
+  );
   let originIsCanonical = false;
   let timestampIsCanonical = false;
   try { const parsed = new URL(event?.actor?.origin); originIsCanonical = parsed.origin === event.actor.origin && (parsed.protocol === "https:" || parsed.protocol === "http:"); } catch {}
@@ -54,7 +63,7 @@ function validEvent(event) {
   return event && typeof event === "object" &&
     typeof event.operationId === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(event.operationId) &&
     boundedString(event.correlationId, 128) && /^[a-zA-Z0-9._:-]+$/.test(event.correlationId) &&
-    EVENT_TYPES.has(event.eventType) && boundedString(event.status, 64) && timestampIsCanonical &&
+    EVENT_TYPES.has(event.eventType) && boundedString(event.status, 64) && lifecycleIsCanonical && timestampIsCanonical &&
     event.actor?.type === "anonymous-origin" && originIsCanonical &&
     boundedString(event.provenance?.system, 64) && boundedString(event.provenance?.producer, 96) &&
     boundedString(event.provenance?.environment, 32) && boundedString(event.provenance?.deploymentId, 128) &&
