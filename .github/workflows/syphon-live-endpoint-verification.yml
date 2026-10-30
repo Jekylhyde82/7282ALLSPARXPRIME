@@ -8,41 +8,78 @@ permissions:
 
 jobs:
   verify-live-gateway:
-    name: Verify configured ALLSPARX gateway contract
+    name: Verify authenticated ALLSPARX gateway contract
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 3
     steps:
-      - name: Send one bounded contract smoke test
+      - name: Authenticate test user and send one bounded contract smoke test
         env:
           ALLSPARX_GATEWAY_URL: ${{ secrets.ALLSPARX_GATEWAY_URL }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+          SUPABASE_TEST_EMAIL: ${{ secrets.SUPABASE_TEST_EMAIL }}
+          SUPABASE_TEST_PASSWORD: ${{ secrets.SUPABASE_TEST_PASSWORD }}
         run: |
           node --input-type=module <<'NODE'
-          const endpoint = process.env.ALLSPARX_GATEWAY_URL;
-          if (!endpoint) {
-            console.error("BLOCKED: add the secured gateway URL as repository Actions secret ALLSPARX_GATEWAY_URL.");
+          const required = ["ALLSPARX_GATEWAY_URL", "SUPABASE_URL", "SUPABASE_PUBLISHABLE_KEY", "SUPABASE_TEST_EMAIL", "SUPABASE_TEST_PASSWORD"];
+          const missing = required.filter((name) => !process.env[name]);
+          if (missing.length) {
+            console.error("BLOCKED: configure the required GitHub Actions secrets: " + missing.join(", "));
             process.exit(2);
           }
-          let url;
-          try { url = new URL(endpoint); }
-          catch { console.error("FAIL: ALLSPARX_GATEWAY_URL is not an absolute URL."); process.exit(1); }
-          if (url.protocol !== "https:" || url.username || url.password || url.hash) {
-            console.error("FAIL: gateway must use HTTPS and contain no URL credentials or fragment.");
+          let gateway, supabase;
+          try {
+            gateway = new URL(process.env.ALLSPARX_GATEWAY_URL);
+            supabase = new URL(process.env.SUPABASE_URL);
+          } catch {
+            console.error("FAIL: gateway or Supabase URL is not absolute.");
+            process.exit(1);
+          }
+          if ([gateway, supabase].some((url) => url.protocol !== "https:" || url.username || url.password || url.hash)) {
+            console.error("FAIL: gateway and Supabase URLs must use HTTPS and contain no credentials or fragment.");
+            process.exit(1);
+          }
+          const authTimeout = AbortSignal.timeout(15000);
+          let accessToken;
+          try {
+            const auth = await fetch(new URL("/auth/v1/token?grant_type=password", supabase), {
+              method: "POST",
+              headers: { "Content-Type": "application/json", apikey: process.env.SUPABASE_PUBLISHABLE_KEY },
+              body: JSON.stringify({ email: process.env.SUPABASE_TEST_EMAIL, password: process.env.SUPABASE_TEST_PASSWORD }),
+              signal: authTimeout
+            });
+            if (!auth.ok) {
+              console.error("FAIL: Supabase test-user authentication failed; response details are not logged.");
+              process.exit(1);
+            }
+            const session = await auth.json();
+            accessToken = session.access_token;
+            if (typeof accessToken !== "string" || !accessToken) {
+              console.error("FAIL: Supabase did not return an access token.");
+              process.exit(1);
+            }
+          } catch (error) {
+            console.error(error?.name === "TimeoutError" ? "FAIL: Supabase authentication timed out." : "FAIL: Supabase authentication request failed.");
             process.exit(1);
           }
           const controller = new AbortController();
           const timeout = setTimeout(() => controller.abort(), 30000);
           try {
-            const response = await fetch(url, {
+            const response = await fetch(gateway, {
               method: "POST", redirect: "error",
-              headers: { "Content-Type": "application/json", "X-ALLSPARX-Request-ID": "syphon-live-smoke-test" },
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + accessToken,
+                "X-ALLSPARX-Request-ID": "syphon-live-smoke-test"
+              },
               body: JSON.stringify({
-                prompt: "SYPHON gateway contract check. Return a short summary and an empty programs array.",
-                task: "startup-deal-recommendation", provider: "auto", contractVersion: 1
+                prompt: "SYPHON gateway contract check. Return a short summary and no program matches.",
+                task: "startup-deal-recommendation", provider: "auto", contractVersion: 1, catalog: []
               }),
               signal: controller.signal
             });
             if (!response.ok) {
-              console.error(`FAIL: gateway returned HTTP ${response.status}; URL and response content are not logged.`);
+              console.error(`FAIL: gateway returned HTTP ${response.status}; URL, token, and response content are not logged.`);
               process.exit(1);
             }
             const mediaType = (response.headers.get("content-type") ?? "").split(";")[0].trim().toLowerCase();
@@ -52,8 +89,10 @@ jobs:
             }
             const maxBytes = 64 * 1024;
             const declared = Number(response.headers.get("content-length") ?? "0");
-            if (declared > maxBytes) { console.error("FAIL: response exceeded 64 KiB."); process.exit(1); }
-            if (!response.body) { console.error("FAIL: gateway returned an empty body."); process.exit(1); }
+            if (declared > maxBytes || !response.body) {
+              console.error("FAIL: gateway response was empty or exceeded 64 KiB.");
+              process.exit(1);
+            }
             const reader = response.body.getReader();
             const chunks = [];
             let total = 0;
@@ -76,20 +115,21 @@ jobs:
             let body;
             try { body = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)); }
             catch { console.error("FAIL: invalid JSON or non-UTF-8 response."); process.exit(1); }
-            const validProvider = body && (body.provider === undefined ||
-              ["openai", "anthropic", "google", "ollama"].includes(body.provider));
-            const validPrograms = body && (body.programs === undefined ||
-              (Array.isArray(body.programs) && body.programs.every(
-                (program) => program && typeof program === "object" && typeof program.title === "string"
-              )));
+            const validProvider = body && ["openai", "anthropic", "google", "ollama"].includes(body.provider);
+            const validPrograms = body && Array.isArray(body.programs) &&
+              body.programs.every((program) => program && typeof program === "object" && typeof program.title === "string");
             if (!body || typeof body.summary !== "string" || !validPrograms || !validProvider) {
               console.error("FAIL: response does not match ALLSPARX gateway contract version 1.");
               process.exit(1);
             }
-            console.log("PASS: live HTTPS gateway returned the expected bounded JSON contract.");
+            if (body.programs.length !== 0) {
+              console.error("FAIL: empty-catalog smoke test returned unexpected program matches.");
+              process.exit(1);
+            }
+            console.log("PASS: authenticated live HTTPS gateway returned the expected bounded JSON contract.");
           } catch (error) {
             console.error(controller.signal.aborted ? "FAIL: gateway exceeded 30-second timeout." :
-              `FAIL: request failed (${error instanceof Error ? error.name : "unknown"}); URL and response content are not logged.`);
+              `FAIL: gateway request failed (${error instanceof Error ? error.name : "unknown"}); URL, token, and response content are not logged.`);
             process.exit(1);
           } finally { clearTimeout(timeout); }
           NODE
