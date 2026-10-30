@@ -1,4 +1,4 @@
-name: SYPHON live endpoint verification
+name: SYPHON live gateway verification
 
 on:
   workflow_dispatch:
@@ -7,50 +7,87 @@ permissions:
   contents: read
 
 jobs:
-  verify-live-endpoint:
-    name: Verify configured AI endpoint contract
+  verify-live-gateway:
+    name: Verify configured ALLSPARX gateway contract
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      - name: Send one bounded contract smoke test
+      - name: Validate secured smoke-test inputs
         env:
-          AI_CHAT_ENDPOINT: ${{ secrets.AI_CHAT_ENDPOINT }}
+          ALLSPARX_GATEWAY_URL: ${{ secrets.ALLSPARX_GATEWAY_URL }}
+          ALLSPARX_SMOKE_ORIGIN: ${{ secrets.ALLSPARX_SMOKE_ORIGIN }}
+          ALLSPARX_SMOKE_TURNSTILE_TOKEN: ${{ secrets.ALLSPARX_SMOKE_TURNSTILE_TOKEN }}
         run: |
           node --input-type=module <<'NODE'
-          const endpoint = process.env.AI_CHAT_ENDPOINT;
-          if (!endpoint) {
-            console.error("BLOCKED: add approved endpoint URL as repository Actions secret AI_CHAT_ENDPOINT.");
+          const endpoint = process.env.ALLSPARX_GATEWAY_URL;
+          const origin = process.env.ALLSPARX_SMOKE_ORIGIN;
+          const token = process.env.ALLSPARX_SMOKE_TURNSTILE_TOKEN;
+          if (!endpoint || !origin || !token) {
+            console.error("BLOCKED: configure ALLSPARX_GATEWAY_URL, ALLSPARX_SMOKE_ORIGIN, and a fresh ALLSPARX_SMOKE_TURNSTILE_TOKEN Actions secret.");
             process.exit(2);
           }
-          let url;
-          try { url = new URL(endpoint); }
-          catch { console.error("FAIL: AI_CHAT_ENDPOINT is not an absolute URL."); process.exit(1); }
-          if (url.protocol !== "https:" || url.username || url.password || url.hash) {
-            console.error("FAIL: endpoint must use HTTPS and contain no URL credentials or fragment.");
+          let url, parsedOrigin;
+          try { url = new URL(endpoint); parsedOrigin = new URL(origin); }
+          catch { console.error("FAIL: gateway URL or smoke origin is not an absolute URL."); process.exit(1); }
+          if (url.protocol !== "https:" || url.username || url.password || url.hash ||
+              parsedOrigin.protocol !== "https:" || parsedOrigin.origin !== origin ||
+              parsedOrigin.username || parsedOrigin.password || parsedOrigin.pathname !== "/" ||
+              parsedOrigin.search || parsedOrigin.hash) {
+            console.error("FAIL: gateway and smoke origin must be credential-free HTTPS URLs; origin must contain only the site origin.");
             process.exit(1);
           }
+          if (url.pathname !== "/v1/ask" || url.search) {
+            console.error("FAIL: gateway URL must target /v1/ask without a query string.");
+            process.exit(1);
+          }
+          if (token.length > 4096 || /[\u0000-\u001f\u007f]/.test(token)) {
+            console.error("FAIL: Turnstile token is malformed.");
+            process.exit(1);
+          }
+          NODE
+
+      - name: Send one bounded authenticated contract smoke test
+        env:
+          ALLSPARX_GATEWAY_URL: ${{ secrets.ALLSPARX_GATEWAY_URL }}
+          ALLSPARX_SMOKE_ORIGIN: ${{ secrets.ALLSPARX_SMOKE_ORIGIN }}
+          ALLSPARX_SMOKE_TURNSTILE_TOKEN: ${{ secrets.ALLSPARX_SMOKE_TURNSTILE_TOKEN }}
+        run: |
+          node --input-type=module <<'NODE'
+          const endpoint = process.env.ALLSPARX_GATEWAY_URL;
+          const origin = process.env.ALLSPARX_SMOKE_ORIGIN;
+          const token = process.env.ALLSPARX_SMOKE_TURNSTILE_TOKEN;
           const controller = new AbortController();
           const timeout = setTimeout(() => controller.abort(), 30000);
           try {
-            const response = await fetch(url, {
+            const response = await fetch(endpoint, {
               method: "POST", redirect: "error",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ prompt: "SYPHON endpoint contract check. Return a short summary and an empty programs array." }),
+              headers: {
+                "Content-Type": "application/json",
+                "Origin": origin,
+                "X-ALLSPARX-Request-ID": `syphon-live-${crypto.randomUUID()}`,
+                "X-ALLSPARX-Turnstile-Token": token
+              },
+              body: JSON.stringify({
+                prompt: "SYPHON gateway contract check. Return a short summary and an empty programs array.",
+                task: "startup-deal-recommendation", provider: "auto", contractVersion: 1
+              }),
               signal: controller.signal
             });
             if (!response.ok) {
-              console.error(`FAIL: endpoint returned HTTP ${response.status}; URL and response content are not logged.`);
+              console.error(`FAIL: gateway returned HTTP ${response.status}; URL, token, and response content are not logged.`);
               process.exit(1);
             }
             const mediaType = (response.headers.get("content-type") ?? "").split(";")[0].trim().toLowerCase();
             if (mediaType !== "application/json" && !/^application\/[a-z0-9.+-]+\+json$/.test(mediaType)) {
-              console.error("FAIL: endpoint did not declare a valid JSON media type.");
+              console.error("FAIL: gateway did not declare a valid JSON media type.");
               process.exit(1);
             }
             const maxBytes = 64 * 1024;
             const declared = Number(response.headers.get("content-length") ?? "0");
-            if (declared > maxBytes) { console.error("FAIL: response exceeded 64 KiB."); process.exit(1); }
-            if (!response.body) { console.error("FAIL: endpoint returned an empty body."); process.exit(1); }
+            if (declared > maxBytes || !response.body) {
+              console.error("FAIL: response was empty or exceeded 64 KiB.");
+              process.exit(1);
+            }
             const reader = response.body.getReader();
             const chunks = [];
             let total = 0;
@@ -73,18 +110,20 @@ jobs:
             let body;
             try { body = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)); }
             catch { console.error("FAIL: invalid JSON or non-UTF-8 response."); process.exit(1); }
+            const validProvider = body && (body.provider === undefined ||
+              ["openai", "anthropic", "google", "ollama"].includes(body.provider));
             const validPrograms = body && (body.programs === undefined ||
               (Array.isArray(body.programs) && body.programs.every(
                 (program) => program && typeof program === "object" && typeof program.title === "string"
               )));
-            if (!body || typeof body.summary !== "string" || !validPrograms) {
-              console.error("FAIL: response does not match the Ask AI response contract.");
+            if (!body || typeof body.summary !== "string" || !validPrograms || !validProvider) {
+              console.error("FAIL: response does not match ALLSPARX gateway contract version 1.");
               process.exit(1);
             }
-            console.log("PASS: live HTTPS endpoint returned the expected bounded JSON contract.");
+            console.log("PASS: live HTTPS gateway returned the expected bounded JSON contract.");
           } catch (error) {
-            console.error(controller.signal.aborted ? "FAIL: endpoint exceeded 30-second timeout." :
-              `FAIL: request failed (${error instanceof Error ? error.name : "unknown"}); URL and response content are not logged.`);
+            console.error(controller.signal.aborted ? "FAIL: gateway exceeded 30-second timeout." :
+              `FAIL: request failed (${error instanceof Error ? error.name : "unknown"}); URL, token, and response content are not logged.`);
             process.exit(1);
           } finally { clearTimeout(timeout); }
           NODE
