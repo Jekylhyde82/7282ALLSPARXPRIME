@@ -1,0 +1,24 @@
+name = "allsparx-prime-gateway"
+main = "src/index.js"
+compatibility_date = "2026-10-30"
+workers_dev = false
+
+[vars]
+ALLOWED_ORIGINS = "https://cloudcredits.io,https://www.cloudcredits.io"
+RATE_LIMIT_PER_MINUTE = "10"
+MONTHLY_REQUEST_BUDGET = "1000"
+OPENAI_MODEL = "gpt-4.1-mini"
+ANTHROPIC_MODEL = "claude-3-5-haiku-latest"
+GOOGLE_MODEL = "gemini-2.0-flash"
+
+[[durable_objects.bindings]]
+name = "RATE_LIMITER"
+class_name = "RateLimiter"
+
+[[durable_objects.bindings]]
+name = "SPEND_BUDGET"
+class_name = "SpendBudget"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["RateLimiter", "SpendBudget"]
