@@ -187,6 +187,23 @@ Each repository record must capture:
 
 A record marked merged is invalid unless it includes both the pull-request reference and the immutable merge commit. Never infer a merged relationship from a repository name, a dependency declaration or a conversational claim.
 
+
+## Phase 2 implementation: bounded read-only discovery
+
+The first discovery implementation is a local, read-only scanner. Callers must supply explicit root directories. It inventories package metadata and the supported declarative manifest filenames `allsparx.capability.json` and `capability.manifest.json`.
+
+Safety properties:
+- Never imports or executes discovered package code, scripts, lifecycle hooks or binaries.
+- Never modifies scanned source files.
+- Does not follow symbolic links.
+- Skips common generated/dependency directories such as `.git`, `node_modules`, `dist` and `build`.
+- Applies caller-configurable bounds for recursion depth, files scanned and manifest size.
+- Validates capability manifests against the canonical schema and labels valid manifests as unverified, not trusted or installed.
+- Treats package metadata without a valid capability manifest as a candidate requiring further assessment.
+- Returns diagnostics for malformed or inaccessible content instead of silently treating it as trusted.
+
+This scanner is a local discovery primitive, not yet a GitHub crawler, remote repository fetcher, sandbox, installer or runtime agent. Remote discovery must be added behind an explicit source allowlist, authenticated read-only access and the same provenance, licence and security gates.
+
 ## Agent and capability catalogue
 
 The system-wide catalogue should describe agents, tools, services and reusable capabilities through stable IDs and links to capability manifests. Each entry must separate:
