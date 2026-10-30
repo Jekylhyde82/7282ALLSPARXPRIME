@@ -62,7 +62,7 @@ The ledger is durable within Cloudflare Durable Object storage and records appen
 
 ## Offline evidence verification
 
-The repository includes `scripts/verify-evidence-export.mjs`, a Node.js offline verifier for a complete monthly export in the `allsparx-evidence-export-v1` format. It recomputes every record hash in sequence, checks each previous-hash link, rejects unexpected record fields and gaps, and compares the final hash and sequence with a checkpoint supplied separately by the operator.
+The repository includes `scripts/verify-evidence-export.mjs`, a Node.js offline verifier for a complete monthly export in the `allsparx-evidence-export-v1` format. It recomputes every record hash in sequence, checks each previous-hash link, rejects unexpected record fields and gaps, validates the same lifecycle, actor, provenance, identifier, provider, and outcome constraints as the gateway ledger, and compares the final hash and sequence with a checkpoint supplied separately by the operator. Semantic checks are applied even when a record's hash is internally consistent.
 
 Example:
 
