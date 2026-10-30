@@ -44,10 +44,10 @@ test("rate limiter enforces a fixed one-minute window", async () => {
   assert.equal((await limiter.fetch()).status, 200);
   assert.equal((await limiter.fetch()).status, 429);
 });
-test("monthly budget refuses requests after the configured reservation ceiling", async () => {
+test("monthly spend guard refuses reservations above the configured ceiling", async () => {
   const store = new Map();
   const state = { storage: { get: async (k) => store.get(k), put: async (k, v) => store.set(k, v) } };
-  const budget = new SpendBudget(state, { MONTHLY_REQUEST_BUDGET: "1" });
+  const budget = new SpendBudget(state, { MAX_REQUEST_COST_MICROS: "50000", MONTHLY_SPEND_LIMIT_MICROS: "50000" });
   assert.equal((await budget.fetch()).status, 200);
   assert.equal((await budget.fetch()).status, 429);
 });
