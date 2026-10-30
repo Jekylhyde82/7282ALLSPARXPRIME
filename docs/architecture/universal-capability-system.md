@@ -350,3 +350,33 @@ The current repository's `wrangler.toml` configures only static assets from `./d
 Do not enable automatic production merging or claim a live post-merge downloader until the deployment architecture is implemented and verified. The next required work is to design and implement an authenticated server-side event boundary, a durable immutable storage adapter, protected policy/evidence records, isolated test execution, audit persistence, and rollback/reconciliation. The coordinator deliberately uses injected adapters so those controls can be implemented against the actual approved runtime rather than guessed.
 
 CI concurrency has also been changed to queue successive PR verification runs instead of cancelling an in-flight run on every push. This prevents rapid, sequential implementation commits from repeatedly interrupting the evidence pipeline; the newest head must still receive its own completed run before it is called verified.
+
+### Phase 6 implementation: Cloudflare server-side snapshot boundary
+
+A Cloudflare Worker entrypoint now exists at `src/worker/index.mjs`, and `wrangler.toml` declares the Worker, static asset binding, R2 snapshot bucket binding and SQLite-backed Durable Object migration.
+
+The Worker implements:
+- A dedicated `POST /api/github/webhook` route with bounded request bodies and GitHub `X-Hub-Signature-256` HMAC-SHA256 verification.
+- Exact target repository and target-branch checks.
+- Explicit source repository allowlisting and a per-repository approved licence-expression policy. Missing allowlist or licence policy denies the event.
+- Validation of merged pull-request identity, immutable source commit SHA, merge commit SHA and delivery identifier.
+- A Durable Object keyed by source repository and source commit to serialize duplicate acquisition attempts.
+- Pinned GitHub commit lookup and tarball retrieval over HTTPS, with a strict GitHub API/codeload host allowlist, bounded redirects and a 100 MiB streaming limit.
+- SHA-256 digest calculation and R2 object metadata recording source commit, merge commit, pull request, licence, digest, size and acquisition time.
+- No extraction, installation or execution of acquired source.
+- Retry-aware failure recording and verification of an existing R2 object's digest metadata before acknowledging a duplicate as already stored.
+
+The Worker has ten focused tests covering signature rejection, source allowlisting, missing licence policy, immutable commit forwarding, malformed delivery/job rejection, pinned archive acquisition, digest/provenance metadata and duplicate snapshot verification. These are mock-based tests; they do not establish live Cloudflare deployment or live GitHub webhook delivery.
+
+### Required Cloudflare configuration before activation
+
+The Wrangler configuration declares the R2 bucket `allsparx-prime-repository-snapshots` and Durable Object class `SnapshotCoordinator`, but declaring bindings does not create the bucket or deploy the Worker. Before activation, an operator must:
+1. Create the named R2 bucket in the intended Cloudflare account.
+2. Configure the Worker secret `GITHUB_WEBHOOK_SECRET` with the matching GitHub webhook secret (at least 32 characters).
+3. Configure `GITHUB_REPOSITORY_ALLOWLIST` as an explicit JSON array or comma-separated list of approved source repositories.
+4. Configure `REPOSITORY_LICENSE_POLICY` as a JSON object mapping each approved repository to its approved SPDX licence expression.
+5. For private source repositories, configure `GITHUB_API_TOKEN` as a secret with read-only repository contents access.
+6. Configure the GitHub webhook to send `pull_request` events to `/api/github/webhook`, using the same webhook secret.
+7. Deploy the Worker, confirm the Durable Object migration and R2 binding, then perform signed staging delivery and independently verify the stored object's digest and metadata.
+
+No secret values are committed. The repository allowlist and licence policy are intentionally absent from committed defaults, so the endpoint denies acquisition until an operator configures them. R2 object lifecycle/retention, account-level access controls, alerting and independent off-account digest anchoring remain deployment controls to configure and verify. The Worker is implemented in the PR branch only; it is not deployed or live-verified.
