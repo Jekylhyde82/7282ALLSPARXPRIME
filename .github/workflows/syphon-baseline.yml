@@ -40,6 +40,9 @@ jobs:
       - name: Run capability registry contract tests
         id: capability-registry-tests
         run: pnpm test:capability-registry
+      - name: Run capability registry chain integrity tests
+        id: capability-registry-chain-tests
+        run: pnpm test:capability-registry-chain
       - name: Run Astro type and content checks
         id: check
         run: pnpm check
