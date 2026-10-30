@@ -144,7 +144,16 @@ export default function AssistantClient({
       const accessToken = await getAuthAccessToken(supabaseUrl, supabasePublishableKey);
       if (!accessToken) { setAuthToken(""); throw new Error("Your sign-in session has expired. Please sign in again."); }
       setAuthToken(accessToken);
-      const apiResponse = await runAllsparxPrimeTask(inputPrompt, aiEndpoint, providerPreference as "auto" | "openai" | "anthropic" | "google" | "ollama", accessToken, allPrograms.map((program) => program.data.title).slice(0, 200));
+      const apiResponse = await runAllsparxPrimeTask(
+        inputPrompt, aiEndpoint,
+        providerPreference as "auto" | "openai" | "anthropic" | "google" | "ollama",
+        accessToken, allPrograms.map((program) => program.data.title).slice(0, 200),
+        async () => {
+          const refreshedToken = await getAuthAccessToken(supabaseUrl, supabasePublishableKey, true);
+          if (refreshedToken) setAuthToken(refreshedToken);
+          return refreshedToken;
+        },
+      );
 
       setSummary(apiResponse.summary);
       setRuntimeEvidence(apiResponse.evidence);
