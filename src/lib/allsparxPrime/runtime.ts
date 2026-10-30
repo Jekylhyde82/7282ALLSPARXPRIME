@@ -1,17 +1,19 @@
 /**
- * ALLSPARX PRIME runtime adapter for CloudCredits.io's Ask AI workflow.
+ * Browser-safe ALLSPARX PRIME gateway client.
  *
- * This is a local orchestration boundary, not a claim that a remote ALLSPARX
- * PRIME service is connected. The configured AI endpoint remains the execution
- * provider until a separately authenticated service contract is configured.
+ * This calls a secured, vendor-neutral gateway. Provider credentials and
+ * provider-specific API calls belong behind that gateway, never in this app.
  */
+import { isProviderId, type AllsparxProviderId, type ProviderPreference } from "./providers";
+
 export interface AllsparxTaskEvidence {
   requestId: string;
   engine: "ALLSPARX PRIME";
   controller: "SYPHON";
   task: "startup-deal-recommendation";
   status: "PROVIDER_RESPONSE_VALIDATED";
-  provider: "configured-ai-endpoint";
+  provider: AllsparxProviderId | "gateway";
+  requestedProvider: ProviderPreference;
   verified: false;
   verificationNote: string;
 }
@@ -24,6 +26,7 @@ export interface AssistantTaskResult {
 interface AssistantApiResponse {
   summary: string;
   programs?: AssistantProgramMatch[];
+  provider?: AllsparxProviderId;
 }
 function createRequestId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
@@ -37,7 +40,8 @@ function isAssistantApiResponse(value: unknown): value is AssistantApiResponse {
       (Array.isArray(candidate.programs) && candidate.programs.every(
         (program) => typeof program === "object" && program !== null &&
           typeof (program as Record<string, unknown>).title === "string",
-      )));
+      ))) &&
+    (candidate.provider === undefined || isProviderId(candidate.provider));
 }
 const MAX_RESPONSE_BYTES = 64 * 1024;
 async function readBoundedJson(response: Response): Promise<unknown> {
@@ -45,15 +49,15 @@ async function readBoundedJson(response: Response): Promise<unknown> {
   const mediaType = contentType.split(";")[0].trim().toLowerCase();
   if (mediaType !== "application/json" &&
       !/^application\/[a-z0-9.+-]+\+json$/.test(mediaType)) {
-    throw new Error("The AI service did not return JSON.");
+    throw new Error("The AI gateway did not return JSON.");
   }
   const declaredLength = response.headers.get("content-length");
   if (declaredLength !== null) {
     const length = Number(declaredLength);
     if (Number.isFinite(length) && length > MAX_RESPONSE_BYTES)
-      throw new Error("The AI service response exceeded the 64 KiB safety limit.");
+      throw new Error("The AI gateway response exceeded the 64 KiB safety limit.");
   }
-  if (!response.body) throw new Error("The AI service returned an empty response.");
+  if (!response.body) throw new Error("The AI gateway returned an empty response.");
   const reader = response.body.getReader();
   const chunks: Uint8Array[] = [];
   let totalBytes = 0;
@@ -64,7 +68,7 @@ async function readBoundedJson(response: Response): Promise<unknown> {
       totalBytes += value.byteLength;
       if (totalBytes > MAX_RESPONSE_BYTES) {
         await reader.cancel();
-        throw new Error("The AI service response exceeded the 64 KiB safety limit.");
+        throw new Error("The AI gateway response exceeded the 64 KiB safety limit.");
       }
       chunks.push(value);
     }
@@ -73,46 +77,59 @@ async function readBoundedJson(response: Response): Promise<unknown> {
   let offset = 0;
   for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
   try { return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)); }
-  catch { throw new Error("The AI service returned invalid JSON or non-UTF-8 content."); }
+  catch { throw new Error("The AI gateway returned invalid JSON or non-UTF-8 content."); }
 }
-/** Provider response validation is not independent verification of its claims. */
-export async function runAllsparxPrimeTask(prompt: string, endpoint: string): Promise<AssistantTaskResult> {
+
+/** Validates the gateway response, not the truth of the model's claims. */
+export async function runAllsparxPrimeTask(
+  prompt: string,
+  gatewayEndpoint: string,
+  providerPreference: ProviderPreference = "auto",
+): Promise<AssistantTaskResult> {
   const normalizedPrompt = prompt.trim();
   if (!normalizedPrompt) throw new Error("Enter a request before starting an ALLSPARX PRIME task.");
   if (normalizedPrompt.length > 500) throw new Error("Requests must be 500 characters or fewer.");
   let endpointUrl: URL;
-  try { endpointUrl = new URL(endpoint); }
-  catch { throw new Error("The Ask AI endpoint must be an absolute HTTP(S) URL."); }
+  try { endpointUrl = new URL(gatewayEndpoint); }
+  catch { throw new Error("The ALLSPARX gateway must be an absolute HTTP(S) URL."); }
   const isLocalHttp = endpointUrl.protocol === "http:" &&
     ["localhost", "127.0.0.1", "[::1]"].includes(endpointUrl.hostname);
   if (endpointUrl.protocol !== "https:" && !isLocalHttp)
-    throw new Error("The Ask AI endpoint must use HTTPS (HTTP is allowed only for localhost development).");
+    throw new Error("The ALLSPARX gateway must use HTTPS (HTTP is allowed only for localhost development).");
   if (endpointUrl.username || endpointUrl.password || endpointUrl.hash)
-    throw new Error("The Ask AI endpoint must not contain URL credentials or a fragment.");
+    throw new Error("The ALLSPARX gateway URL must not contain credentials or a fragment.");
+  if (!["auto", "openai", "anthropic", "google", "ollama"].includes(providerPreference))
+    throw new Error("Unsupported AI provider preference.");
   const requestId = createRequestId();
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 30_000);
   try {
     const response = await fetch(endpointUrl.toString(), {
       method: "POST", redirect: "error",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "X-ALLSPARX-Request-ID": requestId },
       signal: controller.signal,
-      body: JSON.stringify({ prompt: normalizedPrompt }),
+      body: JSON.stringify({
+        prompt: normalizedPrompt,
+        task: "startup-deal-recommendation",
+        provider: providerPreference,
+        contractVersion: 1,
+      }),
     });
-    if (!response.ok) throw new Error("The AI service could not complete this request.");
+    if (!response.ok) throw new Error("The ALLSPARX gateway could not complete this request.");
     const body: unknown = await readBoundedJson(response);
-    if (!isAssistantApiResponse(body)) throw new Error("The AI service returned an invalid response format.");
+    if (!isAssistantApiResponse(body)) throw new Error("The ALLSPARX gateway returned an invalid response format.");
     return {
       summary: body.summary, programs: body.programs ?? [],
       evidence: {
         requestId, engine: "ALLSPARX PRIME", controller: "SYPHON",
         task: "startup-deal-recommendation", status: "PROVIDER_RESPONSE_VALIDATED",
-        provider: "configured-ai-endpoint", verified: false,
-        verificationNote: "Provider response validated; recommendation accuracy, downstream outcomes, and durable evidence have not been independently verified.",
+        provider: body.provider ?? "gateway", requestedProvider: providerPreference,
+        verified: false,
+        verificationNote: "Gateway response validated. Provider selection, recommendation accuracy, downstream outcomes, and durable evidence require independent verification.",
       },
     };
   } catch (error) {
-    if (controller.signal.aborted) throw new Error("The AI service timed out after 30 seconds. Please try again.");
+    if (controller.signal.aborted) throw new Error("The ALLSPARX gateway timed out after 30 seconds. Please try again.");
     throw error;
   } finally { clearTimeout(timeout); }
 }
