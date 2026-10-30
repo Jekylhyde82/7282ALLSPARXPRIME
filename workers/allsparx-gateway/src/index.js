@@ -84,7 +84,7 @@ async function providerCall(provider, prompt, env) {
       response = await fetch("https://api.openai.com/v1/responses", {
         method: "POST",
         headers: { authorization: `Bearer ${env.OPENAI_API_KEY}`, "content-type": "application/json" },
-        body: JSON.stringify({ model: env.OPENAI_MODEL || "gpt-4.1-mini", input: prompt, max_output_tokens: MAX_OUTPUT_TOKENS }),
+        body: JSON.stringify({ model: "gpt-4.1-mini", input: prompt, max_output_tokens: MAX_OUTPUT_TOKENS }),
         signal: controller.signal,
       });
       const data = await response.json();
@@ -94,14 +94,14 @@ async function providerCall(provider, prompt, env) {
       response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-        body: JSON.stringify({ model: env.ANTHROPIC_MODEL || "claude-3-5-haiku-latest", max_tokens: MAX_OUTPUT_TOKENS, messages: [{ role: "user", content: prompt }] }),
+        body: JSON.stringify({ model: "claude-3-5-haiku-latest", max_tokens: MAX_OUTPUT_TOKENS, messages: [{ role: "user", content: prompt }] }),
         signal: controller.signal,
       });
       const data = await response.json();
       if (!response.ok) throw Object.assign(new Error("PROVIDER_FAILURE"), { retryable: response.status >= 500 || response.status === 429 });
       text = (data.content || []).filter((part) => part.type === "text").map((part) => part.text).join("\n");
     } else if (provider === "google") {
-      const model = env.GOOGLE_MODEL || "gemini-2.0-flash";
+      const model = "gemini-2.0-flash";
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
       response = await fetch(url, {
         method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": env.GOOGLE_API_KEY },
@@ -198,10 +198,14 @@ export class SpendBudget {
   async fetch() {
     const month = new Date().toISOString().slice(0, 7);
     const key = `reserved:${month}`;
-    const cap = Number(this.env.MONTHLY_REQUEST_BUDGET || 1000);
+    const reservation = Number(this.env.MAX_REQUEST_COST_MICROS || 50000);
+    const cap = Number(this.env.MONTHLY_SPEND_LIMIT_MICROS || 20000000);
     const current = Number(await this.state.storage.get(key) || 0);
-    if (current >= cap) return new Response("budget exhausted", { status: 429 });
-    await this.state.storage.put(key, current + 1);
+    if (!Number.isSafeInteger(reservation) || reservation < 1 || !Number.isSafeInteger(cap) || cap < reservation || current + reservation > cap)
+      return new Response("budget exhausted", { status: 429 });
+    // Conservatively reserve the full configured request ceiling. Reservations
+    // are not refunded until usage-based settlement is independently verified.
+    await this.state.storage.put(key, current + reservation);
     return new Response("reserved");
   }
 }
