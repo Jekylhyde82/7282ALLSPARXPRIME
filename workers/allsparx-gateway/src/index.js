@@ -8,7 +8,23 @@ const MAX_RESPONSE_BYTES = 64 * 1024;
 const MAX_TURNSTILE_RESPONSE_BYTES = 16 * 1024;
 const MAX_OUTPUT_TOKENS = 512;
 const TIMEOUT_MS = 25_000;
+const MAX_EVIDENCE_EXPORT_RECORDS = 5_000;
+const MAX_EVIDENCE_EXPORT_BYTES = 8 * 1024 * 1024;
 
+async function constantTimeTokenMatch(provided, expected) {
+  if (typeof provided !== "string" || typeof expected !== "string" ||
+      provided.length < 32 || expected.length < 32) return false;
+  const encoder = new TextEncoder();
+  const [left, right] = await Promise.all([
+    crypto.subtle.digest("SHA-256", encoder.encode(provided)),
+    crypto.subtle.digest("SHA-256", encoder.encode(expected)),
+  ]);
+  const a = new Uint8Array(left);
+  const b = new Uint8Array(right);
+  let difference = 0;
+  for (let index = 0; index < a.length; index += 1) difference |= a[index] ^ b[index];
+  return difference === 0;
+}
 async function promptFingerprint(value, secret) {
   const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
   const digest = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(value));
@@ -225,6 +241,85 @@ function extractSummary(text) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === "/internal/evidence/export") {
+      if (request.method !== "GET") return json({ error: "METHOD_NOT_ALLOWED" }, 405, { allow: "GET" });
+      if (!env.EVIDENCE_EXPORT_TOKEN || env.EVIDENCE_EXPORT_TOKEN.length < 32) {
+        return json({ error: "EVIDENCE_EXPORT_NOT_CONFIGURED" }, 503);
+      }
+      const authorization = request.headers.get("Authorization") || "";
+      const suppliedToken = authorization.startsWith("Bearer ") ? authorization.slice(7) : "";
+      if (!(await constantTimeTokenMatch(suppliedToken, env.EVIDENCE_EXPORT_TOKEN))) {
+        return json({ error: "UNAUTHORIZED" }, 401, { "www-authenticate": "Bearer" });
+      }
+      const month = url.searchParams.get("month") || "";
+      if (!/^\\d{4}-(0[1-9]|1[0-2])$/.test(month)) {
+        return json({ error: "INVALID_LEDGER_MONTH" }, 400);
+      }
+      if (!env.EVIDENCE_LEDGER) return json({ error: "EVIDENCE_LEDGER_UNAVAILABLE" }, 503);
+      try {
+        const ledger = env.EVIDENCE_LEDGER.get(env.EVIDENCE_LEDGER.idFromName(month));
+        const records = [];
+        let cursor = { from: 1, previousHash: "0".repeat(64) };
+        let expectedHeadSequence = null;
+        let checkpointHash = null;
+        while (true) {
+          const query = new URLSearchParams({ from: String(cursor.from), limit: "100" });
+          if (cursor.from > 1) query.set("previousHash", cursor.previousHash);
+          const pageResponse = await ledger.fetch("https://evidence/export?" + query.toString());
+          if (!pageResponse.ok) return json({ error: "EVIDENCE_EXPORT_VERIFICATION_FAILED" }, 502);
+          const page = await pageResponse.json();
+          if (page.valid !== true || !Array.isArray(page.records) ||
+              !Number.isSafeInteger(page.headSequence) || page.headSequence < 0 ||
+              (expectedHeadSequence !== null && page.headSequence !== expectedHeadSequence)) {
+            return json({ error: "EVIDENCE_EXPORT_VERIFICATION_FAILED" }, 502);
+          }
+          expectedHeadSequence = page.headSequence;
+          if (records.length + page.records.length > MAX_EVIDENCE_EXPORT_RECORDS) {
+            return json({ error: "EVIDENCE_EXPORT_TOO_LARGE", maxRecords: MAX_EVIDENCE_EXPORT_RECORDS }, 413);
+          }
+          records.push(...page.records);
+          if (page.complete === true) {
+            if (page.verifiedThrough !== expectedHeadSequence ||
+                (expectedHeadSequence > 0 && !/^[a-f0-9]{64}$/.test(page.headHash || ""))) {
+              return json({ error: "EVIDENCE_EXPORT_VERIFICATION_FAILED" }, 502);
+            }
+            checkpointHash = page.headHash || "0".repeat(64);
+            break;
+          }
+          if (!page.next || !Number.isSafeInteger(page.next.from) ||
+              typeof page.next.previousHash !== "string" || !/^[a-f0-9]{64}$/.test(page.next.previousHash) ||
+              page.verifiedThrough + 1 !== page.next.from) {
+            return json({ error: "EVIDENCE_EXPORT_CURSOR_INVALID" }, 502);
+          }
+          cursor = page.next;
+        }
+        if (records.length !== expectedHeadSequence) {
+          return json({ error: "EVIDENCE_EXPORT_SEQUENCE_MISMATCH" }, 502);
+        }
+        const bundle = {
+          format: "allsparx-evidence-export-v1",
+          ledgerMonth: month,
+          records,
+          checkpoint: { sequence: expectedHeadSequence, hash: checkpointHash },
+        };
+        const serialized = JSON.stringify(bundle);
+        if (new TextEncoder().encode(serialized).byteLength > MAX_EVIDENCE_EXPORT_BYTES) {
+          return json({ error: "EVIDENCE_EXPORT_TOO_LARGE", maxBytes: MAX_EVIDENCE_EXPORT_BYTES }, 413);
+        }
+        return new Response(serialized, {
+          status: 200,
+          headers: {
+            "content-type": "application/json; charset=utf-8",
+            "cache-control": "no-store",
+            "content-disposition": `attachment; filename="allsparx-evidence-${month}.json"`,
+            "x-content-type-options": "nosniff",
+            "referrer-policy": "no-referrer",
+          },
+        });
+      } catch {
+        return json({ error: "EVIDENCE_EXPORT_UNAVAILABLE" }, 503);
+      }
+    }
     if (url.pathname === "/healthz" && request.method === "GET") {
       return json({ status: "ok", service: "allsparx-prime-gateway" });
     }
