@@ -35,6 +35,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "24"
+      - name: Run read-only evidence-gate contract tests
+        run: node --test tests/verification-agent.test.mjs
       - name: Run pinned Promptfoo evaluation
         run: npx --yes promptfoo@0.125.1 eval -c promptfooconfig.yaml --no-cache -o /tmp/allsparx-promptfoo-results.json
       - name: Preserve evaluation evidence
