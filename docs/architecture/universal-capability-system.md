@@ -266,3 +266,20 @@ The automation is comprehensive in coverage, not unconditional in trust:
 High-impact changes—including new repositories, uncertain or incompatible licences, security-boundary changes, elevated permissions, credentials, unrestricted network access, destructive operations, schema/data migrations and production deployment—remain blocked pending explicit authorized review. Automation may perform all safe preparation and verification while that approval is pending.
 
 The initial operating mode remains Observe/Prepare until SYPHON identity, policy enforcement, evidence integrity, isolation and rollback controls are independently verified in the actual deployment architecture. Only then may an authenticated owner enable Auto-integrate. This rule does not claim that automatic merging is currently operational merely because it is specified here.
+
+## Phase 3 implementation: verified source archive acquisition
+
+A first, network-adapter-injected acquisition primitive now exists at `src/lib/allsparxPrime/repository-snapshot-acquirer.mjs`, with contract tests in `tests/repository-snapshot-acquirer.test.mjs`.
+
+Implemented safeguards:
+- Requires a closed, successfully merged pull-request event, an immutable source commit, merge commit, approved licence evidence and an injected event-authentication verifier.
+- Confirms the exact source commit through the GitHub commit API before requesting the archive.
+- Pins the archive request to that commit SHA; it never requests a moving branch or tag.
+- Restricts archive requests and redirects to HTTPS GitHub API/codeload hosts and does not forward bearer credentials to codeload.
+- Enforces a configurable streamed archive-size limit and computes a SHA-256 digest over the downloaded bytes.
+- Uses an injected atomic `putIfAbsent` storage contract and rejects a storage receipt whose digest differs from the downloaded archive.
+- Records repository identity, source commit, merge PR/commit, licence expression, digest, byte count and acquisition time.
+- Is idempotent for duplicate merge deliveries when the storage adapter returns the existing matching digest.
+- Does not extract, install, import or execute downloaded source.
+
+**Remaining integration requirements:** this module is an acquisition primitive, not yet an operational webhook or durable storage deployment. A production caller must supply a verified webhook/event adapter, a durable immutable storage implementation with atomic create-if-absent semantics, quota/retention controls, and independently protected credentials. No storage provider or server runtime is assumed until the actual deployment architecture is verified. The CI contract tests exercise the injected interfaces; they do not prove live GitHub acquisition or production persistence.
