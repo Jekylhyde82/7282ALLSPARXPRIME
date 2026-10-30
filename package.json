@@ -21,7 +21,8 @@
     "test:capability-policy": "node --test tests/capability-policy.test.mjs",
     "test:capability-manifest-validation": "node --test tests/capability-manifest-validation.test.mjs",
     "test:source-repository-record": "node --test tests/source-repository-record.test.mjs",
-    "test:capability-discovery": "node --test tests/capability-discovery.test.mjs"
+    "test:capability-discovery": "node --test tests/capability-discovery.test.mjs",
+    "test:repository-snapshot-acquirer": "node --test tests/repository-snapshot-acquirer.test.mjs"
   },
   "dependencies": {
     "@astrojs/check": "0.9.4",
