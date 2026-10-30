@@ -469,6 +469,56 @@ test("automatic provider fallback handles non-JSON retryable provider errors", a
 });
 
 
+test("evidence ledger enforces exact actor and provenance schemas and validates the chain head shape", async () => {
+  const makeStorage = (store) => ({
+    get: async (key) => store.get(key),
+    put: async (key, value) => store.set(key, value),
+    transaction: async (callback) => callback({
+      get: async (key) => store.get(key),
+      put: async (key, value) => store.set(key, value),
+    }),
+  });
+  const base = {
+    operationId: "00000000-0000-4000-8000-000000000001",
+    correlationId: "schema-check-1",
+    eventType: "ATTEMPTED",
+    status: "ATTEMPTED",
+    timestamp: "2026-10-30T02:00:00.000Z",
+    actor: { type: "anonymous-origin", origin: "https://cloudcredits.io" },
+    provenance: { system: "ALLSPARX PRIME", producer: "gateway", environment: "test", deploymentId: "test-build" },
+    objective: "startup-deal-recommendation",
+    promptHmacSha256: "a".repeat(64),
+    provider: null,
+    outcomeCode: "REQUEST_ACCEPTED",
+  };
+  const mutations = [
+    (event) => { event.actor.extra = "unexpected"; },
+    (event) => { event.actor.origin = "https://user:pass@cloudcredits.io"; },
+    (event) => { event.provenance.extra = "unexpected"; },
+    (event) => { event.provenance.environment = "test environment"; },
+    (event) => { event.provenance.deploymentId = "bad/deployment"; },
+    (event) => { event.provenance.deploymentId = "d".repeat(129); },
+    (event) => { event.unexpected = true; },
+  ];
+  for (const mutate of mutations) {
+    const store = new Map();
+    const ledger = new EvidenceLedger({ storage: makeStorage(store) });
+    const event = structuredClone(base);
+    mutate(event);
+    const response = await ledger.fetch(new Request("https://evidence/append", {
+      method: "POST", body: JSON.stringify(event),
+    }));
+    assert.equal(response.status, 400);
+    assert.equal(store.has("head"), false);
+  }
+
+  const store = new Map([["head", { sequence: 0, hash: "0".repeat(64), unexpected: true }]]);
+  const ledger = new EvidenceLedger({ storage: makeStorage(store) });
+  const invalidHead = await ledger.fetch(new Request("https://evidence/verify"));
+  assert.equal(invalidHead.status, 409);
+  assert.deepEqual(await invalidHead.json(), { valid: false, invalidHead: true });
+});
+
 test("evidence ledger rejects lifecycle labels that misstate the outcome", async () => {
   const store = new Map();
   const storage = {
