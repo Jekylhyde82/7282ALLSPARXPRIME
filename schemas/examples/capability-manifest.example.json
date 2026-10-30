@@ -1,0 +1,64 @@
+{
+  "manifest_version": "1.0.0",
+  "capability_id": "allsparx.example.text-normalizer",
+  "display_name": "Text Normalizer",
+  "version": "0.1.0",
+  "release_channel": "experimental",
+  "description": "A small deterministic text-normalization capability used to demonstrate manifest metadata only.",
+  "owner": {
+    "team": "ALLSPARX PRIME"
+  },
+  "source": {
+    "repository": "https://github.com/example/text-normalizer",
+    "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "path": "src/normalize.ts"
+  },
+  "license": {
+    "spdx_expression": "MIT",
+    "attribution": "Example attribution; verify before reuse.",
+    "review_status": "unknown"
+  },
+  "package": {
+    "artifact": "registry://allsparx.example.text-normalizer/0.1.0",
+    "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "interfaces": [
+    {
+      "name": "normalizeText",
+      "version": "1.0.0",
+      "contract": "Input: UTF-8 string. Output: normalized UTF-8 string."
+    }
+  ],
+  "dependencies": [],
+  "runtime": {
+    "environments": [
+      "node"
+    ]
+  },
+  "permissions": {
+    "capabilities": [
+      "read:declared-input",
+      "write:declared-output"
+    ],
+    "network_destinations": []
+  },
+  "data_handling": {
+    "classification": "public",
+    "retention": "No persistence.",
+    "personal_data": false,
+    "secret_access": false
+  },
+  "verification": {
+    "suite_id": "example-contract-tests",
+    "status": "not-run",
+    "verified_at": "2026-10-30T00:00:00Z",
+    "evidence": []
+  },
+  "security_review": {
+    "status": "pending",
+    "risk_tier": "low"
+  },
+  "rollback": {
+    "compatible_with_previous": false
+  }
+}

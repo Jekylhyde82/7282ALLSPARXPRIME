@@ -14,7 +14,19 @@
     "clean:pagefind": "rm -rf public/pagefind",
     "check": "astro check",
     "format": "prettier -w ./src",
-    "test:syphon": "node --test tests/syphon-runtime.test.mjs"
+    "test:syphon": "node --test tests/syphon-runtime.test.mjs",
+    "test:capability-manifest": "node --test tests/capability-manifest.test.mjs",
+    "test:capability-registry": "node --test tests/capability-registry.test.mjs",
+    "test:capability-registry-service": "node --test tests/capability-registry-service.test.mjs",
+    "test:capability-registry-chain": "node --test tests/capability-registry-chain.test.mjs",
+    "test:capability-policy": "node --test tests/capability-policy.test.mjs",
+    "test:capability-manifest-validation": "node --test tests/capability-manifest-validation.test.mjs",
+    "test:source-repository-record": "node --test tests/source-repository-record.test.mjs",
+    "test:capability-discovery": "node --test tests/capability-discovery.test.mjs",
+    "test:repository-snapshot-acquirer": "node --test tests/repository-snapshot-acquirer.test.mjs",
+    "test:improvement-assessment": "node --test tests/improvement-assessment.test.mjs",
+    "test:continuous-improvement-pipeline": "node --test tests/continuous-improvement-pipeline.test.mjs",
+    "test:cloudflare-worker": "node --test tests/cloudflare-worker.test.mjs"
   },
   "dependencies": {
     "@astrojs/check": "0.9.4",
@@ -47,7 +59,8 @@
     "remark-collapse": "^0.1.2",
     "remark-toc": "^9.0.0",
     "swiper": "^11.2.0",
-    "tailwind-merge": "^3.0.2"
+    "tailwind-merge": "^3.0.2",
+    "ajv": "8.17.1"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.9",
