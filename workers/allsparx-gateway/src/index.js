@@ -1,3 +1,5 @@
+import { EvidenceLedger } from "./evidence-ledger.js";
+
 const PROVIDERS = ["openai", "anthropic", "google"];
 const MAX_BODY_BYTES = 8 * 1024;
 const MAX_PROMPT_CHARS = 500;
@@ -5,6 +7,20 @@ const MAX_RESPONSE_BYTES = 64 * 1024;
 const MAX_OUTPUT_TOKENS = 512;
 const TIMEOUT_MS = 25_000;
 
+async function sha256Hex(value) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+async function recordEvidence(env, event) {
+  try {
+    const month = event.timestamp.slice(0, 7);
+    const ledger = env.EVIDENCE_LEDGER.get(env.EVIDENCE_LEDGER.idFromName(month));
+    const response = await ledger.fetch("https://evidence/append", {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(event),
+    });
+    return response.ok;
+  } catch { return false; }
+}
 function json(body, status = 200, headers = {}) {
   return new Response(JSON.stringify(body), {
     status,
@@ -166,7 +182,7 @@ export default {
     if (url.pathname !== "/v1/ask") return json({ error: "NOT_FOUND" }, 404, headers);
     if (request.method !== "POST") return json({ error: "METHOD_NOT_ALLOWED" }, 405, headers);
     if (!request.headers.get("content-type")?.toLowerCase().startsWith("application/json")) return json({ error: "UNSUPPORTED_MEDIA_TYPE" }, 415, headers);
-    if (!env.RATE_LIMITER || !env.SPEND_BUDGET || !env.TURNSTILE_SECRET_KEY) return json({ error: "GATEWAY_NOT_CONFIGURED" }, 503, headers);
+    if (!env.RATE_LIMITER || !env.SPEND_BUDGET || !env.EVIDENCE_LEDGER || !env.TURNSTILE_SECRET_KEY) return json({ error: "GATEWAY_NOT_CONFIGURED" }, 503, headers);
 
     const ip = request.headers.get("CF-Connecting-IP") || "unknown";
     const rate = await env.RATE_LIMITER.get(env.RATE_LIMITER.idFromName(ip)).fetch("https://rate-limit/check");
@@ -191,19 +207,51 @@ export default {
     const candidates = configuredProviders(env, body.provider);
     if (!candidates.length) return json({ error: "PROVIDER_UNAVAILABLE" }, 503, headers);
 
-    const budget = await env.SPEND_BUDGET.get(env.SPEND_BUDGET.idFromName(new Date().toISOString().slice(0, 7))).fetch("https://budget/reserve", { method: "POST" });
-    if (!budget.ok) return json({ error: "MONTHLY_BUDGET_EXHAUSTED" }, 429, headers);
+    const timestamp = new Date().toISOString();
+    const promptSha256 = await sha256Hex(body.prompt.trim());
+    const evidence = (eventType, status, provider, outcomeCode) => ({
+      operationId: requestId,
+      eventType,
+      status,
+      timestamp: new Date().toISOString(),
+      provenance: {
+        system: "ALLSPARX PRIME",
+        producer: "allsparx-prime-gateway",
+        environment: env.ENVIRONMENT || "production",
+        deploymentId: env.CF_VERSION_METADATA?.id || env.APP_VERSION || "unavailable",
+      },
+      objective: body.task,
+      promptSha256,
+      provider: provider || null,
+      outcomeCode,
+    });
+    if (!(await recordEvidence(env, evidence("ATTEMPTED", "ATTEMPTED", null, "REQUEST_ACCEPTED")))) {
+      return json({ error: "EVIDENCE_UNAVAILABLE" }, 503, headers);
+    }
+
+    const budget = await env.SPEND_BUDGET.get(env.SPEND_BUDGET.idFromName(timestamp.slice(0, 7))).fetch("https://budget/reserve", { method: "POST" });
+    if (!budget.ok) {
+      const recorded = await recordEvidence(env, evidence("FAILED", "FAILED", null, "MONTHLY_BUDGET_EXHAUSTED"));
+      return json({ error: recorded ? "MONTHLY_BUDGET_EXHAUSTED" : "EVIDENCE_UNAVAILABLE" }, recorded ? 429 : 503, headers);
+    }
     for (const provider of candidates) {
       try {
         const output = await providerCall(provider, body.prompt.trim(), env);
-        return json({ ...extractSummary(output), provider }, 200, { ...headers, "x-allsparx-request-id": requestId });
+        const result = extractSummary(output);
+        if (!(await recordEvidence(env, evidence("SUCCEEDED", "PROVIDER_RESPONSE_RETURNED", provider, "PROVIDER_RESPONSE_RETURNED")))) {
+          return json({ error: "EVIDENCE_UNAVAILABLE" }, 503, headers);
+        }
+        return json({ ...result, provider }, 200, { ...headers, "x-allsparx-request-id": requestId });
       } catch (error) {
+        const recorded = await recordEvidence(env, evidence("FAILED", "PROVIDER_ATTEMPT_FAILED", provider, "PROVIDER_REQUEST_FAILED"));
+        if (!recorded) return json({ error: "EVIDENCE_UNAVAILABLE" }, 503, headers);
         if (body.provider !== "auto" || !error.retryable) {
           return json({ error: "PROVIDER_REQUEST_FAILED", requestId }, 502, headers);
         }
       }
     }
-    return json({ error: "ALL_PROVIDERS_UNAVAILABLE", requestId }, 503, headers);
+    const recorded = await recordEvidence(env, evidence("FAILED", "FAILED", null, "ALL_PROVIDERS_UNAVAILABLE"));
+    return json({ error: recorded ? "ALL_PROVIDERS_UNAVAILABLE" : "EVIDENCE_UNAVAILABLE", requestId }, recorded ? 503 : 503, headers);
   },
 };
 
