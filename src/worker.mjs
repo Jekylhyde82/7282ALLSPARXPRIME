@@ -59,12 +59,12 @@ function decodeJsonPart(value) {
   return JSON.parse(new TextDecoder().decode(b64urlDecode(value)));
 }
 async function getJwks(url) {
-  if (jwksCache.value && Date.now() < jwksCache.expiresAt) return jwksCache.value;
+  if (jwksCache.url === url && jwksCache.value && Date.now() < jwksCache.expiresAt) return jwksCache.value;
   const response = await fetch(url, { headers: { accept: "application/json" }, signal: AbortSignal.timeout(5000) });
   if (!response.ok) throw new Error("jwks_unavailable");
   const data = await readBoundedJson(response);
   if (!data || !Array.isArray(data.keys) || data.keys.length === 0) throw new Error("jwks_empty");
-  jwksCache = { value: data, expiresAt: Date.now() + 10 * 60 * 1000 };
+  jwksCache = { url, value: data, expiresAt: Date.now() + 10 * 60 * 1000 };
   return data;
 }
 async function verifySupabaseToken(request, env) {
