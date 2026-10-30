@@ -212,6 +212,7 @@ test("hash-chained evidence ledger verifies appended records and detects tamperi
     eventType: "ATTEMPTED",
     status: "ATTEMPTED",
     timestamp: "2026-10-30T02:00:00.000Z",
+    actor: { type: "anonymous-origin", origin: "https://cloudcredits.io" },
     provenance: { system: "ALLSPARX PRIME", producer: "gateway", environment: "test", deploymentId: "test-build" },
     objective: "startup-deal-recommendation",
     promptSha256: "a".repeat(64),
