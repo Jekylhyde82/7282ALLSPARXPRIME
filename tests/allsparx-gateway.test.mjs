@@ -387,3 +387,35 @@ test("automatic provider fallback handles non-JSON retryable provider errors", a
   assert.equal(response.status, 200);
   assert.equal((await response.json()).provider, "anthropic");
 });
+
+
+test("evidence ledger rejects lifecycle labels that misstate the outcome", async () => {
+  const store = new Map();
+  const storage = {
+    get: async (key) => store.get(key),
+    put: async (key, value) => store.set(key, value),
+    transaction: async (callback) => callback({
+      get: async (key) => store.get(key),
+      put: async (key, value) => store.set(key, value),
+    }),
+  };
+  const ledger = new EvidenceLedger({ storage });
+  const event = {
+    operationId: "00000000-0000-4000-8000-000000000001",
+    correlationId: "test-lifecycle-1",
+    eventType: "SUCCEEDED",
+    status: "ATTEMPTED",
+    timestamp: "2026-10-30T02:00:00.000Z",
+    actor: { type: "anonymous-origin", origin: "https://cloudcredits.io" },
+    provenance: { system: "ALLSPARX PRIME", producer: "gateway", environment: "test", deploymentId: "test-build" },
+    objective: "startup-deal-recommendation",
+    promptHmacSha256: "a".repeat(64),
+    provider: "openai",
+    outcomeCode: "REQUEST_ACCEPTED",
+  };
+  const response = await ledger.fetch(new Request("https://evidence/append", {
+    method: "POST", body: JSON.stringify(event),
+  }));
+  assert.equal(response.status, 400);
+  assert.equal(store.has("head"), false);
+});
