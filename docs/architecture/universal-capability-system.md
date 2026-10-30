@@ -366,7 +366,7 @@ The Worker implements:
 - No extraction, installation or execution of acquired source.
 - Retry-aware failure recording and verification of an existing R2 object's digest metadata before acknowledging a duplicate as already stored.
 
-The Worker has ten focused tests covering signature rejection, source allowlisting, missing licence policy, immutable commit forwarding, malformed delivery/job rejection, pinned archive acquisition, digest/provenance metadata and duplicate snapshot verification. These are mock-based tests; they do not establish live Cloudflare deployment or live GitHub webhook delivery.
+The Worker has eleven focused tests covering signature rejection, source allowlisting, missing licence policy, immutable commit forwarding, malformed delivery/job rejection, pinned archive acquisition, digest/provenance metadata and duplicate snapshot verification. These are mock-based tests; they do not establish live Cloudflare deployment or live GitHub webhook delivery.
 
 ### Required Cloudflare configuration before activation
 
