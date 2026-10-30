@@ -199,14 +199,13 @@ test("Durable Object limiter enforces a serialized per-user window", async () =>
     },
   };
   const limiter = new UserRateLimiter(state);
-  for (let i = 0; i < 12; i++) {
-    const response = await limiter.fetch(new Request("https://rate-limiter/check", { method: "POST" }));
-    assert.equal((await response.json()).success, true);
-  }
-  const rejected = await limiter.fetch(new Request("https://rate-limiter/check", { method: "POST" }));
-  const body = await rejected.json();
-  assert.equal(body.success, false);
-  assert.ok(body.retryAfter >= 1);
+  const responses = await Promise.all(Array.from({ length: 13 }, () =>
+    limiter.fetch(new Request("https://rate-limiter/check", { method: "POST" })),
+  ));
+  const outcomes = await Promise.all(responses.map((response) => response.json()));
+  assert.equal(outcomes.filter((item) => item.success).length, 12);
+  assert.equal(outcomes.filter((item) => !item.success).length, 1);
+  assert.ok(outcomes.find((item) => !item.success).retryAfter >= 1);
 });
 
 
