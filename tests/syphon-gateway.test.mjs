@@ -73,7 +73,7 @@ test("requires a bearer token before calling any provider", async () => {
   }), {
     ...baseEnv, SUPABASE_URL: "https://project.supabase.co",
     ALLOWED_ORIGINS: "https://app.example.test",
-    USER_RATE_LIMITER: { limit: async () => ({ success: true }) },
+    USER_RATE_LIMITER_DO: { idFromName: (key) => key, get: () => ({ fetch: async () => Response.json({ success: true, retryAfter: 60 }) }) },
   });
   assert.equal(response.status, 401);
 });
@@ -146,7 +146,7 @@ test("rejects non-JSON content types after authentication", async () => {
       method: "POST", headers: { authorization: "Bearer " + token, "content-type": "text/plain" }, body: "{}",
     }), {
       ...baseEnv, SUPABASE_URL: "https://project.supabase.co", ALLOWED_ORIGINS: "https://app.example.test",
-      USER_RATE_LIMITER: { limit: async () => ({ success: true }) },
+      USER_RATE_LIMITER_DO: { idFromName: (key) => key, get: () => ({ fetch: async () => Response.json({ success: true, retryAfter: 60 }) }) },
     });
     assert.equal(response.status, 415);
   } finally { globalThis.fetch = originalFetch; }
@@ -163,7 +163,7 @@ test("rejects oversized request bodies before JSON parsing", async () => {
       body: JSON.stringify({ prompt: "x".repeat(49 * 1024) }),
     }), {
       ...baseEnv, SUPABASE_URL: "https://project.supabase.co", ALLOWED_ORIGINS: "https://app.example.test",
-      USER_RATE_LIMITER: { limit: async () => ({ success: true }) },
+      USER_RATE_LIMITER_DO: { idFromName: (key) => key, get: () => ({ fetch: async () => Response.json({ success: true, retryAfter: 60 }) }) },
     });
     assert.equal(response.status, 413);
   } finally { globalThis.fetch = originalFetch; }
