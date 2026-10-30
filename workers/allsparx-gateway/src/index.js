@@ -129,8 +129,8 @@ async function providerCall(provider, prompt, env) {
         body: JSON.stringify({ model: "gpt-6-luna", input: prompt, max_output_tokens: MAX_OUTPUT_TOKENS }),
         signal: controller.signal,
       });
-      const data = await readProviderJson(response);
       if (!response.ok) throw Object.assign(new Error("PROVIDER_FAILURE"), { retryable: response.status >= 500 || response.status === 429 });
+      const data = await readProviderJson(response);
       text = (data.output || []).flatMap((item) => item.content || []).filter((part) => part.type === "output_text").map((part) => part.text).join("\n");
     } else if (provider === "anthropic") {
       response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -139,8 +139,8 @@ async function providerCall(provider, prompt, env) {
         body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: MAX_OUTPUT_TOKENS, messages: [{ role: "user", content: prompt }] }),
         signal: controller.signal,
       });
-      const data = await readProviderJson(response);
       if (!response.ok) throw Object.assign(new Error("PROVIDER_FAILURE"), { retryable: response.status >= 500 || response.status === 429 });
+      const data = await readProviderJson(response);
       text = (data.content || []).filter((part) => part.type === "text").map((part) => part.text).join("\n");
     } else if (provider === "google") {
       const model = "gemini-3.8-flash";
@@ -150,8 +150,8 @@ async function providerCall(provider, prompt, env) {
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { maxOutputTokens: MAX_OUTPUT_TOKENS } }),
         signal: controller.signal,
       });
-      const data = await readProviderJson(response);
       if (!response.ok) throw Object.assign(new Error("PROVIDER_FAILURE"), { retryable: response.status >= 500 || response.status === 429 });
+      const data = await readProviderJson(response);
       text = (data.candidates || []).flatMap((candidate) => candidate.content?.parts || []).map((part) => part.text || "").join("\n");
     }
     if (!text.trim()) throw Object.assign(new Error("EMPTY_PROVIDER_RESPONSE"), { retryable: true });
