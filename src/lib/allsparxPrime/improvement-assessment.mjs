@@ -1,5 +1,3 @@
-import { createHash } from "node:crypto";
-
 const DIGEST = /^sha256:[a-f0-9]{64}$/;
 const ALLOWED_RISK = new Set(["low", "medium", "high", "critical"]);
 
@@ -50,6 +48,3 @@ export function assessImprovementCandidate(candidate, policy = {}) {
   });
 }
 
-export function digestImprovementEvidence(value) {
-  return "sha256:" + createHash("sha256").update(JSON.stringify(value)).digest("hex");
-}
