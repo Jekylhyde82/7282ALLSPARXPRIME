@@ -17,6 +17,7 @@ declare global {
         callback: (token: string) => void;
         "expired-callback"?: () => void;
         "error-callback"?: () => void;
+        action?: string;
         theme?: "light" | "dark" | "auto";
       }) => string;
       reset: (widgetId?: string) => void;
@@ -113,6 +114,7 @@ export default function AssistantClient({
       if (!active || !turnstileContainer.current || !window.turnstile) return;
       turnstileWidgetId.current = window.turnstile.render(turnstileContainer.current, {
         sitekey,
+        action: "allsparx_assistant",
         callback: (token) => { setTurnstileToken(token); setTurnstileError(""); },
         "expired-callback": () => setTurnstileToken(""),
         "error-callback": () => { setTurnstileToken(""); setTurnstileError("Security challenge failed. Please reload the challenge."); },
