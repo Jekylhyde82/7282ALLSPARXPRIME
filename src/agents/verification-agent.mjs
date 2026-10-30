@@ -35,7 +35,7 @@ export function evaluateEvidenceClaim(claim) {
     item.trustworthy === true
   );
 
-  if (validEvidence.length === 0) reasons.push("no_trustworthy_success_evidence");
+  if (requested !== "PLANNED" && validEvidence.length === 0) reasons.push("no_trustworthy_success_evidence");
 
   const tested = validEvidence.some((item) =>
     ["test", "workflow", "smoke_test"].includes(item.kind)
