@@ -6,14 +6,15 @@ This checklist is deliberately evidence-based. A successful CI run proves the ch
 
 ## Verified in repository automation
 
-- [x] SYPHON runtime contract tests passed in GitHub Actions run 197.
-- [x] Cloudflare Worker bundle dry-run passed in run 197; no deployment occurred.
-- [x] Astro type/content checks passed in run 197.
-- [x] Production site build passed in run 197.
+- [x] SYPHON runtime contract tests passed in GitHub Actions run 203.
+- [x] Cloudflare Worker bundle dry-run passed in run 203; no deployment occurred.
+- [x] Astro type/content checks passed in run 203.
+- [x] Production site build passed in run 203.
 - [x] Evidence ledger appends fail closed before provider execution.
 - [x] Evidence verification is bounded and paginated (maximum 100 records per page).
 - [x] Ledger validates event lifecycle, actor origin, provenance, identifiers, provider and outcome fields.
 - [x] Offline export verifier validates record schema, semantics, chain links, hashes and a separately supplied checkpoint.
+- [x] Offline Ed25519 checkpoint signing and verification utilities pass signature, tamper, wrong-key, genesis and prior-checkpoint-link regression tests (CI run 203).
 - [x] Pre-admission rejection scope and its observability limitation are documented.
 - [x] Provider secrets are designed to remain in Worker secrets, not browser configuration.
 - [x] Live smoke workflow is manual, bounded, HTTPS-only and does not deploy.
@@ -48,9 +49,9 @@ This checklist is deliberately evidence-based. A successful CI run proves the ch
 - Repository: `Jekylhyde82/7282ALLSPARXPRIME`
 - Pull request: [#15](https://github.com/Jekylhyde82/7282ALLSPARXPRIME/pull/15)
 - Branch: `syphon/permanent-evidence-ledger`
-- Latest CI-confirmed code commit: `01cbaebbe777bcfdf9c28a0fd0b8c60f82abdfe1` (run 203). All baseline steps passed. Any subsequent commit requires its own CI run.
-- CI run 197: terminal-success on the latest evidence-export implementation; all nine job steps passed, including export regression tests within SYPHON, Wrangler dry-run, Astro checks and production build.
-- The CI run validates the export implementation in the repository; it does not establish that the secret is provisioned or that a live export/independent checkpoint has been exercised.
+- Latest CI-confirmed code commit: `01cbaebbe777bcfdf9c28a0fd0b8c60f82abdfe1` (run 203). All baseline steps passed. Checklist follow-up commit `66412a154f3e59bcf21245f04a6de51124c6ac67` is being validated by run 204.
+- CI run 203: terminal-success on checkpoint-tooling head `01cbaebbe777bcfdf9c28a0fd0b8c60f82abdfe1`; SYPHON runtime/checkpoint tests, Wrangler dry-run, Astro validation and production build all passed.
+- CI verifies repository code and tests only. It does not establish secret provisioning, a live export, operational independent signer custody, immutable external retention or recovery.
 - PR state: open, draft, unmerged.
 - Deployment state: not deployed; no production secrets or live endpoint have been verified by this checklist.
 
