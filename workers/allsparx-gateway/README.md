@@ -78,6 +78,10 @@ The sequence and SHA-256 checkpoint must be obtained through a separately contro
 
 `MAX_REQUEST_COST_MICROS` and `MONTHLY_SPEND_LIMIT_MICROS` currently implement fixed per-request admission reservations in integer units. They are **not** provider invoice metering, actual token-cost settlement, or a guaranteed USD hard cap. Reservations are intentionally not refunded. Before treating this as a production financial spend control, implement provider usage extraction, a reviewed price schedule, actual-cost settlement, and reconciliation against provider billing.
 
+## Deployment-readiness gate
+
+The evidence-based release checklist is maintained at [`docs/ALLSPARX-DEPLOYMENT-READINESS.md`](../../docs/ALLSPARX-DEPLOYMENT-READINESS.md). Its current decision is **NO-GO**: CI baseline checks pass, but export generation, independently administered checkpoints and immutable retention, backup/restore exercises, authenticated actor identity decisions, provider usage settlement, configured live provider tests, live endpoint negative-path verification, and independent security approval remain outstanding. Do not merge or deploy until the applicable blocking items have evidence and explicit approval.
+
 ## Local checks
 
 ```sh
