@@ -6,10 +6,10 @@ This checklist is deliberately evidence-based. A successful CI run proves the ch
 
 ## Verified in repository automation
 
-- [x] SYPHON runtime contract tests passed in GitHub Actions run 187.
-- [x] Cloudflare Worker bundle dry-run passed in run 187; no deployment occurred.
-- [x] Astro type/content checks passed in run 187.
-- [x] Production site build passed in run 187.
+- [x] SYPHON runtime contract tests passed in GitHub Actions run 196.
+- [x] Cloudflare Worker bundle dry-run passed in run 196; no deployment occurred.
+- [x] Astro type/content checks passed in run 196.
+- [x] Production site build passed in run 196.
 - [x] Evidence ledger appends fail closed before provider execution.
 - [x] Evidence verification is bounded and paginated (maximum 100 records per page).
 - [x] Ledger validates event lifecycle, actor origin, provenance, identifiers, provider and outcome fields.
@@ -47,8 +47,9 @@ This checklist is deliberately evidence-based. A successful CI run proves the ch
 - Repository: `Jekylhyde82/7282ALLSPARXPRIME`
 - Pull request: [#15](https://github.com/Jekylhyde82/7282ALLSPARXPRIME/pull/15)
 - Branch: `syphon/permanent-evidence-ledger`
-- CI run 187: terminal-success on pre-export commit `076c0da07f3d889afe21ef08266d7aaa05075c5c`; all nine job steps passed, including SYPHON tests, Wrangler dry-run, Astro checks and production build.
-- Subsequent evidence-export implementation and tests are newer than run 187; latest-head CI is required before they can be marked tested or verified.
+- Latest CI-confirmed commit: `e85255b69d3f37af9359a53491ae7f5489bb5086`.
+- CI run 196: terminal-success on the latest evidence-export implementation; all nine job steps passed, including export regression tests within SYPHON, Wrangler dry-run, Astro checks and production build.
+- The CI run validates the export implementation in the repository; it does not establish that the secret is provisioned or that a live export/independent checkpoint has been exercised.
 - PR state: open, draft, unmerged.
 - Deployment state: not deployed; no production secrets or live endpoint have been verified by this checklist.
 
