@@ -123,6 +123,33 @@ Phase 7 — Operational maturity: add signed releases, independent checkpoints, 
 - It does not claim that a capability is installed, tested or operational merely because it is catalogued.
 - It does not replace SYPHON or create a parallel security gateway.
 
+
+## System-wide integration inventory
+
+The registry must maintain an evidence-backed inventory of repositories that contribute to, depend on, fork, or are referenced by ALLSPARX PRIME projects. A repository's presence in this inventory does not imply that its code has been imported or merged.
+
+Each repository record must capture:
+- Canonical repository URL and stable internal repository ID.
+- Relationship type: upstream, fork, integrated component, dependency, reference-only or downstream.
+- Immutable source commit and optional source path or release.
+- Target repository, branch, pull request and merge commit where applicable.
+- Capability IDs associated with the contribution.
+- Evidence references for commits, pull requests, CI runs, reviews, licence/security decisions and deployments.
+- Explicit integration status: discovered, assessed, approved, imported, merged, rejected, retired or unknown.
+
+A record marked merged is invalid unless it includes both the pull-request reference and the immutable merge commit. Never infer a merged relationship from a repository name, a dependency declaration or a conversational claim.
+
+## Agent and capability catalogue
+
+The system-wide catalogue should describe agents, tools, services and reusable capabilities through stable IDs and links to capability manifests. Each entry must separate:
+- declared purpose and supported functions;
+- source repository and version provenance;
+- permissions and trust boundary;
+- lifecycle state (planned, available, integrated, installed, tested, verified, disabled or retired);
+- evidence references and known limitations.
+
+An agent name or role description is not proof of an autonomous process. Record whether an agent is a documented collaboration role, a configured integration, or a separately deployed executable service. Never report a capability as operational without runtime and end-to-end evidence.
+
 ## Current status and dependencies
 
 This document records the intended architecture only. No registry, extractor, installer, sandbox runner or runtime capability-management service is claimed to exist yet.
