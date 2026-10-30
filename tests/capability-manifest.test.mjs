@@ -30,7 +30,7 @@ test("manifest uses explicit bounded permission enums and HTTPS destinations", (
 test("manifest provenance and package integrity require immutable source and SHA-256 digests", () => {
   assert.match(schema.properties.source.properties.commit.pattern, /40/);
   assert.equal(schema.properties.package.properties.digest.pattern, "^sha256:[a-f0-9]{64}$");
-  assert.match(schema.properties.source.properties.path.pattern, /\.\./);
+  assert.ok(schema.properties.source.properties.path.pattern.includes("\\.\\."));
 });
 
 test("example manifest is internally consistent with required core fields", () => {
