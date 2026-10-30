@@ -1,10 +1,16 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { handleRequest } from "../src/worker.mjs";
+import { handleRequest, UserRateLimiter } from "../src/worker.mjs";
 
 const encoder = new TextEncoder();
 const b64url = (bytes) => Buffer.from(bytes).toString("base64url");
-const baseEnv = { ASSETS: { fetch: async () => new Response("asset") } };
+const baseEnv = {
+  ASSETS: { fetch: async () => new Response("asset") },
+  USER_RATE_LIMITER_DO: {
+    idFromName: (key) => key,
+    get: () => ({ fetch: async () => Response.json({ success: true, retryAfter: 60 }) }),
+  },
+};
 const tokenFixture = await makeToken();
 
 async function makeToken() {
@@ -49,7 +55,7 @@ test("does not expose an API route when the gateway is not configured", async ()
 test("rejects non-POST methods for the gateway", async () => {
   const response = await handleRequest(new Request("https://example.test/api/allsparx/v1/ask", {
     method: "GET",
-  }), { ...baseEnv, SUPABASE_URL: "https://project.supabase.co", ALLOWED_ORIGINS: "https://app.example.test", USER_RATE_LIMITER: { limit: async () => ({ success: true }) } });
+  }), { ...baseEnv, SUPABASE_URL: "https://project.supabase.co", ALLOWED_ORIGINS: "https://app.example.test", USER_RATE_LIMITER_DO: { idFromName: (key) => key, get: () => ({ fetch: async () => Response.json({ success: true, retryAfter: 60 }) }) } });
   assert.equal(response.status, 405);
 });
 
@@ -97,7 +103,10 @@ test("verifies Supabase JWT, applies per-user rate limit, and routes to configur
       ...baseEnv, SUPABASE_URL: "https://project.supabase.co",
       ALLOWED_ORIGINS: "https://app.example.test",
       OPENAI_API_KEY: "test-only", OPENAI_MODEL: "test-model",
-      USER_RATE_LIMITER: { limit: async ({ key }) => { limitedKey = key; return { success: true }; } },
+      USER_RATE_LIMITER_DO: {
+        idFromName: (key) => { limitedKey = key; return key; },
+        get: () => ({ fetch: async () => Response.json({ success: true, retryAfter: 60 }) }),
+      },
     });
     assert.equal(response.status, 200);
     assert.equal(limitedKey, "user-123");
@@ -120,7 +129,7 @@ test("returns 429 when the configured user rate limiter rejects a request", asyn
     }), {
       ...baseEnv, SUPABASE_URL: "https://project.supabase.co",
       ALLOWED_ORIGINS: "https://app.example.test",
-      USER_RATE_LIMITER: { limit: async () => ({ success: false }) },
+      USER_RATE_LIMITER_DO: { idFromName: (key) => key, get: () => ({ fetch: async () => Response.json({ success: false, retryAfter: 37 }) }) },
     });
     assert.equal(response.status, 429);
   } finally {
@@ -158,4 +167,24 @@ test("rejects oversized request bodies before JSON parsing", async () => {
     });
     assert.equal(response.status, 413);
   } finally { globalThis.fetch = originalFetch; }
+});
+
+test("Durable Object limiter enforces a serialized per-user window", async () => {
+  const values = new Map();
+  const state = {
+    storage: {
+      get: async (key) => values.get(key),
+      put: async (key, value) => values.set(key, value),
+    },
+    blockConcurrencyWhile: async (callback) => callback(),
+  };
+  const limiter = new UserRateLimiter(state);
+  for (let i = 0; i < 12; i++) {
+    const response = await limiter.fetch(new Request("https://rate-limiter/check", { method: "POST" }));
+    assert.equal((await response.json()).success, true);
+  }
+  const rejected = await limiter.fetch(new Request("https://rate-limiter/check", { method: "POST" }));
+  const body = await rejected.json();
+  assert.equal(body.success, false);
+  assert.ok(body.retryAfter >= 1);
 });
