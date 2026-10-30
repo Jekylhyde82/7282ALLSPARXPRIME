@@ -123,6 +123,11 @@ export async function runAllsparxPrimeTask(
     if (!response.ok) throw new Error("The ALLSPARX gateway could not complete this request.");
     const body: unknown = await readBoundedJson(response);
     if (!isAssistantApiResponse(body)) throw new Error("The ALLSPARX gateway returned an invalid response format.");
+    // Explicit provider selection is a strict contract: require the gateway to
+    // report the actual provider and reject silent substitution or omission.
+    if (providerPreference !== "auto" && body.provider !== providerPreference) {
+      throw new Error("The ALLSPARX gateway did not honor the explicitly selected provider.");
+    }
     return {
       summary: body.summary, programs: body.programs ?? [],
       evidence: {
