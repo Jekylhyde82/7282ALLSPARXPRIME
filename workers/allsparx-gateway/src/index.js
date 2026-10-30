@@ -144,11 +144,18 @@ function validModelId(value) {
     value.trim() === value &&
     !/[\u0000-\u001f\u007f]/.test(value);
 }
+function validCredential(value) {
+  return typeof value === "string" &&
+    value.length > 0 &&
+    value.length <= 4096 &&
+    value.trim() === value &&
+    !/[\\u0000-\\u001f\\u007f]/.test(value);
+}
 function configuredProviders(env, preference) {
   const configured = PROVIDERS.filter((provider) => {
-    if (provider === "openai") return Boolean(env.OPENAI_API_KEY) && validModelId(env.OPENAI_MODEL);
-    if (provider === "anthropic") return Boolean(env.ANTHROPIC_API_KEY) && validModelId(env.ANTHROPIC_MODEL);
-    if (provider === "google") return Boolean(env.GOOGLE_API_KEY) && validModelId(env.GOOGLE_MODEL);
+    if (provider === "openai") return validCredential(env.OPENAI_API_KEY) && validModelId(env.OPENAI_MODEL);
+    if (provider === "anthropic") return validCredential(env.ANTHROPIC_API_KEY) && validModelId(env.ANTHROPIC_MODEL);
+    if (provider === "google") return validCredential(env.GOOGLE_API_KEY) && validModelId(env.GOOGLE_MODEL);
     return false;
   });
   if (preference === "auto") return configured;
