@@ -4,7 +4,7 @@ This directory contains the isolated Cloudflare Worker API boundary for the brow
 
 ## Provider models
 
-The Worker currently pins these API model IDs: OpenAI `gpt-6-luna`, Anthropic `claude-haiku-5-5`, and Google `gemini-3.8-flash`. Ollama remains in the shared provider preference vocabulary but is intentionally unavailable through this public Cloudflare Worker; a local Ollama process is not a trusted remote provider endpoint. An explicit Ollama request fails closed as unavailable.
+The Worker currently pins these API model IDs: OpenAI `gpt-6-luna`, Anthropic `claude-haiku-4-5-20251001`, and Google `gemini-3.8-flash`. Ollama remains in the shared provider preference vocabulary but is intentionally unavailable through this public Cloudflare Worker; a local Ollama process is not a trusted remote provider endpoint. An explicit Ollama request fails closed as unavailable.
 
 ## Request path
 
