@@ -67,3 +67,15 @@ test("offline verifier rejects unexpected record fields", () => {
   bundle.records[0].untrusted = true;
   assert.throws(() => verifyEvidenceExport(bundle, checkpoint), /INVALID_RECORD_SCHEMA/);
 });
+
+test("offline verifier rejects records assigned to the wrong ledger month", () => {
+  const { bundle, checkpoint } = fixture();
+  bundle.ledgerMonth = "2026-09";
+  assert.throws(() => verifyEvidenceExport(bundle, checkpoint), /LEDGER_MONTH_MISMATCH/);
+});
+
+test("offline verifier rejects non-canonical or invalid month metadata", () => {
+  const { bundle, checkpoint } = fixture();
+  bundle.records[0].timestamp = "not-a-timestamp";
+  assert.throws(() => verifyEvidenceExport(bundle, checkpoint), /LEDGER_MONTH_MISMATCH/);
+});
