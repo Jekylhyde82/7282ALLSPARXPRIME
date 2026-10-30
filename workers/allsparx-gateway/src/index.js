@@ -149,7 +149,7 @@ function validCredential(value) {
     value.length > 0 &&
     value.length <= 4096 &&
     value.trim() === value &&
-    !/[\\u0000-\\u001f\\u007f]/.test(value);
+    !/[\u0000-\u001f\u007f]/.test(value);
 }
 function configuredProviders(env, preference) {
   const configured = PROVIDERS.filter((provider) => {
