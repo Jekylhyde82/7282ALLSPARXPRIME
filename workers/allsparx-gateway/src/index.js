@@ -109,9 +109,9 @@ async function verifyTurnstile(token, request, env) {
 }
 function configuredProviders(env, preference) {
   const configured = PROVIDERS.filter((provider) => {
-    if (provider === "openai") return Boolean(env.OPENAI_API_KEY);
-    if (provider === "anthropic") return Boolean(env.ANTHROPIC_API_KEY);
-    if (provider === "google") return Boolean(env.GOOGLE_API_KEY);
+    if (provider === "openai") return Boolean(env.OPENAI_API_KEY && env.OPENAI_MODEL);
+    if (provider === "anthropic") return Boolean(env.ANTHROPIC_API_KEY && env.ANTHROPIC_MODEL);
+    if (provider === "google") return Boolean(env.GOOGLE_API_KEY && env.GOOGLE_MODEL);
     return false;
   });
   if (preference === "auto") return configured;
@@ -126,7 +126,7 @@ async function providerCall(provider, prompt, env) {
       response = await fetch("https://api.openai.com/v1/responses", {
         method: "POST", redirect: "error",
         headers: { authorization: `Bearer ${env.OPENAI_API_KEY}`, "content-type": "application/json" },
-        body: JSON.stringify({ model: "gpt-6-luna", input: prompt, max_output_tokens: MAX_OUTPUT_TOKENS }),
+        body: JSON.stringify({ model: env.OPENAI_MODEL, input: prompt, max_output_tokens: MAX_OUTPUT_TOKENS }),
         signal: controller.signal,
       });
       if (!response.ok) throw Object.assign(new Error("PROVIDER_FAILURE"), { retryable: response.status >= 500 || response.status === 429 });
@@ -136,14 +136,14 @@ async function providerCall(provider, prompt, env) {
       response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST", redirect: "error",
         headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-        body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: MAX_OUTPUT_TOKENS, messages: [{ role: "user", content: prompt }] }),
+        body: JSON.stringify({ model: env.ANTHROPIC_MODEL, max_tokens: MAX_OUTPUT_TOKENS, messages: [{ role: "user", content: prompt }] }),
         signal: controller.signal,
       });
       if (!response.ok) throw Object.assign(new Error("PROVIDER_FAILURE"), { retryable: response.status >= 500 || response.status === 429 });
       const data = await readProviderJson(response);
       text = (data.content || []).filter((part) => part.type === "text").map((part) => part.text).join("\n");
     } else if (provider === "google") {
-      const model = "gemini-3.8-flash";
+      const model = env.GOOGLE_MODEL;
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
       response = await fetch(url, {
         method: "POST", redirect: "error", headers: { "content-type": "application/json", "x-goog-api-key": env.GOOGLE_API_KEY },
