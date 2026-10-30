@@ -15,7 +15,7 @@ The Worker requires explicit model IDs in the server-side `OPENAI_MODEL`, `ANTHR
 
 ## Required configuration
 
-Worker vars are declared in `wrangler.toml`. Before deployment, configure:
+Worker vars are declared in `wrangler.toml`. The configuration sets `ENVIRONMENT=production` and binds Cloudflare Worker version metadata as `CF_VERSION_METADATA`; the ledger records the deployed Worker version ID as provenance when running on Cloudflare. Before deployment, configure:
 
 - `TURNSTILE_SECRET_KEY` — Cloudflare Turnstile secret.
 - `EVIDENCE_HMAC_KEY` — high-entropy secret used to HMAC prompt fingerprints; do not reuse a provider key.
