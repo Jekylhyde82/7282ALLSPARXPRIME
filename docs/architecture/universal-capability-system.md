@@ -114,6 +114,54 @@ Phase 7 — Operational maturity: add signed releases, independent checkpoints, 
 - A capability can be disabled or removed without corrupting unrelated capabilities or the host application.
 - The system is not called production-ready until independent verification, backup/restore and live deployment checks pass.
 
+
+## Automatic synergy and controlled merge policy
+
+The default operating mode is continuous, automatic coordination across every explicitly connected and approved source. "Automatic" means the system performs repeatable discovery, comparison, preparation, validation and lifecycle maintenance without requiring the user to micromanage each safe step. It does not mean blindly copying or merging unknown code.
+
+### Always-automatic, read-only or reversible work
+
+- Discover newly connected repositories, releases, tools and declared integrations from approved source lists.
+- Inventory repository structure, manifests, package metadata, interfaces, dependencies, licences and declared capabilities without executing imported code.
+- Compare candidates against the existing catalogue; detect duplicates, overlapping functions, incompatible versions and shared dependencies.
+- Map complementary capabilities and propose the smallest coherent fusion plan.
+- Generate provenance records, dependency graphs, compatibility reports and proposed change sets.
+- Open isolated branches or pull requests for eligible changes, run the required test and security pipeline, and report precise outcomes.
+- Detect upstream changes, advisories, deprecations and drift; prepare upgrade or rollback proposals.
+- Keep the catalogue and evidence ledger synchronized with verified repository events.
+
+### Conditional automation
+
+A change may be configured for automatic merge only when every gate is satisfied:
+1. The source repository is on an explicit owner-controlled allowlist and its identity is verified.
+2. Source commit and licence are immutable, known and compatible; attribution and notices are preserved.
+3. The change is minimal, scoped to an approved capability boundary and does not alter unrelated application behavior.
+4. Static analysis, secret scanning, dependency and vulnerability checks, licence checks, unit, integration and regression tests all pass on the exact proposed commit.
+5. The change requests only pre-approved low-risk permissions and does not add credential access, unrestricted network access, process spawning, data export, production deployment or destructive behavior.
+6. Branch protection, required reviews and CI policies are satisfied; the merge mechanism is explicitly enabled by the repository owner.
+7. A known-good revision and tested rollback path exist, and the resulting merge is recorded with commit and workflow evidence.
+
+If any gate is absent, ambiguous, stale or failed, the system must stop before merge, preserve the current working version, and produce a review request explaining the blocker. Human approval remains mandatory for new sources, licence uncertainty, security-boundary changes, elevated permissions, schema migrations, data changes, production deployment and destructive operations.
+
+### Fusion rules
+
+- Prefer adapters and narrow interfaces over copying entire repositories.
+- Reuse a capability only when its function, provenance, licence, version, runtime and security posture are understood.
+- Combine complementary capabilities; deduplicate equivalent ones; preserve distinct implementations when they provide meaningful resilience or independent verification.
+- Do not collapse dissenting security findings or competing implementations into one unreviewed "winner".
+- Preserve original project identity, history, authorship, licence notices and a reversible mapping to the source.
+- Keep integration status separate from capability status. A repository can be connected without being merged; a capability can be catalogued without being installed.
+- Every automatic action must be idempotent, bounded, auditable and safe to retry. Failed work must not corrupt a known-good state.
+
+### Operational modes
+
+- **Observe:** discover and catalogue only.
+- **Prepare:** create proposed extraction plans and pull requests; no merge.
+- **Auto-integrate:** perform only pre-authorized low-risk merges after all gates pass.
+- **Restricted:** freeze merges and upgrades while continuing read-only monitoring and evidence collection.
+
+The initial deployment must start in Observe mode. Auto-integrate cannot be enabled until SYPHON's identity, policy enforcement, evidence integrity, isolation and rollback controls are independently verified in the actual deployment architecture. Mode changes require an authenticated, auditable owner decision.
+
 ## Non-goals and safeguards
 
 - This system does not blindly merge entire repositories into ALLSPARX PRIME.
