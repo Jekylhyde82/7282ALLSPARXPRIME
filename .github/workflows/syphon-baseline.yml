@@ -43,6 +43,9 @@ jobs:
       - name: Run read-only capability discovery tests
         id: capability-discovery-tests
         run: pnpm test:capability-discovery
+      - name: Run continuous improvement pipeline orchestration tests
+        id: continuous-improvement-pipeline-tests
+        run: pnpm test:continuous-improvement-pipeline
       - name: Run evidence-based improvement assessment tests
         id: improvement-assessment-tests
         run: pnpm test:improvement-assessment
