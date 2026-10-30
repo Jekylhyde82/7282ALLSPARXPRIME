@@ -189,3 +189,60 @@ test("Durable Object limiter enforces a serialized per-user window", async () =>
   assert.equal(body.success, false);
   assert.ok(body.retryAfter >= 1);
 });
+
+
+test("does not fall back to another provider after an invalid provider response", async () => {
+  const { token, jwk } = tokenFixture;
+  const originalFetch = globalThis.fetch;
+  let anthropicCalls = 0;
+  globalThis.fetch = async (url) => {
+    if (String(url).endsWith("/auth/v1/.well-known/jwks.json")) return Response.json({ keys: [jwk] });
+    if (String(url) === "https://api.openai.com/v1/chat/completions") {
+      return Response.json({ choices: [{ message: { content: "" } }] });
+    }
+    if (String(url) === "https://api.anthropic.com/v1/messages") {
+      anthropicCalls++;
+      return Response.json({ content: [{ type: "text", text: JSON.stringify({ summary: "unexpected fallback", programs: [] }) }] });
+    }
+    throw new Error("Unexpected network request");
+  };
+  try {
+    const response = await handleRequest(new Request("https://example.test/api/allsparx/v1/ask", {
+      method: "POST",
+      headers: { authorization: "Bearer " + token, "content-type": "application/json" },
+      body: JSON.stringify({ prompt: "hello", task: "startup-deal-recommendation", provider: "auto", contractVersion: 1, catalog: [] }),
+    }), {
+      ...baseEnv, SUPABASE_URL: "https://project.supabase.co", ALLOWED_ORIGINS: "https://app.example.test",
+      OPENAI_API_KEY: "test-only", OPENAI_MODEL: "test-model",
+      ANTHROPIC_API_KEY: "test-only", ANTHROPIC_MODEL: "test-model",
+    });
+    assert.equal(response.status, 502);
+    assert.equal(anthropicCalls, 0);
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+test("rejects oversized provider response bodies", async () => {
+  const { token, jwk } = tokenFixture;
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    if (String(url).endsWith("/auth/v1/.well-known/jwks.json")) return Response.json({ keys: [jwk] });
+    if (String(url) === "https://api.openai.com/v1/chat/completions") {
+      return new Response("x".repeat(65 * 1024), {
+        status: 200,
+        headers: { "content-type": "application/json", "content-length": String(65 * 1024) },
+      });
+    }
+    throw new Error("Unexpected network request");
+  };
+  try {
+    const response = await handleRequest(new Request("https://example.test/api/allsparx/v1/ask", {
+      method: "POST",
+      headers: { authorization: "Bearer " + token, "content-type": "application/json" },
+      body: JSON.stringify({ prompt: "hello", task: "startup-deal-recommendation", provider: "auto", contractVersion: 1, catalog: [] }),
+    }), {
+      ...baseEnv, SUPABASE_URL: "https://project.supabase.co", ALLOWED_ORIGINS: "https://app.example.test",
+      OPENAI_API_KEY: "test-only", OPENAI_MODEL: "test-model",
+    });
+    assert.equal(response.status, 502);
+  } finally { globalThis.fetch = originalFetch; }
+});
