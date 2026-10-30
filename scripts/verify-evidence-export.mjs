@@ -42,6 +42,7 @@ export function verifyEvidenceExport(bundle, trustedCheckpoint) {
         RECORD_KEYS.some((key) => !Object.hasOwn(record, key))) fail("INVALID_RECORD_SCHEMA");
     const sequence = index + 1;
     if (record.sequence !== sequence) fail("SEQUENCE_GAP");
+    if (typeof record.timestamp !== "string" || !/^\\d{4}-(0[1-9]|1[0-2])-/.test(record.timestamp) || record.timestamp.slice(0, 7) !== bundle.ledgerMonth) fail("LEDGER_MONTH_MISMATCH");
     if (record.previousHash !== previousHash || !HASH.test(record.eventHash || "")) fail("CHAIN_LINK_MISMATCH");
     const { eventHash, ...payload } = record;
     const calculated = createHash("sha256").update(JSON.stringify(payload), "utf8").digest("hex");
