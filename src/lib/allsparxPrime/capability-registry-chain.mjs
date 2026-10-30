@@ -1,6 +1,11 @@
 import { createHash } from "node:crypto";
 
+// Server-side integrity helper only. This hash chain is not authenticated storage,
+// independent tamper protection, a signature system, or a persistence layer.
+
 const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/;
+const RECORD_KEYS = new Set(["record_version", "record_id", "sequence", "capability_id", "capability_version", "package_digest", "event_type", "occurred_at", "actor", "decision", "policy_version", "previous_record_digest", "record_digest", "external_checkpoint"]);
+const INPUT_KEYS = new Set(["record_id", "capability_id", "capability_version", "package_digest", "event_type", "occurred_at", "actor", "decision", "policy_version", "external_checkpoint"]);
 const EVENT_TYPES = new Set([
   "discovered", "provenance-recorded", "license-reviewed", "extracted",
   "packaged", "validated", "approved", "rejected", "published", "installed",
@@ -28,6 +33,7 @@ function digestRecord(record) {
 
 function assertRecordShape(record) {
   if (!record || typeof record !== "object" || Array.isArray(record)) throw new TypeError("A registry record must be an object.");
+  if (Object.keys(record).some((key) => !RECORD_KEYS.has(key))) throw new TypeError("Registry record contains an unknown field.");
   if (record.record_version !== "1.0.0") throw new TypeError("Unsupported registry record version.");
   if (typeof record.record_id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(record.record_id)) throw new TypeError("Registry record_id must be a UUID v4.");
   if (!Number.isSafeInteger(record.sequence) || record.sequence < 1) throw new TypeError("Registry sequence must be a positive safe integer.");
@@ -45,6 +51,7 @@ function assertRecordShape(record) {
 
 export function createRegistryRecord(input, previousRecord = null) {
   if (!input || typeof input !== "object" || Array.isArray(input)) throw new TypeError("Registry record input must be an object.");
+  if (Object.keys(input).some((key) => !INPUT_KEYS.has(key))) throw new TypeError("Registry record input contains a reserved or unknown field.");
   const expectedSequence = previousRecord ? previousRecord.sequence + 1 : 1;
   const expectedPreviousDigest = previousRecord ? previousRecord.record_digest : null;
   const record = {
