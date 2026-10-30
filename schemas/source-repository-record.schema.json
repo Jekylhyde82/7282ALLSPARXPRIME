@@ -17,7 +17,9 @@
     "evidence"
   ],
   "properties": {
-    "record_version": { "const": "1.0.0" },
+    "record_version": {
+      "const": "1.0.0"
+    },
     "repository_id": {
       "type": "string",
       "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
@@ -29,32 +31,68 @@
       "maxLength": 500
     },
     "relationship": {
-      "enum": ["upstream", "fork", "integrated-component", "dependency", "reference-only", "downstream"]
+      "enum": [
+        "upstream",
+        "fork",
+        "integrated-component",
+        "dependency",
+        "reference-only",
+        "downstream"
+      ]
     },
     "integration_status": {
-      "enum": ["discovered", "assessed", "approved", "imported", "merged", "rejected", "retired", "unknown"]
+      "enum": [
+        "discovered",
+        "assessed",
+        "approved",
+        "imported",
+        "merged",
+        "rejected",
+        "retired",
+        "unknown"
+      ]
     },
     "source": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["commit"],
+      "required": [
+        "commit"
+      ],
       "properties": {
         "commit": {
           "type": "string",
           "pattern": "^(?:[a-f0-9]{40}|[a-f0-9]{64})$"
         },
-        "path": { "type": "string", "maxLength": 500 },
-        "release": { "type": "string", "maxLength": 120 }
+        "path": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "release": {
+          "type": "string",
+          "maxLength": 120
+        }
       }
     },
     "target": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["repository_id"],
+      "required": [
+        "repository_id"
+      ],
       "properties": {
-        "repository_id": { "type": "string", "minLength": 1, "maxLength": 160 },
-        "branch": { "type": "string", "maxLength": 200 },
-        "pull_request": { "type": "string", "maxLength": 500 },
+        "repository_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "branch": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "pull_request": {
+          "type": "string",
+          "maxLength": 500
+        },
         "merge_commit": {
           "type": "string",
           "pattern": "^(?:[a-f0-9]{40}|[a-f0-9]{64})$"
@@ -65,7 +103,11 @@
       "type": "array",
       "maxItems": 200,
       "uniqueItems": true,
-      "items": { "type": "string", "minLength": 3, "maxLength": 160 }
+      "items": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 160
+      }
     },
     "evidence": {
       "type": "array",
@@ -73,17 +115,72 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["kind", "reference"],
+        "required": [
+          "kind",
+          "reference"
+        ],
         "properties": {
           "kind": {
-            "enum": ["commit", "pull-request", "workflow-run", "review", "test-report", "license-review", "security-review", "deployment"]
+            "enum": [
+              "commit",
+              "pull-request",
+              "workflow-run",
+              "review",
+              "test-report",
+              "license-review",
+              "security-review",
+              "deployment"
+            ]
           },
-          "reference": { "type": "string", "minLength": 1, "maxLength": 1000 },
-          "result": { "enum": ["passed", "failed", "pending", "not-applicable", "unknown"] }
+          "reference": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "result": {
+            "enum": [
+              "passed",
+              "failed",
+              "pending",
+              "not-applicable",
+              "unknown"
+            ]
+          }
         }
       }
     },
-    "last_reviewed_at": { "type": "string", "maxLength": 80 },
-    "notes": { "type": "string", "maxLength": 4000 }
-  }
+    "last_reviewed_at": {
+      "type": "string",
+      "maxLength": 80
+    },
+    "notes": {
+      "type": "string",
+      "maxLength": 4000
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "integration_status": {
+            "const": "merged"
+          }
+        },
+        "required": [
+          "integration_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "target": {
+            "required": [
+              "repository_id",
+              "pull_request",
+              "merge_commit"
+            ]
+          }
+        }
+      }
+    }
+  ]
 }
