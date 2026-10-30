@@ -106,6 +106,20 @@ test("fails closed when Turnstile is not configured", async () => {
   const response = await worker.fetch(request(), env({ TURNSTILE_SECRET_KEY: undefined }));
   assert.equal(response.status, 503);
 });
+test("rejects malformed and non-object Turnstile verification responses", async () => {
+  for (const payload of ["not-json", "null", "[]"]) {
+    globalThis.fetch = async () => new Response(payload, { status: 200 });
+    const response = await worker.fetch(request(), env());
+    assert.equal(response.status, 403);
+    assert.deepEqual(await response.json(), { error: "CHALLENGE_FAILED" });
+  }
+});
+test("rejects oversized Turnstile verification responses without parsing them", async () => {
+  globalThis.fetch = async () => new Response("x".repeat(16 * 1024 + 1), { status: 200 });
+  const response = await worker.fetch(request(), env());
+  assert.equal(response.status, 403);
+  assert.deepEqual(await response.json(), { error: "CHALLENGE_FAILED" });
+});
 test("rejects a Turnstile action mismatch", async () => {
   globalThis.fetch = async () => Response.json({ success: true, hostname: "cloudcredits.io", action: "different_action" });
   const response = await worker.fetch(request(), env());
