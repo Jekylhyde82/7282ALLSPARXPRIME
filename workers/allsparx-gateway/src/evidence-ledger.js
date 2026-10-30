@@ -38,7 +38,8 @@ async function readBoundedJson(request) {
 }
 function validEvent(event) {
   return event && typeof event === "object" &&
-    typeof event.operationId === "string" && /^[a-zA-Z0-9._:-]{1,128}$/.test(event.operationId) &&
+    typeof event.operationId === "string" && /^[a-f0-9-]{36}$/.test(event.operationId) &&
+    typeof event.correlationId === "string" && /^[a-zA-Z0-9._:-]{1,128}$/.test(event.correlationId) &&
     EVENT_TYPES.has(event.eventType) &&
     typeof event.status === "string" && event.status.length <= 64 &&
     typeof event.timestamp === "string" && !Number.isNaN(Date.parse(event.timestamp)) &&
@@ -47,7 +48,7 @@ function validEvent(event) {
     typeof event.provenance.producer === "string" &&
     typeof event.provenance.environment === "string" &&
     typeof event.objective === "string" && event.objective.length <= 128 &&
-    typeof event.promptSha256 === "string" && /^[a-f0-9]{64}$/.test(event.promptSha256) &&
+    typeof event.promptHmacSha256 === "string" && /^[a-f0-9]{64}$/.test(event.promptHmacSha256) &&
     (event.provider === null || typeof event.provider === "string") &&
     typeof event.outcomeCode === "string" && event.outcomeCode.length <= 64;
 }
@@ -71,13 +72,14 @@ export class EvidenceLedger {
         const record = {
           sequence,
           operationId: event.operationId,
+          correlationId: event.correlationId,
           eventType: event.eventType,
           status: event.status,
           timestamp: event.timestamp,
           provenance: event.provenance,
           actor: event.actor,
           objective: event.objective,
-          promptSha256: event.promptSha256,
+          promptHmacSha256: event.promptHmacSha256,
           provider: event.provider,
           outcomeCode: event.outcomeCode,
           previousHash: head.hash,
