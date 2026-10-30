@@ -244,3 +244,30 @@ test("Durable Object verifies the R2 object before treating a retry as already s
     globalThis.fetch = originalFetch;
   }
 });
+
+test("Durable Object returns retryable processing while an acquisition lease is active", async () => {
+  const active = {
+    status: "processing",
+    lease_expires_at: new Date(Date.now() + 60000).toISOString(),
+  };
+  const state = {
+    storage: {
+      async transaction(fn) {
+        return fn({ get: async () => active, put: async () => { throw new Error("must_not_claim"); } });
+      },
+    },
+  };
+  const coordinator = new SnapshotCoordinator(state, {});
+  const response = await coordinator.fetch(new Request("https://snapshot.internal/process", {
+    method: "POST",
+    body: JSON.stringify({
+      repository_full_name: "Jekylhyde82/7282ALLSPARXPRIME",
+      source_commit_sha: "b".repeat(40),
+      merge_commit_sha: "a".repeat(40),
+      pull_request_number: 22,
+      license_expression: "MIT",
+    }),
+  }));
+  assert.equal(response.status, 202);
+  assert.equal((await response.json()).status, "processing");
+});
