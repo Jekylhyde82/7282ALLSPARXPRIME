@@ -82,7 +82,7 @@ Automatic provider routing is a gateway policy (OpenAI → Anthropic → Google 
 
 The browser must never contain provider API keys. `PUBLIC_*` values are bundled into browser code and are not secrets. Before public exposure, the server-side gateway must enforce authentication/abuse controls, origin allowlisting, rate limits, provider spend limits, and secret rotation. CORS alone is not authentication.
 
-The repository contains the provider registry, browser gateway contract, bounded response handling, routing/runtime tests, and a manual live-gateway smoke-test workflow. It does not by itself provide the server-side gateway, vendor adapters, provider credentials, live provider connectivity, or production deployment. A passing mocked test is not live verification; the live gateway check is a separate gate. Do not configure a public endpoint until the gateway security controls are implemented and independently verified.
+The repository contains the provider registry, browser gateway contract, a Cloudflare Worker gateway, Supabase Auth sign-in/session handling, server-side provider adapters, bounded request/response handling, origin allowlisting, per-user rate limiting, routing/runtime/security tests, and a manual live-gateway smoke-test workflow. The Worker and frontend auth code still require an active Supabase project, asymmetric JWT signing, deployment configuration, provider credentials, CI verification, and live endpoint testing. A per-user SQLite-backed Durable Object enforces a strict global request window; this is not a provider spend cap. A passing mocked test is not live verification; do not expose the endpoint publicly until all deployment and verification gates pass.
 
 ## Building for Production
 
