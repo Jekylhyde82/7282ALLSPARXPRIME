@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: syphon-baseline-${{ github.workflow }}-${{ github.ref }}
+  group: syphon-baseline-\${{ github.workflow }}-\${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -19,26 +19,24 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v4
-
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10.8.1
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: pnpm
-
       - name: Install locked dependencies
         id: install
         run: pnpm install --frozen-lockfile
-
+      - name: Run SYPHON runtime contract tests
+        id: syphon-tests
+        run: pnpm test:syphon
       - name: Run Astro type and content checks
         id: check
         run: pnpm check
-
       - name: Run production build
-        if: ${{ always() && steps.install.outcome == 'success' }}
+        if: \${{ always() && steps.install.outcome == 'success' }}
         run: pnpm build
