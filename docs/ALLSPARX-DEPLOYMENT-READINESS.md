@@ -57,3 +57,23 @@ This checklist is deliberately evidence-based. A successful CI run proves the ch
 - Deployment state: not deployed; no production secrets or live endpoint have been verified by this checklist.
 
 Update this document only when the corresponding evidence exists. Never check an item based solely on intention or an attempted action.
+
+
+## Additional CI security and provenance gates — 2026-10-31
+
+A separate workflow, `.github/workflows/syphon-security-provenance.yml`, has been added to the open PR branch. Its first execution is required before any control below can be marked tested or verified.
+
+- [ ] Zizmor GitHub Actions security-policy analysis completes successfully.
+- [ ] Gitleaks scans the checked-out repository history without exposing matched values.
+- [ ] Locked dependency audit completes with no high/critical findings.
+- [ ] Existing SYPHON regression tests pass, including current tamper-detection, fail-closed evidence-storage and provider-failure/fallback cases.
+- [ ] Cloudflare Worker dry-run, Astro checks and production build pass in this security workflow.
+- [ ] Commit-bound source bundle and CI evidence manifest are generated with SHA-256 linkage.
+- [ ] GitHub build-provenance attestations for the source bundle and evidence manifest are successfully published and independently retrievable.
+- [ ] CI evidence artifact is retained and its run/commit association is confirmed.
+
+**Scope limitation:** this CI evidence package is an inspectable, commit-linked CI output. It is not yet a write into the live SYPHON Durable Object ledger, an external immutable archive, or the independently administered Ed25519 checkpoint service. The new workflow's artifact retention is not a substitute for external immutable retention.
+
+**Resilience limitation:** the existing tests exercise selected fault paths and tamper rejection. A dedicated backup/restore exercise, measured recovery objective, and cross-boundary continuity verification remain outstanding.
+
+**Current execution checkpoint:** latest PR head at the time of this update is `8114a0bbd7f4ce03dd809c1f18087a1be57eade5`. GitHub Actions has created run 3 of the security/provenance workflow (run ID `41118495255`) and baseline run 213 (run ID `41118495282`) for this exact commit. Both were pending when last inspected. Do not mark these gates passed until both the job results and generated attestations/artifacts are independently checked.
