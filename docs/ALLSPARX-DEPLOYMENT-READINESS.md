@@ -6,10 +6,10 @@ This checklist is deliberately evidence-based. A successful CI run proves the ch
 
 ## Verified in repository automation
 
-- [x] SYPHON runtime contract tests passed in GitHub Actions run 203.
-- [x] Cloudflare Worker bundle dry-run passed in run 203; no deployment occurred.
-- [x] Astro type/content checks passed in run 203.
-- [x] Production site build passed in run 203.
+- [x] SYPHON runtime contract tests passed on PR head `3b75154ab382e354cfe5d9953e8ff568a42e9604` in GitHub Actions run 206.
+- [x] Cloudflare Worker bundle dry-run passed on that same head in run 206; no deployment occurred.
+- [x] Astro type/content checks passed on that same head in run 206.
+- [x] Production site build passed on that same head in run 206.
 - [x] Evidence ledger appends fail closed before provider execution.
 - [x] Evidence verification is bounded and paginated (maximum 100 records per page).
 - [x] Ledger validates event lifecycle, actor origin, provenance, identifiers, provider and outcome fields.
@@ -21,7 +21,7 @@ This checklist is deliberately evidence-based. A successful CI run proves the ch
 
 ## Blocking requirements before production approval
 
-- [x] Implement a protected, bounded monthly evidence export-generation path with paginated record reads, per-page chain validation, a dedicated bearer secret, and size limits. Regression tests have been added; latest-head CI and a live export invocation are still required before treating it as verified.
+- [x] Implement a protected, bounded monthly evidence export-generation path with paginated record reads, per-page chain validation, a dedicated bearer secret, and size limits. Regression tests passed in CI run 206 on PR head `3b75154ab382e354cfe5d9953e8ff568a42e9604`; live export invocation remains outstanding.
 - [ ] Securely provision and rotate `EVIDENCE_EXPORT_TOKEN`, restrict the route at the Cloudflare edge where supported, and perform a live export against a non-production ledger.
 - [x] Implement offline Ed25519 checkpoint signing and verification tools with signature, tamper, key-mismatch, genesis, and previous-checkpoint-chain regression tests.
 - [ ] Provision and operate a separately administered signer outside the Cloudflare Worker and Durable Object trust boundary; pin/distribute its public key out of band, establish the genesis trust anchor, and verify key custody, rotation, revocation, and checkpoint hand-off.
@@ -49,8 +49,8 @@ This checklist is deliberately evidence-based. A successful CI run proves the ch
 - Repository: `Jekylhyde82/7282ALLSPARXPRIME`
 - Pull request: [#15](https://github.com/Jekylhyde82/7282ALLSPARXPRIME/pull/15)
 - Branch: `syphon/permanent-evidence-ledger`
-- Latest CI-confirmed code commit: `01cbaebbe777bcfdf9c28a0fd0b8c60f82abdfe1` (run 203). All baseline steps passed. Checklist follow-up commit `66412a154f3e59bcf21245f04a6de51124c6ac67` is being validated by run 204.
-- CI run 203: terminal-success on checkpoint-tooling head `01cbaebbe777bcfdf9c28a0fd0b8c60f82abdfe1`; SYPHON runtime/checkpoint tests, Wrangler dry-run, Astro validation and production build all passed.
+- Latest CI-confirmed code commit at this checkpoint: `3b75154ab382e354cfe5d9953e8ff568a42e9604` (run 206, run ID `41018455189`); all nine workflow steps completed successfully, including dependency installation, SYPHON tests, Wrangler dry-run, Astro checks, production build, and job teardown.
+- Run 206 is terminal-success for the exact PR head above. It does not verify this subsequent documentation-only update or any live Cloudflare resources, credentials, provider calls, external retention, signer custody or recovery exercise.
 - CI verifies repository code and tests only. It does not establish secret provisioning, a live export, operational independent signer custody, immutable external retention or recovery.
 - PR state: open, draft, unmerged.
 - Deployment state: not deployed; no production secrets or live endpoint have been verified by this checklist.
