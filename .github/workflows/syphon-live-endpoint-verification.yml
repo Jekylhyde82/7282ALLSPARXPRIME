@@ -40,7 +40,7 @@ jobs:
             console.error("FAIL: gateway URL must target /v1/ask without a query string.");
             process.exit(1);
           }
-          if (token.length > 4096 || /[\\u0000-\\u001f\\u007f]/.test(token)) {
+          if (token.length > 4096 || /[\u0000-\u001f\u007f]/.test(token)) {
             console.error("FAIL: Turnstile token is malformed.");
             process.exit(1);
           }
@@ -78,7 +78,7 @@ jobs:
               process.exit(1);
             }
             const mediaType = (response.headers.get("content-type") ?? "").split(";")[0].trim().toLowerCase();
-            if (mediaType !== "application/json" && !/^application\\/[a-z0-9.+-]+\\+json$/.test(mediaType)) {
+            if (mediaType !== "application/json" && !/^application\/[a-z0-9.+-]+\+json$/.test(mediaType)) {
               console.error("FAIL: gateway did not declare a valid JSON media type.");
               process.exit(1);
             }
