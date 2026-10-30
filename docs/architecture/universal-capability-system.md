@@ -341,7 +341,7 @@ The coordinator:
 - Distinguishes a confirmed merge followed by snapshot failure from an uncertain merge response. An uncertain merge is recorded as unknown and is not reported as a success or failure.
 - Exposes an outcome sink for durable audit recording.
 
-Eight orchestration tests cover the successful path and fail-closed paths. The tests use injected fake adapters; they prove coordinator behaviour, not live repository merging, isolation, authenticated evidence, webhook handling or durable storage.
+Ten orchestration tests cover the successful path, isolation/evidence failures, policy denial, ambiguous merge responses, post-merge snapshot failure, digest validation and missing adapters. The tests use injected fake adapters; they prove coordinator behaviour, not live repository merging, isolation, authenticated evidence, webhook handling or durable storage.
 
 ### Verified deployment constraint
 
