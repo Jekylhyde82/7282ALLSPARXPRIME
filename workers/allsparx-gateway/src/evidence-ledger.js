@@ -18,9 +18,23 @@ async function sha256(value) {
 async function readBoundedJson(request) {
   const declared = Number(request.headers.get("content-length") || 0);
   if (declared > MAX_BODY_BYTES) throw new Error("BODY_TOO_LARGE");
-  const text = await request.text();
-  if (new TextEncoder().encode(text).byteLength > MAX_BODY_BYTES) throw new Error("BODY_TOO_LARGE");
-  return JSON.parse(text);
+  const reader = request.body?.getReader();
+  if (!reader) throw new Error("EMPTY_BODY");
+  const chunks = [];
+  let size = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > MAX_BODY_BYTES) { await reader.cancel(); throw new Error("BODY_TOO_LARGE"); }
+      chunks.push(value);
+    }
+  } finally { reader.releaseLock(); }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+  return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
 }
 function validEvent(event) {
   return event && typeof event === "object" &&
@@ -28,6 +42,7 @@ function validEvent(event) {
     EVENT_TYPES.has(event.eventType) &&
     typeof event.status === "string" && event.status.length <= 64 &&
     typeof event.timestamp === "string" && !Number.isNaN(Date.parse(event.timestamp)) &&
+    event.actor && event.actor.type === "anonymous-origin" && typeof event.actor.origin === "string" &&
     event.provenance && typeof event.provenance.system === "string" &&
     typeof event.provenance.producer === "string" &&
     typeof event.provenance.environment === "string" &&
@@ -60,6 +75,7 @@ export class EvidenceLedger {
           status: event.status,
           timestamp: event.timestamp,
           provenance: event.provenance,
+          actor: event.actor,
           objective: event.objective,
           promptSha256: event.promptSha256,
           provider: event.provider,
