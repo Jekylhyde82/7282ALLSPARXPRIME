@@ -10,7 +10,7 @@ The Worker currently pins these API model IDs: OpenAI `gpt-6-luna`, Anthropic `c
 
 - Browser: HTTPS POST to `/v1/ask`, with a one-time Cloudflare Turnstile token and request ID.
 - Worker: exact origin allowlist, bounded JSON input, Turnstile Siteverify hostname validation, per-IP Durable Object rate limit, provider allowlist, monthly admission reservation, bounded provider output, durable evidence append, and normalized JSON response.
-- Evidence: a separate monthly Durable Object ledger stores request IDs, lifecycle events, anonymous origin, deployment provenance, task identifier, provider outcome, and a SHA-256 hash of the prompt. Raw prompts and provider credentials are never written to the ledger. Each event links to the prior event hash; the internal verification endpoint recomputes the chain.
+- Evidence: a separate monthly Durable Object ledger stores request IDs, lifecycle events, anonymous origin, deployment provenance, task identifier, provider outcome, and an HMAC-SHA-256 fingerprint of the prompt using the separate `EVIDENCE_HMAC_KEY` secret. Raw prompts and provider credentials are never written to the ledger. Each event links to the prior event hash; the internal verification endpoint recomputes the chain.
 - Provider credentials: Worker secrets only. Never place provider secrets in Astro `PUBLIC_*` variables or browser bundles.
 
 ## Required configuration
@@ -18,6 +18,7 @@ The Worker currently pins these API model IDs: OpenAI `gpt-6-luna`, Anthropic `c
 Worker vars are declared in `wrangler.toml`. Before deployment, configure:
 
 - `TURNSTILE_SECRET_KEY` — Cloudflare Turnstile secret.
+- `EVIDENCE_HMAC_KEY` — high-entropy secret used to HMAC prompt fingerprints; do not reuse a provider key.
 - At least one of `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or `GOOGLE_API_KEY`.
 
 Set secrets using the Cloudflare account that owns the Worker:
@@ -25,6 +26,7 @@ Set secrets using the Cloudflare account that owns the Worker:
 ```sh
 npx wrangler@4 login
 npx wrangler@4 secret put TURNSTILE_SECRET_KEY --config workers/allsparx-gateway/wrangler.toml
+npx wrangler@4 secret put EVIDENCE_HMAC_KEY --config workers/allsparx-gateway/wrangler.toml
 npx wrangler@4 secret put OPENAI_API_KEY --config workers/allsparx-gateway/wrangler.toml
 # Optional additional providers:
 npx wrangler@4 secret put ANTHROPIC_API_KEY --config workers/allsparx-gateway/wrangler.toml
@@ -50,7 +52,7 @@ The internal evidence Durable Object supports `POST /append` and `GET /verify`; 
 
 ## Evidence ledger limitations
 
-The ledger is durable within Cloudflare Durable Object storage and records append-only hash-linked events. It does not yet provide cross-account immutable retention, external timestamping, signed exports, retention/backup policy, or an independent verifier outside the same Cloudflare trust boundary. Request identity is anonymous origin context, not authenticated end-user identity. The prompt is represented by SHA-256 only; raw prompt content is deliberately excluded.
+The ledger is durable within Cloudflare Durable Object storage and records append-only hash-linked events. It does not yet provide cross-account immutable retention, external timestamping, signed exports, retention/backup policy, or an independent verifier outside the same Cloudflare trust boundary. Request identity is anonymous origin context, not authenticated end-user identity. The prompt is represented by a keyed HMAC-SHA-256 fingerprint; raw prompt content is deliberately excluded.
 
 ## Admission-budget limitation
 
