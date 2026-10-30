@@ -2,6 +2,7 @@ const API_PATH = "/api/allsparx/v1/ask";
 const MAX_BODY_BYTES = 48 * 1024;
 const MAX_PROMPT_CHARS = 500;
 const MAX_OUTPUT_TOKENS = 800;
+const MAX_PROVIDER_RESPONSE_BYTES = 64 * 1024;
 const PROVIDERS = ["openai", "anthropic", "google", "ollama"];
 let jwksCache = { value: null, expiresAt: 0 };
 
@@ -61,7 +62,7 @@ async function getJwks(url) {
   if (jwksCache.value && Date.now() < jwksCache.expiresAt) return jwksCache.value;
   const response = await fetch(url, { headers: { accept: "application/json" }, signal: AbortSignal.timeout(5000) });
   if (!response.ok) throw new Error("jwks_unavailable");
-  const data = await response.json();
+  const data = await readBoundedJson(response);
   if (!data || !Array.isArray(data.keys) || data.keys.length === 0) throw new Error("jwks_empty");
   jwksCache = { value: data, expiresAt: Date.now() + 10 * 60 * 1000 };
   return data;
@@ -111,6 +112,32 @@ function providerConfigs(env) {
   if (env.OLLAMA_BASE_URL && env.OLLAMA_MODEL) list.push("ollama");
   return list;
 }
+async function readBoundedJson(response, maxBytes = MAX_PROVIDER_RESPONSE_BYTES) {
+  const declared = Number(response.headers.get("content-length") || "0");
+  if (declared > maxBytes) throw new Error("provider_response_too_large");
+  if (!response.body) throw new Error("provider_invalid_response");
+  const reader = response.body.getReader();
+  const chunks = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > maxBytes) {
+        await reader.cancel();
+        throw new Error("provider_response_too_large");
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+  return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
+}
 function extractJson(text) {
   try { return JSON.parse(text); } catch {}
   const start = text.indexOf("{"), end = text.lastIndexOf("}");
@@ -129,14 +156,14 @@ async function callProvider(provider, prompt, catalog, env) {
       headers: { authorization: "Bearer " + env.OPENAI_API_KEY, "content-type": "application/json" },
       body: JSON.stringify({ model: env.OPENAI_MODEL, messages: [{ role: "user", content: instruction }], max_tokens: MAX_OUTPUT_TOKENS, temperature: 0.2 }),
     });
-    if (response.ok) { const data = await response.json(); text = data.choices?.[0]?.message?.content; }
+    if (response.ok) { const data = await readBoundedJson(response); text = data.choices?.[0]?.message?.content; }
   } else if (provider === "anthropic") {
     response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST", signal,
       headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" },
       body: JSON.stringify({ model: env.ANTHROPIC_MODEL, max_tokens: MAX_OUTPUT_TOKENS, messages: [{ role: "user", content: instruction }] }),
     });
-    if (response.ok) { const data = await response.json(); text = data.content?.find((part) => part.type === "text")?.text; }
+    if (response.ok) { const data = await readBoundedJson(response); text = data.content?.find((part) => part.type === "text")?.text; }
   } else if (provider === "google") {
     const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(env.GOOGLE_MODEL) + ":generateContent";
     response = await fetch(endpoint, {
@@ -144,7 +171,7 @@ async function callProvider(provider, prompt, catalog, env) {
       headers: { "x-goog-api-key": env.GOOGLE_API_KEY, "content-type": "application/json" },
       body: JSON.stringify({ contents: [{ parts: [{ text: instruction }] }], generationConfig: { maxOutputTokens: MAX_OUTPUT_TOKENS, temperature: 0.2 } }),
     });
-    if (response.ok) { const data = await response.json(); text = data.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join(""); }
+    if (response.ok) { const data = await readBoundedJson(response); text = data.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join(""); }
   } else {
     const base = env.OLLAMA_BASE_URL.replace(/\/$/, "");
     if (!/^https:\/\//.test(base)) throw new Error("provider_not_configured");
@@ -152,7 +179,7 @@ async function callProvider(provider, prompt, catalog, env) {
       method: "POST", signal, headers: { "content-type": "application/json" },
       body: JSON.stringify({ model: env.OLLAMA_MODEL, prompt: instruction, stream: false, format: "json", options: { num_predict: MAX_OUTPUT_TOKENS, temperature: 0.2 } }),
     });
-    if (response.ok) { const data = await response.json(); text = data.response; }
+    if (response.ok) { const data = await readBoundedJson(response); text = data.response; }
   }
   if (!response) throw new Error("provider_not_configured");
   if (!response.ok) {
@@ -178,7 +205,9 @@ async function runTask(body, env) {
     try { return await callProvider(provider, body.prompt.trim(), body.catalog || [], env); }
     catch (error) {
       lastError = error;
-      const retryable = !error.status || error.status === 429 || error.status >= 500;
+      const retryable = error instanceof TypeError ||
+        error.name === "AbortError" || error.name === "TimeoutError" ||
+        error.status === 429 || (error.status >= 500 && error.status <= 599);
       if (body.provider !== "auto" || !retryable) throw error;
     }
   }
