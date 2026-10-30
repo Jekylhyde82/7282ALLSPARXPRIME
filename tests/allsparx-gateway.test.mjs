@@ -23,6 +23,7 @@ function env(overrides = {}) {
     RATE_LIMITER: stubNamespace(),
     SPEND_BUDGET: stubNamespace(),
     EVIDENCE_LEDGER: stubNamespace(async () => Response.json({ stored: true }, { status: 201 })),
+    EVIDENCE_HMAC_KEY: "test-evidence-hmac-key",
     TURNSTILE_SECRET_KEY: "test-secret",
     ...overrides,
   };
@@ -191,8 +192,9 @@ test("records attempt and success before returning a provider response", async (
   }), env({ OPENAI_API_KEY: "test-provider-key", EVIDENCE_LEDGER: evidenceNamespace }));
   assert.equal(response.status, 200);
   assert.deepEqual(events.map((event) => event.eventType), ["ATTEMPTED", "SUCCEEDED"]);
-  assert.equal(events[0].operationId, "test-request-001");
-  assert.match(events[0].promptSha256, /^[a-f0-9]{64}$/);
+  assert.match(events[0].operationId, /^[a-f0-9-]{36}$/);
+  assert.equal(events[0].correlationId, "test-request-001");
+  assert.match(events[0].promptHmacSha256, /^[a-f0-9]{64}$/);
   assert.equal(JSON.stringify(events).includes("Find startup credits"), false);
   assert.equal(events[1].provider, "openai");
 });
@@ -208,14 +210,15 @@ test("hash-chained evidence ledger verifies appended records and detects tamperi
   };
   const ledger = new EvidenceLedger({ storage });
   const event = {
-    operationId: "operation-1",
+    operationId: "00000000-0000-4000-8000-000000000001",
     eventType: "ATTEMPTED",
     status: "ATTEMPTED",
     timestamp: "2026-10-30T02:00:00.000Z",
     actor: { type: "anonymous-origin", origin: "https://cloudcredits.io" },
+    correlationId: "test-correlation-1",
     provenance: { system: "ALLSPARX PRIME", producer: "gateway", environment: "test", deploymentId: "test-build" },
     objective: "startup-deal-recommendation",
-    promptSha256: "a".repeat(64),
+    promptHmacSha256: "a".repeat(64),
     provider: null,
     outcomeCode: "REQUEST_ACCEPTED",
   };
