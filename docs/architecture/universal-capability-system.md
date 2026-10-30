@@ -360,8 +360,8 @@ The Worker implements:
 - Exact target repository and target-branch checks.
 - Explicit source repository allowlisting and a per-repository approved licence-expression policy. Missing allowlist or licence policy denies the event.
 - Validation of merged pull-request identity, immutable source commit SHA, merge commit SHA and delivery identifier.
-- A Durable Object keyed by source repository and source commit to serialize duplicate acquisition attempts.
-- Pinned GitHub commit lookup and tarball retrieval over HTTPS, with a strict GitHub API/codeload host allowlist, bounded redirects and a 100 MiB streaming limit.
+- A Durable Object keyed by source repository and source commit, using atomic storage-transaction leases to serialize duplicate acquisition attempts without holding a concurrency lock across network I/O.
+- Pinned GitHub commit lookup and tarball retrieval over HTTPS, with a strict GitHub API/codeload host allowlist, bounded redirects and a 32 MiB in-memory archive limit.
 - SHA-256 digest calculation and R2 object metadata recording source commit, merge commit, pull request, licence, digest, size and acquisition time.
 - No extraction, installation or execution of acquired source.
 - Retry-aware failure recording and verification of an existing R2 object's digest metadata before acknowledging a duplicate as already stored.
