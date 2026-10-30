@@ -13,11 +13,15 @@ test.beforeEach(() => {
 });
 test.after(() => { globalThis.fetch = originalFetch; });
 
+const stubNamespace = (fetchFn = async () => new Response("ok")) => ({
+  idFromName: () => "test-object",
+  get: () => ({ fetch: fetchFn }),
+});
 function env(overrides = {}) {
   return {
     ALLOWED_ORIGINS: "https://cloudcredits.io",
-    RATE_LIMITER: { get: () => ({ fetch: async () => new Response("ok") }) },
-    SPEND_BUDGET: { get: () => ({ fetch: async () => new Response("ok") }) },
+    RATE_LIMITER: stubNamespace(),
+    SPEND_BUDGET: stubNamespace(),
     TURNSTILE_SECRET_KEY: "test-secret",
     ...overrides,
   };
@@ -49,6 +53,14 @@ test("rejects an unapproved origin before invoking dependencies", async () => {
     method: "POST", headers: { Origin: "https://evil.example" },
   }), env());
   assert.equal(response.status, 403);
+});
+test("answers preflight only for approved origins and allowed headers", async () => {
+  const response = await worker.fetch(new Request("https://gateway.example/v1/ask", {
+    method: "OPTIONS", headers: { Origin: "https://cloudcredits.io" },
+  }), env());
+  assert.equal(response.status, 204);
+  assert.equal(response.headers.get("access-control-allow-origin"), "https://cloudcredits.io");
+  assert.match(response.headers.get("access-control-allow-headers"), /x-allsparx-turnstile-token/);
 });
 test("rejects methods other than POST and OPTIONS", async () => {
   const response = await worker.fetch(new Request("https://gateway.example/v1/ask", {
@@ -89,7 +101,7 @@ test("does not reserve budget when the requested provider is unavailable", async
   const response = await worker.fetch(request("/v1/ask", {
     body: JSON.stringify({ prompt: "x", task: "startup-deal-recommendation", provider: "openai", contractVersion: 1 }),
   }), env({
-    SPEND_BUDGET: { get: () => ({ fetch: async () => { reservations += 1; return new Response("ok"); } }) },
+    SPEND_BUDGET: stubNamespace(async () => { reservations += 1; return new Response("ok"); }),
   }));
   assert.equal(response.status, 503);
   assert.equal(reservations, 0);
