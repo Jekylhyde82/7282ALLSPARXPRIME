@@ -67,6 +67,7 @@ jobs:
           mkdir -p dist/syphon-evidence
           git archive --format=tar.gz --output=dist/syphon-evidence/allsparx-source.tar.gz HEAD
           SOURCE_SHA256="$(sha256sum dist/syphon-evidence/allsparx-source.tar.gz | cut -d ' ' -f 1)"
+          export SOURCE_SHA256
           node --input-type=module <<'NODE'
           import { writeFileSync } from "node:fs";
           const manifest = {
@@ -91,9 +92,6 @@ jobs:
           };
           writeFileSync("dist/syphon-evidence/ci-evidence.json", JSON.stringify(manifest, null, 2) + "\n", { flag: "wx" });
           NODE
-        env:
-          SOURCE_SHA256: ${{ steps.evidence.outputs.source_sha256 }}
-
       - name: Attest source bundle provenance
         uses: actions/attest-build-provenance@v2
         with:
