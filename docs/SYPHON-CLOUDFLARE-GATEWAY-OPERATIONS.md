@@ -26,6 +26,16 @@ The per-user Durable Object counter is strict across locations for its 12-per-60
 
 Supabase JWT verification requires an asymmetric signing key published in the project's JWKS endpoint. The Worker caches JWKS for 10 minutes, so key revocation/rotation is not instantaneous at this gateway; allow for cache expiry during planned rotation and treat urgent key compromise as an incident requiring a cache-bypass/redeploy strategy. Legacy HS256 projects with no JWKS keys fail closed and must be migrated to RS256 or ES256 before the gateway can authenticate users.
 
+### Safe signing-key migration sequence
+
+1. Create the new asymmetric signing key as a standby key; do not delete or revoke the existing key.
+2. Confirm the new key's public `kid` appears in `https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json` and its algorithm is `ES256` or `RS256`.
+3. Wait at least 20 minutes after key creation so Supabase's edge cache and downstream verifiers can discover the standby public key before rotation.
+4. Rotate keys in Supabase. The browser client now retries a gateway request once after HTTP 401 by forcing a Supabase refresh-token exchange, so a session still holding an access token signed by the previously used key can recover with a newly issued token.
+5. Keep the previously used key trusted. Do not revoke Key 1 as part of this deployment. Revoke only after a separate, verified retirement plan confirms all required tokens and dependent services have migrated.
+
+The browser refresh retry is bounded to one attempt and only occurs after HTTP 401; it does not retry provider errors or repeat a successful task. Supabase recommends allowing at least 20 minutes for JWKS discovery when independently verifying JWTs. See the official [JWT signing-key guidance](https://supabase.com/docs/guides/auth/signing-keys) and [JWT verification guidance](https://supabase.com/docs/guides/auth/jwts).
+
 The assistant now includes email/password sign-in and account creation using Supabase Auth, stores the session in sessionStorage, refreshes access tokens, and sends the bearer token to the Worker. The gateway is end-to-end code-complete but remains deployment-blocked until an active Supabase project, asymmetric signing keys, allowed origin, and provider configuration are supplied and live-tested.
 
 ## Required deployment configuration
