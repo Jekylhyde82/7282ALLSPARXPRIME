@@ -70,7 +70,7 @@ Example:
 node scripts/verify-evidence-export.mjs ./evidence-export.json <trusted-sequence> <trusted-sha256>
 ```
 
-The sequence and SHA-256 checkpoint must be obtained through a separately controlled channel (for example, an independently administered signed checkpoint process). Do not copy the checkpoint from the export being verified: the verifier intentionally ignores any checkpoint embedded in that file. Protect the checkpoint's provenance and custody.
+The sequence and SHA-256 checkpoint must be obtained through a separately controlled channel (for example, an independently administered signed checkpoint process). Do not copy the checkpoint from the export being verified: the verifier intentionally ignores any checkpoint embedded in that file. Protect the checkpoint's provenance and custody. Export records must preserve the ledger's serialized property order because the current chain hashes the exact JSON serialization of each stored record payload; reformatting or reordering keys changes the digest. This is a verifier contract, not yet an implemented export-generation API.
 
 **Scope limitation:** this verifier does not fetch, create, sign, or retain exports, and it does not itself establish who issued a checkpoint. A complete export must contain records from sequence 1 through the checkpoint sequence for one ledger month. Until an export-generation and independently controlled checkpoint process is implemented and exercised, this is an implemented offline verification utility with automated tests—not a live independent audit or a production evidence-retention control.
 
