@@ -107,7 +107,7 @@ test("does not claim merge success when the merge adapter returns an unverified 
   const f = fixture({ async merge() { return { merged: true }; } });
   const result = await runContinuousImprovementCycle({ sources: ["acme/tool"], adapters: f.adapters, policy });
   assert.equal(result.outcomes[0].status, "merge_unconfirmed");
-  assert.equal(result.outcomes[0].merged, false);
+  assert.equal(result.outcomes[0].merged, null);
   assert.equal(f.calls.some((call) => call[0] === "snapshot"), false);
 });
 
