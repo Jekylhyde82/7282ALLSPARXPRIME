@@ -159,6 +159,23 @@ test("does not reserve budget when the requested provider is unavailable", async
   assert.equal(response.status, 503);
   assert.equal(reservations, 0);
 });
+test("does not configure providers with blank, padded, control-character, or oversized credentials", async () => {
+  const cases = [
+    ["openai", "OPENAI_API_KEY", "OPENAI_MODEL"],
+    ["anthropic", "ANTHROPIC_API_KEY", "ANTHROPIC_MODEL"],
+    ["google", "GOOGLE_API_KEY", "GOOGLE_MODEL"],
+  ];
+  for (const [provider, keyName, modelName] of cases) {
+    for (const key of ["   ", " padded-key", "key" + String.fromCharCode(10) + "value", "k".repeat(4097)]) {
+      const response = await worker.fetch(request("/v1/ask", {
+        body: JSON.stringify({ prompt: "x", task: "startup-deal-recommendation", provider, contractVersion: 1 }),
+      }), env({ [keyName]: key }));
+      assert.equal(response.status, 503, `${provider} unexpectedly accepted credential ${JSON.stringify(key)}`);
+      assert.deepEqual(await response.json(), { error: "PROVIDER_UNAVAILABLE" });
+    }
+  }
+});
+
 test("does not treat an API key without an explicit model ID as a configured provider", async () => {
   const response = await worker.fetch(request("/v1/ask", {
     body: JSON.stringify({ prompt: "x", task: "startup-deal-recommendation", provider: "openai", contractVersion: 1 }),
