@@ -245,3 +245,24 @@ PR #15 (SYPHON evidence ledger and fail-closed gateway audit trail) remains a se
 ## Required status vocabulary
 
 Use PLANNED, ATTEMPTED, IMPLEMENTED, INSTALLED, TESTED and VERIFIED precisely. Completion requires evidence of the intended outcome, independent verification where appropriate, and durability and safety checks.
+
+## Universal automatic integration rule
+
+**Default rule: ALLSPARX PRIME must automatically evaluate and integrate every eligible contribution from every explicitly connected and owner-authorized repository.** The user should not need to request each routine discovery, comparison, compatibility check, test run, or low-risk merge individually.
+
+The automation is comprehensive in coverage, not unconditional in trust:
+
+1. Continuously discover changes from every repository on the explicit connected-source allowlist. Do not silently expand that allowlist or crawl arbitrary repositories.
+2. Automatically inventory, classify, deduplicate, map dependencies, assess licence/provenance, compare interfaces, and prepare the smallest coherent integration change.
+3. Automatically create an isolated proposal/branch and run the complete required validation pipeline for every eligible change.
+4. Automatically merge a change when—and only when—all pre-authorized low-risk merge gates in this specification pass on the exact immutable proposed commit, required branch protections/reviews are satisfied, and a tested rollback path exists.
+5. Automatically trigger the mandatory post-merge source snapshot acquisition rule for each verified merge, then link the retained snapshot and evidence to the repository and capability records.
+6. Automatically retry bounded transient failures and reconcile duplicate events idempotently. Record each attempt, result and source revision.
+7. If any gate fails, is missing, stale, ambiguous or outside the pre-authorized policy, automatically stop that change before merge, preserve the known-good system, record the precise blocker and prepare a review item. Do not silently bypass a gate, downgrade a finding, grant a new permission or treat silence as approval.
+8. Automatically monitor integrated sources for upstream changes, vulnerabilities, licence changes, incompatibility and drift; prepare and validate upgrades. Do not replace a working version until the candidate passes and rollback remains available.
+
+“Everything” means every eligible contribution across all explicitly connected and authorized repositories—not every file, dependency, branch, or arbitrary remote repository regardless of safety. Whole-repository merges are not the default: integrate the smallest maintainable capability through defined interfaces, preserve source history and notices, and retain the full immutable source snapshot separately.
+
+High-impact changes—including new repositories, uncertain or incompatible licences, security-boundary changes, elevated permissions, credentials, unrestricted network access, destructive operations, schema/data migrations and production deployment—remain blocked pending explicit authorized review. Automation may perform all safe preparation and verification while that approval is pending.
+
+The initial operating mode remains Observe/Prepare until SYPHON identity, policy enforcement, evidence integrity, isolation and rollback controls are independently verified in the actual deployment architecture. Only then may an authenticated owner enable Auto-integrate. This rule does not claim that automatic merging is currently operational merely because it is specified here.
