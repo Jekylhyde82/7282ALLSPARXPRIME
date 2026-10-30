@@ -43,6 +43,9 @@ jobs:
       - name: Run read-only capability discovery tests
         id: capability-discovery-tests
         run: pnpm test:capability-discovery
+      - name: Run repository snapshot acquisition tests
+        id: repository-snapshot-acquirer-tests
+        run: pnpm test:repository-snapshot-acquirer
       - name: Run source repository inventory contract tests
         id: source-repository-record-tests
         run: pnpm test:source-repository-record
