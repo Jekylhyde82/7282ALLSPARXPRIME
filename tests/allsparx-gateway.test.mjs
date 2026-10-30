@@ -235,6 +235,36 @@ test("hash-chained evidence ledger verifies appended records and detects tamperi
   assert.equal(tampered.status, 409);
   assert.equal((await tampered.json()).valid, false);
 });
+test("evidence verification is paginated and hash-linked across pages", async () => {
+  const store = new Map();
+  const storage = { get: async (key) => store.get(key), put: async (key, value) => store.set(key, value), transaction: async (callback) => callback({ get: async (key) => store.get(key), put: async (key, value) => store.set(key, value) }) };
+  const ledger = new EvidenceLedger({ storage });
+  for (let i = 1; i <= 3; i += 1) {
+    const event = { operationId: `00000000-0000-4000-8000-${String(i).padStart(12, "0")}`, correlationId: `test-${i}`, eventType: "ATTEMPTED", status: "ATTEMPTED", timestamp: `2026-10-30T02:00:0${i}.000Z`, actor: { type: "anonymous-origin", origin: "https://cloudcredits.io" }, provenance: { system: "ALLSPARX PRIME", producer: "gateway", environment: "test", deploymentId: "test-build" }, objective: "startup-deal-recommendation", promptHmacSha256: "a".repeat(64), provider: null, outcomeCode: "REQUEST_ACCEPTED" };
+    const appended = await ledger.fetch(new Request("https://evidence/append", { method: "POST", body: JSON.stringify(event) }));
+    assert.equal(appended.status, 201);
+  }
+  const first = await (await ledger.fetch(new Request("https://evidence/verify?limit=2"))).json();
+  assert.equal(first.valid, true);
+  assert.equal(first.complete, false);
+  assert.equal(first.verifiedEvents, 2);
+  const cursor = new URLSearchParams({ from: String(first.next.from), previousHash: first.next.previousHash });
+  const second = await (await ledger.fetch(new Request("https://evidence/verify?" + cursor))).json();
+  assert.equal(second.valid, true);
+  assert.equal(second.complete, true);
+  assert.equal(second.verifiedEvents, 1);
+  const oversizedPage = await ledger.fetch(new Request("https://evidence/verify?limit=101"));
+  assert.equal(oversizedPage.status, 400);
+});
+
+test("evidence ledger rejects malformed provenance and non-canonical origins", async () => {
+  const store = new Map();
+  const storage = { get: async (key) => store.get(key), put: async (key, value) => store.set(key, value), transaction: async (callback) => callback({ get: async (key) => store.get(key), put: async (key, value) => store.set(key, value) }) };
+  const ledger = new EvidenceLedger({ storage });
+  const event = { operationId: "00000000-0000-4000-8000-000000000001", correlationId: "test-1", eventType: "ATTEMPTED", status: "ATTEMPTED", timestamp: "2026-10-30T02:00:00.000Z", actor: { type: "anonymous-origin", origin: "https://cloudcredits.io/path" }, provenance: { system: "ALLSPARX PRIME", producer: "gateway", environment: "test", deploymentId: "" }, objective: "startup-deal-recommendation", promptHmacSha256: "a".repeat(64), provider: null, outcomeCode: "REQUEST_ACCEPTED" };
+  const response = await ledger.fetch(new Request("https://evidence/append", { method: "POST", body: JSON.stringify(event) }));
+  assert.equal(response.status, 400);
+});
 test("evidence ledger rejects invalid and oversized records", async () => {
   const store = new Map();
   const storage = {
