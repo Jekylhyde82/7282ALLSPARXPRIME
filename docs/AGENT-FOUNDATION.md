@@ -7,10 +7,23 @@ This branch is stacked on `syphon/server-gateway-security` (PR #17), which itsel
 | Capability | Status | Evidence boundary |
 |---|---|---|
 | Promptfoo deterministic evaluation fixture | IMPLEMENTED in this branch | Echo-provider assertions only; no model/API calls |
-| Promptfoo CI workflow | IMPLEMENTED in this branch | Must pass on GitHub Actions before this slice is TESTED |
+| Read-only evidence verification module | IMPLEMENTED in this branch | Deterministic contract evaluator; it assesses supplied evidence and does not independently retrieve it |
+| Promptfoo CI workflow and evidence-gate tests | IMPLEMENTED in this branch | Must pass on GitHub Actions before this slice is TESTED |
 | Cloudflare Agents SDK adoption | PLANNED | No SDK dependency or runtime agent is installed by this slice |
 | Durable multi-step orchestration with Workflows | PLANNED | Requires a separate implementation and recovery tests |
 | Live agent quality / red-team evaluation | BLOCKED pending approved model endpoint and explicit spend approval | No provider secrets are required or configured here |
+
+## Read-only Verification Agent (first specialist)
+
+The first specialist is a deterministic evidence-gate module at `src/agents/verification-agent.mjs`. It does not call a model, access credentials, fetch remote resources, mutate repository state, or perform privileged actions. It evaluates an explicit claim and supplied evidence envelope against the status ladder:
+
+- PLANNED requires a concrete intended outcome.
+- IMPLEMENTED requires trustworthy successful commit, deployment, or installation evidence.
+- INSTALLED requires trustworthy successful installation evidence.
+- TESTED requires trustworthy successful test, workflow, or smoke-test evidence.
+- VERIFIED requires implementation and test evidence plus independent verification evidence marked durable and safety-passed.
+
+Missing, failed, untrusted, or insufficient evidence yields `UNVERIFIED`; the module does not upgrade a claim merely because a lower-level check passed. The module is a policy evaluator, not an independent evidence collector: the caller must obtain evidence from trusted sources and preserve provenance. Its contract tests cover false-success prevention and non-mutation.
 
 ## Why this is deliberately staged
 
@@ -45,6 +58,7 @@ Before adding the SDK dependency:
 ## Acceptance criteria for this branch
 
 - [ ] Promptfoo configuration passes on the pinned version with the Echo provider.
+- [ ] Read-only evidence-gate contract tests pass, including rejection of unsupported VERIFIED claims.
 - [ ] GitHub Actions workflow runs successfully and preserves its result artifact.
 - [ ] Existing SYPHON CI and gateway tests remain green on the stacked PR chain.
 - [ ] Cloudflare Agents SDK compatibility and dependency tree are reviewed before installation.
