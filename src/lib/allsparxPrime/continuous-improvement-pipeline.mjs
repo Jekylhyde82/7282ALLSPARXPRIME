@@ -97,7 +97,7 @@ export async function runContinuousImprovementCycle({
                 status: "merge_unconfirmed",
                 reason: "MERGE_RESULT_NOT_VERIFIED",
                 assessment,
-                merged: false,
+                merged: mergeResult?.merged === false ? false : null,
                 snapshot_status: "not_started",
               });
             } else {
@@ -120,8 +120,8 @@ export async function runContinuousImprovementCycle({
               const snapshotMatches = snapshot &&
                 ["stored", "already_present"].includes(snapshot.status) &&
                 snapshot.metadata?.source_commit_sha === mergeResult.source_commit_sha &&
-                typeof snapshot.metadata?.archive_digest === "string" &&
-                snapshot.metadata.archive_digest.startsWith("sha256:");
+                /^sha256:[a-f0-9]{64}$/.test(snapshot.metadata?.archive_digest ?? "") &&
+                typeof snapshot.key === "string" && snapshot.key.length > 0;
               outcome = immutableOutcome({
                 candidate_id: identity,
                 status: snapshotMatches ? "assimilated" : "snapshot_failed",
