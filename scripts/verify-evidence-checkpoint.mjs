@@ -12,9 +12,8 @@ async function main() {
   const expectedPrevious = expectedPreviousText === "GENESIS" ? null : expectedPreviousText;
   if (expectedPrevious !== null && !/^[a-f0-9]{64}$/.test(expectedPrevious)) throw new Error("INVALID_PREVIOUS_CHECKPOINT");
   const result = verifyEvidenceCheckpoint(checkpoint, publicKey, expectedPrevious);
-  process.stdout.write(JSON.stringify(result) + "\\n");
+  process.stdout.write(JSON.stringify(result) + "\n");
 }
-
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main().catch((error) => { process.stderr.write(error.message + "\\n"); process.exitCode = 1; });
+  main().catch((error) => { process.stderr.write(error.message + "\n"); process.exitCode = 1; });
 }
