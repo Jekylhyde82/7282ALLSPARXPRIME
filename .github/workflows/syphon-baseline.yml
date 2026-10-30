@@ -43,6 +43,9 @@ jobs:
       - name: Run read-only capability discovery tests
         id: capability-discovery-tests
         run: pnpm test:capability-discovery
+      - name: Run Cloudflare Worker webhook and snapshot boundary tests
+        id: cloudflare-worker-tests
+        run: pnpm test:cloudflare-worker
       - name: Run continuous improvement pipeline orchestration tests
         id: continuous-improvement-pipeline-tests
         run: pnpm test:continuous-improvement-pipeline
