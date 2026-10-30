@@ -61,7 +61,8 @@ async function verifyTurnstile(token, request, env) {
   });
   if (!response.ok) return false;
   const result = await response.json();
-  const expectedHostname = new URL(request.url).hostname;
+  const origin = request.headers.get("Origin");
+  const expectedHostname = origin ? new URL(origin).hostname : "";
   return result.success === true && (!result.hostname || result.hostname === expectedHostname);
 }
 function configuredProviders(env, preference) {
@@ -101,9 +102,9 @@ async function providerCall(provider, prompt, env) {
       text = (data.content || []).filter((part) => part.type === "text").map((part) => part.text).join("\n");
     } else if (provider === "google") {
       const model = env.GOOGLE_MODEL || "gemini-2.0-flash";
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(env.GOOGLE_API_KEY)}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
       response = await fetch(url, {
-        method: "POST", headers: { "content-type": "application/json" },
+        method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": env.GOOGLE_API_KEY },
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { maxOutputTokens: MAX_OUTPUT_TOKENS } }),
         signal: controller.signal,
       });
