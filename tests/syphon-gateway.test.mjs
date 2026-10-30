@@ -119,6 +119,19 @@ test("verifies Supabase JWT, applies per-user rate limit, and routes to configur
   }
 });
 
+test("rejects structurally malformed JWT JSON as unauthorized", async () => {
+  const malformed = b64url(encoder.encode("null")) + "." +
+    b64url(encoder.encode("null")) + ".signature";
+  const response = await handleRequest(new Request("https://example.test/api/allsparx/v1/ask", {
+    method: "POST", headers: { authorization: "Bearer " + malformed },
+  }), {
+    ...baseEnv, SUPABASE_URL: "https://project.supabase.co",
+    ALLOWED_ORIGINS: "https://app.example.test",
+  });
+  assert.equal(response.status, 401);
+  assert.equal((await response.json()).error, "unauthorized");
+});
+
 test("returns 503 when the Supabase JWKS endpoint is temporarily unavailable", async () => {
   const { token } = tokenFixture;
   const originalFetch = globalThis.fetch;
