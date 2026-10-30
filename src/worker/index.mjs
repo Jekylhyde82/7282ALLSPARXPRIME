@@ -1,5 +1,5 @@
 const MAX_WEBHOOK_BYTES = 1024 * 1024;
-const MAX_ARCHIVE_BYTES = 100 * 1024 * 1024;
+const MAX_ARCHIVE_BYTES = 32 * 1024 * 1024;
 const SHA = /^[a-f0-9]{40}$/i;
 const REPOSITORY = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
 const ARCHIVE_HOSTS = new Set(["api.github.com", "codeload.github.com"]);
@@ -258,92 +258,99 @@ export class SnapshotCoordinator {
       return response(400, { error: "snapshot_request_invalid" });
     }
 
-    return this.state.blockConcurrencyWhile(async () => {
-      const previous = await this.state.storage.get("snapshot");
-      if (previous?.status === "stored" &&
-          previous.source_commit_sha === event.source_commit_sha &&
-          previous.archive_digest && previous.object_key) {
-        const retained = await this.env.SNAPSHOTS.head(previous.object_key);
-        if (retained && retained.customMetadata?.archive_digest === previous.archive_digest &&
-            retained.customMetadata?.source_commit_sha === event.source_commit_sha) {
-          return response(200, {
-            status: "already_present",
-            source_commit_sha: previous.source_commit_sha,
-            archive_digest: previous.archive_digest,
-            object_key: previous.object_key,
-          });
-        }
-        if (retained) return response(409, { error: "snapshot_object_conflict", retryable: false });
+    const nowMs = Date.now();
+    const leaseExpiresAt = new Date(nowMs + 15 * 60 * 1000).toISOString();
+    const claim = await this.state.storage.transaction(async (transaction) => {
+      const previous = await transaction.get("snapshot");
+      if (previous?.status === "processing" &&
+          Date.parse(previous.lease_expires_at || "") > nowMs) {
+        return { status: "processing" };
       }
-
-      const now = new Date().toISOString();
-      await this.state.storage.put("snapshot", {
+      await transaction.put("snapshot", {
         status: "processing",
         source_commit_sha: event.source_commit_sha,
         delivery_id: event.delivery_id,
-        started_at: now,
+        started_at: new Date(nowMs).toISOString(),
+        lease_expires_at: leaseExpiresAt,
       });
+      return { status: "claimed" };
+    });
+    if (claim.status === "processing") {
+      return response(202, { status: "processing", retryable: true });
+    }
 
-      try {
-        const parts = event.repository_full_name.split("/");
-        const archive = await fetchPinnedArchive(parts[0], parts[1], event.source_commit_sha, this.env.GITHUB_API_TOKEN);
-        const digestBytes = new Uint8Array(await crypto.subtle.digest("SHA-256", archive));
-        const digest = "sha256:" + Array.from(digestBytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
-        const objectKey = "snapshots/" + parts[0] + "/" + parts[1] + "/" + event.source_commit_sha + ".tar.gz";
-        const metadata = {
-          repository_full_name: event.repository_full_name,
-          source_commit_sha: event.source_commit_sha,
-          merge_commit_sha: event.merge_commit_sha,
-          pull_request_number: String(event.pull_request_number),
-          license_expression: event.license_expression,
-          archive_digest: digest,
-          archive_size_bytes: String(archive.byteLength),
-          acquired_at: now,
-          executed_source_code: "false",
-          extracted: "false",
-        };
-
-        const existing = await this.env.SNAPSHOTS.head(objectKey);
-        let status = "stored";
-        if (existing) {
-          if (existing.customMetadata?.archive_digest !== digest ||
-              existing.customMetadata?.source_commit_sha !== event.source_commit_sha) {
-            throw new Error("snapshot_object_conflict");
-          }
-          status = "already_present";
-        } else {
-          await this.env.SNAPSHOTS.put(objectKey, archive, {
-            httpMetadata: { contentType: "application/gzip" },
-            customMetadata: metadata,
-          });
+    const parts = event.repository_full_name.split("/");
+    const objectKey = "snapshots/" + parts[0] + "/" + parts[1] + "/" + event.source_commit_sha + ".tar.gz";
+    try {
+      const existing = await this.env.SNAPSHOTS.head(objectKey);
+      if (existing) {
+        const existingDigest = existing.customMetadata?.archive_digest;
+        if (existing.customMetadata?.source_commit_sha !== event.source_commit_sha ||
+            !/^sha256:[a-f0-9]{64}$/.test(existingDigest || "")) {
+          throw new Error("snapshot_object_conflict");
         }
-
         await this.state.storage.put("snapshot", {
           status: "stored",
           source_commit_sha: event.source_commit_sha,
-          archive_digest: digest,
+          archive_digest: existingDigest,
           object_key: objectKey,
-          acquired_at: now,
+          acquired_at: existing.customMetadata?.acquired_at || new Date().toISOString(),
           delivery_id: event.delivery_id,
         });
         return response(200, {
-          status,
+          status: "already_present",
           source_commit_sha: event.source_commit_sha,
-          archive_digest: digest,
+          archive_digest: existingDigest,
           object_key: objectKey,
         });
-      } catch (error) {
-        const code = typeof error?.message === "string" ? error.message.slice(0, 100) : "snapshot_failed";
-        await this.state.storage.put("snapshot", {
-          status: "failed",
-          source_commit_sha: event.source_commit_sha,
-          delivery_id: event.delivery_id,
-          failed_at: new Date().toISOString(),
-          error_code: code,
-        });
-        return response(503, { error: code, retryable: true });
       }
-    });
+
+      const now = new Date().toISOString();
+      const archive = await fetchPinnedArchive(parts[0], parts[1], event.source_commit_sha, this.env.GITHUB_API_TOKEN);
+      const digestBytes = new Uint8Array(await crypto.subtle.digest("SHA-256", archive));
+      const digest = "sha256:" + Array.from(digestBytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+      const metadata = {
+        repository_full_name: event.repository_full_name,
+        source_commit_sha: event.source_commit_sha,
+        merge_commit_sha: event.merge_commit_sha,
+        pull_request_number: String(event.pull_request_number),
+        license_expression: event.license_expression,
+        archive_digest: digest,
+        archive_size_bytes: String(archive.byteLength),
+        acquired_at: now,
+        executed_source_code: "false",
+        extracted: "false",
+      };
+
+      await this.env.SNAPSHOTS.put(objectKey, archive, {
+        httpMetadata: { contentType: "application/gzip" },
+        customMetadata: metadata,
+      });
+      await this.state.storage.put("snapshot", {
+        status: "stored",
+        source_commit_sha: event.source_commit_sha,
+        archive_digest: digest,
+        object_key: objectKey,
+        acquired_at: now,
+        delivery_id: event.delivery_id,
+      });
+      return response(200, {
+        status: "stored",
+        source_commit_sha: event.source_commit_sha,
+        archive_digest: digest,
+        object_key: objectKey,
+      });
+    } catch (error) {
+      const code = typeof error?.message === "string" ? error.message.slice(0, 100) : "snapshot_failed";
+      await this.state.storage.put("snapshot", {
+        status: "failed",
+        source_commit_sha: event.source_commit_sha,
+        delivery_id: event.delivery_id,
+        failed_at: new Date().toISOString(),
+        error_code: code,
+      });
+      return response(503, { error: code, retryable: true });
+    }
   }
 }
 
