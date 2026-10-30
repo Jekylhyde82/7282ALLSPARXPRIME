@@ -77,6 +77,11 @@ test("fails closed when Turnstile is not configured", async () => {
   const response = await worker.fetch(request(), env({ TURNSTILE_SECRET_KEY: undefined }));
   assert.equal(response.status, 503);
 });
+test("rejects a Turnstile action mismatch", async () => {
+  globalThis.fetch = async () => Response.json({ success: true, hostname: "cloudcredits.io", action: "different_action" });
+  const response = await worker.fetch(request(), env());
+  assert.equal(response.status, 403);
+});
 test("rejects a Turnstile hostname mismatch", async () => {
   globalThis.fetch = async () => Response.json({ success: true, hostname: "attacker.example", action: "allsparx_assistant" });
   const response = await worker.fetch(request(), env());
@@ -121,7 +126,7 @@ test("does not route local Ollama through the public Worker", async () => {
 test("successful OpenAI request returns the validated response contract and request ID", async () => {
   globalThis.fetch = async (url) => {
     if (String(url).includes("/siteverify")) {
-      return Response.json({ success: true, hostname: "cloudcredits.io" });
+      return Response.json({ success: true, hostname: "cloudcredits.io", action: "allsparx_assistant" });
     }
     if (String(url) === "https://api.openai.com/v1/responses") {
       return Response.json({
