@@ -48,7 +48,7 @@ npx wrangler@4 deploy --dry-run --config workers/allsparx-gateway/wrangler.toml
 npx wrangler@4 deploy --config workers/allsparx-gateway/wrangler.toml
 ```
 
-The internal evidence Durable Object supports `POST /append` and `GET /verify`; it is not exposed as a public Worker route. Hash chaining detects accidental or partial record alteration, but it is not a substitute for an independently controlled external checkpoint, WORM retention, or signed audit export. The `GET /healthz` endpoint is a liveness check only; it does not prove provider credentials, Durable Objects, Turnstile, or provider connectivity are ready. Live verification must separately test approved and rejected origins, challenge failure, invalid input, rate limiting, budget exhaustion, a real provider response, response headers, and absence of secret leakage.
+The internal evidence Durable Object supports `POST /append` and `GET /verify`; it is not exposed as a public Worker route. Verification is paginated (maximum 100 records per request); continuation cursors are checked against the actual preceding stored record before a page is accepted. Hash chaining detects accidental or partial record alteration, but it is not a substitute for an independently controlled external checkpoint, WORM retention, or signed audit export. The `GET /healthz` endpoint is a liveness check only; it does not prove provider credentials, Durable Objects, Turnstile, or provider connectivity are ready. Live verification must separately test approved and rejected origins, challenge failure, invalid input, rate limiting, budget exhaustion, a real provider response, response headers, and absence of secret leakage.
 
 ## Evidence ledger limitations
 
