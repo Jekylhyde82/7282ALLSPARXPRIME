@@ -60,6 +60,20 @@ The evidence ledger records requests only after they pass origin admission, rate
 
 The ledger is durable within Cloudflare Durable Object storage and records append-only hash-linked events. It does not yet provide cross-account immutable retention, external timestamping, signed exports, retention/backup policy, or an independent verifier outside the same Cloudflare trust boundary. Request identity is anonymous origin context, not authenticated end-user identity. The prompt is represented by a keyed HMAC-SHA-256 fingerprint; raw prompt content is deliberately excluded.
 
+## Offline evidence verification
+
+The repository includes `scripts/verify-evidence-export.mjs`, a Node.js offline verifier for a complete monthly export in the `allsparx-evidence-export-v1` format. It recomputes every record hash in sequence, checks each previous-hash link, rejects unexpected record fields and gaps, and compares the final hash and sequence with a checkpoint supplied separately by the operator.
+
+Example:
+
+```sh
+node scripts/verify-evidence-export.mjs ./evidence-export.json <trusted-sequence> <trusted-sha256>
+```
+
+The sequence and SHA-256 checkpoint must be obtained through a separately controlled channel (for example, an independently administered signed checkpoint process). Do not copy the checkpoint from the export being verified: the verifier intentionally ignores any checkpoint embedded in that file. Protect the checkpoint's provenance and custody.
+
+**Scope limitation:** this verifier does not fetch, create, sign, or retain exports, and it does not itself establish who issued a checkpoint. A complete export must contain records from sequence 1 through the checkpoint sequence for one ledger month. Until an export-generation and independently controlled checkpoint process is implemented and exercised, this is an implemented offline verification utility with automated tests—not a live independent audit or a production evidence-retention control.
+
 ## Admission-budget limitation
 
 `MAX_REQUEST_COST_MICROS` and `MONTHLY_SPEND_LIMIT_MICROS` currently implement fixed per-request admission reservations in integer units. They are **not** provider invoice metering, actual token-cost settlement, or a guaranteed USD hard cap. Reservations are intentionally not refunded. Before treating this as a production financial spend control, implement provider usage extraction, a reviewed price schedule, actual-cost settlement, and reconciliation against provider billing.
