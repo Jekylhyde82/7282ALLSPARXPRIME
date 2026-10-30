@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://allsparx.prime/schemas/source-repository-record.schema.json",
+  "title": "ALLSPARX PRIME Source Repository Record",
+  "description": "Evidence-backed inventory record for a repository considered or used as a source of reusable capabilities.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "record_version",
+    "repository_id",
+    "repository_url",
+    "relationship",
+    "integration_status",
+    "source",
+    "target",
+    "capabilities",
+    "evidence"
+  ],
+  "properties": {
+    "record_version": { "const": "1.0.0" },
+    "repository_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
+      "maxLength": 160
+    },
+    "repository_url": {
+      "type": "string",
+      "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/?$",
+      "maxLength": 500
+    },
+    "relationship": {
+      "enum": ["upstream", "fork", "integrated-component", "dependency", "reference-only", "downstream"]
+    },
+    "integration_status": {
+      "enum": ["discovered", "assessed", "approved", "imported", "merged", "rejected", "retired", "unknown"]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commit"],
+      "properties": {
+        "commit": {
+          "type": "string",
+          "pattern": "^(?:[a-f0-9]{40}|[a-f0-9]{64})$"
+        },
+        "path": { "type": "string", "maxLength": 500 },
+        "release": { "type": "string", "maxLength": 120 }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_id"],
+      "properties": {
+        "repository_id": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "branch": { "type": "string", "maxLength": 200 },
+        "pull_request": { "type": "string", "maxLength": 500 },
+        "merge_commit": {
+          "type": "string",
+          "pattern": "^(?:[a-f0-9]{40}|[a-f0-9]{64})$"
+        }
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "maxItems": 200,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 3, "maxLength": 160 }
+    },
+    "evidence": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "reference"],
+        "properties": {
+          "kind": {
+            "enum": ["commit", "pull-request", "workflow-run", "review", "test-report", "license-review", "security-review", "deployment"]
+          },
+          "reference": { "type": "string", "minLength": 1, "maxLength": 1000 },
+          "result": { "enum": ["passed", "failed", "pending", "not-applicable", "unknown"] }
+        }
+      }
+    },
+    "last_reviewed_at": { "type": "string", "maxLength": 80 },
+    "notes": { "type": "string", "maxLength": 4000 }
+  }
+}
