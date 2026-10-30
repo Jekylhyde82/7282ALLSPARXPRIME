@@ -92,6 +92,7 @@ export async function runAllsparxPrimeTask(
   providerPreference: ProviderPreference = "auto",
   turnstileToken: string,
 ): Promise<AssistantTaskResult> {
+  if (!turnstileToken || !turnstileToken.trim()) throw new Error("Complete the Cloudflare security check before sending your request.");
   const normalizedPrompt = prompt.trim();
   if (!normalizedPrompt) throw new Error("Enter a request before starting an ALLSPARX PRIME task.");
   if (normalizedPrompt.length > 500) throw new Error("Requests must be 500 characters or fewer.");
