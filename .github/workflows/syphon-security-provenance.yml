@@ -38,6 +38,63 @@ jobs:
           node-version: '20'
           cache: pnpm
 
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Capture complete dependency audit report
+        id: dependency-audit
+        continue-on-error: true
+        shell: bash
+        run: |
+          mkdir -p dist/syphon-audit
+          set +e
+          pnpm audit --json > dist/syphon-audit/pnpm-audit.json
+          audit_exit_code=$?
+          set -e
+          printf '%s\n' "$audit_exit_code" > dist/syphon-audit/pnpm-audit-exit-code.txt
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from "node:fs";
+          const report = JSON.parse(readFileSync("dist/syphon-audit/pnpm-audit.json", "utf8"));
+          const metadata = report.metadata?.vulnerabilities ?? {};
+          const summary = {
+            repository: process.env.GITHUB_REPOSITORY,
+            commit: process.env.GITHUB_SHA,
+            auditCommand: "pnpm audit --json",
+            exitCode: Number(readFileSync("dist/syphon-audit/pnpm-audit-exit-code.txt", "utf8").trim()),
+            counts: {
+              total: metadata.total ?? null,
+              info: metadata.info ?? null,
+              low: metadata.low ?? null,
+              moderate: metadata.moderate ?? null,
+              high: metadata.high ?? null,
+              critical: metadata.critical ?? null
+            },
+            advisories: (report.advisories ? Object.values(report.advisories) : []).map((item) => ({
+              id: item.id,
+              title: item.title,
+              module_name: item.module_name,
+              severity: item.severity,
+              vulnerable_versions: item.vulnerable_versions,
+              patched_versions: item.patched_versions,
+              url: item.url,
+              findings: item.findings ?? []
+            }))
+          };
+          writeFileSync("dist/syphon-audit/remediation-ledger.json", JSON.stringify(summary, null, 2) + "\n", { flag: "wx" });
+          NODE
+
+      - name: Retain raw dependency audit and vulnerability ledger
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: syphon-dependency-audit-${{ github.sha }}
+          path: dist/syphon-audit/
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Enforce dependency vulnerability threshold
+        run: pnpm audit --audit-level high
+
       - name: Install and run GitHub Actions security policy analyzer
         run: |
           cargo install zizmor --locked
@@ -47,12 +104,6 @@ jobs:
         run: |
           docker run --rm -v "$PWD:/path" zricethezav/gitleaks:v8.24.2 detect \
             --source=/path --no-banner --redact --exit-code 1
-
-      - name: Install locked dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Enforce dependency vulnerability threshold
-        run: pnpm audit --audit-level high
 
       - name: Run SYPHON security, tamper and fault-path regression suite
         run: pnpm test:syphon
