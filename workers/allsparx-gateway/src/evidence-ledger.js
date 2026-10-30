@@ -192,7 +192,8 @@ export class EvidenceLedger {
           return json({ valid: false, verifiedEvents: records.length, expectedSequence: sequence }, 409);
         }
         const { sequence: storedSequence, previousHash: storedPreviousHash, eventHash, ...eventPayload } = record;
-        const { eventHash: ignoredHash, ...hashPayload } = record;
+        const hashPayload = { ...record };
+        delete hashPayload.eventHash;
         if (storedSequence !== sequence || storedPreviousHash !== previousHash || !validEvent(eventPayload) ||
             !/^[a-f0-9]{64}$/.test(eventHash || "") || await sha256(canonical(hashPayload)) !== eventHash) {
           return json({ valid: false, verifiedEvents: records.length, invalidSequence: sequence }, 409);
