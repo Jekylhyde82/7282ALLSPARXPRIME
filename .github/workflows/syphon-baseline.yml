@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: syphon-baseline-\${{ github.workflow }}-\${{ github.ref }}
+  group: syphon-baseline-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -38,5 +38,5 @@ jobs:
         id: check
         run: pnpm check
       - name: Run production build
-        if: \${{ always() && steps.install.outcome == 'success' }}
+        if: ${{ always() && steps.install.outcome == 'success' }}
         run: pnpm build
