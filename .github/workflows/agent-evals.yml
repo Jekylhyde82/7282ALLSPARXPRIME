@@ -8,6 +8,8 @@ on:
       - "promptfooconfig.yaml"
       - ".github/workflows/agent-evals.yml"
       - "docs/AGENT-FOUNDATION.md"
+      - "src/agents/**"
+      - "tests/verification-agent.test.mjs"
   push:
     branches:
       - syphon/agent-foundation-promptfoo
