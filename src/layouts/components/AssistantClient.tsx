@@ -1,41 +1,13 @@
 import React, { useState, useEffect } from "react";
+import type { CollectionEntry } from "astro:content";
 import AIInput from "./AIInput";
 import ProgramCard from "./ProgramCard";
 import LoadingIndicator from "./LoadingIndicator";
 import StarCTADialog from "./StarCTADialog";
 import { useStarCTA } from "./useStarCTA";
 
-interface Program {
-  id: string;
-  collection: "programs";
-  data: {
-    title: string;
-    intro: string;
-    max_value: number;
-    value_type: string;
-    currency: string;
-    status: "Active" | "Discontinued" | "Beta" | "Upcoming";
-    tags: string[];
-    url: string;
-    provider_slug: string;
-    tiers: Array<{
-      effort_level: number;
-    }>;
-  };
-}
-
-interface Provider {
-  id: string;
-  collection: "providers";
-  data: {
-    title: string;
-    slug: string;
-    color: string;
-    logo: string;
-    website: string;
-  };
-}
-
+type Program = CollectionEntry<"programs">;
+type Provider = CollectionEntry<"providers">;
 interface APIResponse {
   summary: string;
   programs: Array<{ title: string }>;
