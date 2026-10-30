@@ -119,6 +119,25 @@ test("verifies Supabase JWT, applies per-user rate limit, and routes to configur
   }
 });
 
+test("returns 503 when the Supabase JWKS endpoint is temporarily unavailable", async () => {
+  const { token } = tokenFixture;
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => { throw new TypeError("network unavailable"); };
+  try {
+    const response = await handleRequest(new Request("https://example.test/api/allsparx/v1/ask", {
+      method: "POST", headers: { authorization: "Bearer " + token },
+    }), {
+      ...baseEnv, SUPABASE_URL: "https://jwks-outage.supabase.co",
+      ALLOWED_ORIGINS: "https://app.example.test",
+    });
+    assert.equal(response.status, 503);
+    assert.equal((await response.json()).error, "authentication_unavailable");
+    assert.equal(response.headers.get("retry-after"), "5");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("returns 429 when the configured user rate limiter rejects a request", async () => {
   const { token, jwk } = tokenFixture;
   const originalFetch = globalThis.fetch;
