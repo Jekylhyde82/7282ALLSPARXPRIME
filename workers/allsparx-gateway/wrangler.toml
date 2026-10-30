@@ -20,3 +20,11 @@ class_name = "SpendBudget"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["RateLimiter", "SpendBudget"]
+
+[[durable_objects.bindings]]
+name = "EVIDENCE_LEDGER"
+class_name = "EvidenceLedger"
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["EvidenceLedger"]
