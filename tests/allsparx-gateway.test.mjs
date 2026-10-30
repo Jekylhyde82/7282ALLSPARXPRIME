@@ -249,6 +249,8 @@ test("evidence verification is paginated and hash-linked across pages", async ()
   assert.equal(first.complete, false);
   assert.equal(first.verifiedEvents, 2);
   const cursor = new URLSearchParams({ from: String(first.next.from), previousHash: first.next.previousHash });
+  const forgedCursor = await ledger.fetch(new Request("https://evidence/verify?from=3&previousHash=" + "f".repeat(64)));
+  assert.equal(forgedCursor.status, 400);
   const second = await (await ledger.fetch(new Request("https://evidence/verify?" + cursor))).json();
   assert.equal(second.valid, true);
   assert.equal(second.complete, true);
