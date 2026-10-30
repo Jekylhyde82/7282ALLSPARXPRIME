@@ -89,9 +89,12 @@ async function readBoundedJson(response: Response): Promise<unknown> {
 export async function runAllsparxPrimeTask(
   prompt: string,
   gatewayEndpoint: string,
-  providerPreference: ProviderPreference = "auto",
+  providerPreference: ProviderPreference,
+  accessToken: string,
+  catalogTitles: string[] = [],
 ): Promise<AssistantTaskResult> {
   const normalizedPrompt = prompt.trim();
+  if (!accessToken) throw new Error("Sign in before starting an ALLSPARX PRIME task.");
   if (!normalizedPrompt) throw new Error("Enter a request before starting an ALLSPARX PRIME task.");
   if (normalizedPrompt.length > 500) throw new Error("Requests must be 500 characters or fewer.");
   let endpointUrl: URL;
@@ -111,13 +114,14 @@ export async function runAllsparxPrimeTask(
   try {
     const response = await fetch(endpointUrl.toString(), {
       method: "POST", redirect: "error",
-      headers: { "Content-Type": "application/json", "X-ALLSPARX-Request-ID": requestId },
+      headers: { "Content-Type": "application/json", "X-ALLSPARX-Request-ID": requestId, Authorization: `Bearer ${accessToken}` },
       signal: controller.signal,
       body: JSON.stringify({
         prompt: normalizedPrompt,
         task: "startup-deal-recommendation",
         provider: providerPreference,
         contractVersion: 1,
+        catalog: catalogTitles.slice(0, 200).filter((title) => typeof title === "string").map((title) => title.slice(0, 160)),
       }),
     });
     if (!response.ok) throw new Error("The ALLSPARX gateway could not complete this request.");
