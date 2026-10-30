@@ -549,3 +549,80 @@ test("evidence ledger rejects lifecycle labels that misstate the outcome", async
   assert.equal(response.status, 400);
   assert.equal(store.has("head"), false);
 });
+
+
+test("protected evidence export rejects missing and incorrect bearer credentials", async () => {
+  const missing = await worker.fetch(new Request("https://gateway.example/internal/evidence/export?month=2026-10"), env());
+  assert.equal(missing.status, 503);
+  const denied = await worker.fetch(new Request("https://gateway.example/internal/evidence/export?month=2026-10", {
+    headers: { authorization: "Bearer " + "x".repeat(40) },
+  }), env({ EVIDENCE_EXPORT_TOKEN: "y".repeat(40) }));
+  assert.equal(denied.status, 401);
+});
+
+test("protected evidence export validates month and returns a bounded verified empty-month bundle", async () => {
+  const token = "export-token-".padEnd(48, "x");
+  const invalid = await worker.fetch(new Request("https://gateway.example/internal/evidence/export?month=2026-13", {
+    headers: { authorization: "Bearer " + token },
+  }), env({ EVIDENCE_EXPORT_TOKEN: token }));
+  assert.equal(invalid.status, 400);
+  const response = await worker.fetch(new Request("https://gateway.example/internal/evidence/export?month=2026-10", {
+    headers: { authorization: "Bearer " + token },
+  }), env({
+    EVIDENCE_EXPORT_TOKEN: token,
+    EVIDENCE_LEDGER: stubNamespace(async () => Response.json({
+      valid: true, records: [], verifiedThrough: 0, complete: true, headSequence: 0,
+    })),
+  }));
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  const bundle = await response.json();
+  assert.equal(bundle.format, "allsparx-evidence-export-v1");
+  assert.equal(bundle.ledgerMonth, "2026-10");
+  assert.deepEqual(bundle.records, []);
+  assert.deepEqual(bundle.checkpoint, { sequence: 0, hash: "0".repeat(64) });
+});
+
+test("evidence ledger export pages validate stored records and chain anchors", async () => {
+  const store = new Map();
+  const ledger = new EvidenceLedger(transactionalState(store));
+  const makeEvent = (sequence) => ({
+    operationId: `00000000-0000-4000-8000-${String(sequence).padStart(12, "0")}`,
+    correlationId: `export-test-${sequence}`,
+    eventType: "ATTEMPTED",
+    status: "ATTEMPTED",
+    timestamp: `2026-10-30T02:00:0${sequence}.000Z`,
+    actor: { type: "anonymous-origin", origin: "https://cloudcredits.io" },
+    provenance: { system: "ALLSPARX PRIME", producer: "gateway", environment: "test", deploymentId: "test-build" },
+    objective: "startup-deal-recommendation",
+    promptHmacSha256: "a".repeat(64),
+    provider: null,
+    outcomeCode: "REQUEST_ACCEPTED",
+  });
+  for (let sequence = 1; sequence <= 2; sequence += 1) {
+    const appended = await ledger.fetch(new Request("https://evidence/append", {
+      method: "POST", body: JSON.stringify(makeEvent(sequence)),
+    }));
+    assert.equal(appended.status, 201);
+  }
+  const firstResponse = await ledger.fetch(new Request("https://evidence/export?from=1&limit=1"));
+  assert.equal(firstResponse.status, 200);
+  const first = await firstResponse.json();
+  assert.equal(first.valid, true);
+  assert.equal(first.records.length, 1);
+  assert.equal(first.complete, false);
+  const secondUrl = new URLSearchParams({
+    from: String(first.next.from),
+    limit: "1",
+    previousHash: first.next.previousHash,
+  });
+  const secondResponse = await ledger.fetch(new Request("https://evidence/export?" + secondUrl));
+  const second = await secondResponse.json();
+  assert.equal(second.valid, true);
+  assert.equal(second.records.length, 1);
+  assert.equal(second.complete, true);
+  assert.equal(second.headSequence, 2);
+  assert.equal(second.headHash, second.records[0].eventHash);
+  const forged = await ledger.fetch(new Request("https://evidence/export?from=2&limit=1&previousHash=" + "f".repeat(64)));
+  assert.equal(forged.status, 400);
+});
