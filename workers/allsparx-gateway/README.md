@@ -78,9 +78,38 @@ Example:
 node scripts/verify-evidence-export.mjs ./evidence-export.json <trusted-sequence> <trusted-sha256>
 ```
 
-The sequence and SHA-256 checkpoint must be obtained through a separately controlled channel (for example, an independently administered signed checkpoint process). Do not copy the checkpoint from the export being verified: the verifier intentionally ignores any checkpoint embedded in that file. Protect the checkpoint's provenance and custody. Export records must preserve the ledger's serialized property order because the current chain hashes the exact JSON serialization of each stored record payload; reformatting or reordering keys changes the digest. This is a verifier contract, not yet an implemented export-generation API.
+The sequence and SHA-256 checkpoint must be obtained through a separately controlled channel (for example, an independently administered signed checkpoint process). Do not copy the checkpoint from the export being verified: the verifier intentionally ignores any checkpoint embedded in that file. Protect the checkpoint's provenance and custody. Export records must preserve the ledger's serialized property order because the current chain hashes the exact JSON serialization of each stored record payload; reformatting or reordering keys changes the digest. The protected Worker route implements export generation; it does not independently establish checkpoint trust.
 
 **Scope limitation:** the offline verifier does not fetch, sign, or retain exports, and it does not establish who issued a checkpoint. The Worker route generates a bounded bundle but does not sign its checkpoint or provide independent custody. A complete export must contain records from sequence 1 through the checkpoint sequence for one ledger month. Until the bearer token is securely provisioned, a live export is exercised, and independently controlled signed checkpoints plus immutable retention are established, this is an implemented export-generation path—not a live independent audit or production evidence-retention control.
+
+
+## Independent Ed25519 checkpoint signing
+
+The repository provides offline tooling in `scripts/evidence-checkpoint.mjs`, `scripts/sign-evidence-checkpoint.mjs`, and `scripts/verify-evidence-checkpoint.mjs`. It uses Ed25519 and a signed, canonical JSON payload. The signed checkpoint binds the ledger month, sequence, final event hash, issue time, algorithm, and SHA-256 digest of the preceding month's signed checkpoint.
+
+Generate a dedicated key pair on an independently administered signing workstation. Keep the private key offline or in a separately controlled signing service; never commit it, upload it to the Worker, or place it in a browser or ordinary CI secret. Pin and distribute the public key fingerprint through an independent channel.
+
+```sh
+umask 077
+openssl genpkey -algorithm ED25519 -out allsparx-evidence-ed25519-private.pem
+openssl pkey -in allsparx-evidence-ed25519-private.pem -pubout -out allsparx-evidence-ed25519-public.pem
+```
+
+After obtaining the expected ledger sequence and hash through a separately controlled source, sign a verified export:
+
+```sh
+node scripts/sign-evidence-checkpoint.mjs evidence-export.json <trusted-sequence> <trusted-sha256> GENESIS allsparx-evidence-ed25519-private.pem checkpoint-2026-10.json
+```
+
+For later checkpoints, replace `GENESIS` with the SHA-256 digest of the previous signed checkpoint file. Verify the signature using the independently pinned public key and the expected prior-checkpoint digest:
+
+```sh
+node scripts/verify-evidence-checkpoint.mjs checkpoint-2026-10.json allsparx-evidence-ed25519-public.pem GENESIS
+```
+
+The verifier returns the signed checkpoint's digest; retain that digest independently and supply it as the expected predecessor when verifying the next checkpoint. The first checkpoint's public-key fingerprint and genesis decision must be trusted out of band. A valid signature proves that the holder of the corresponding private key signed the checkpoint; it does not prove that the signer selected a truthful ledger head. The signer must independently establish the expected sequence/hash before signing. Protect private-key custody, signer access, key rotation, revocation, checkpoint distribution, and immutable retention as separate operational controls.
+
+The scripts and tests implement local signing and verification. They do **not** provision a signer, pin a production public key, create immutable external retention, timestamp the checkpoint independently, or prove live ledger export. Those operational controls remain release blockers.
 
 ## Admission-budget limitation
 
