@@ -6,10 +6,10 @@ This checklist is deliberately evidence-based. A successful CI run proves the ch
 
 ## Verified in repository automation
 
-- [x] SYPHON runtime contract tests passed in GitHub Actions run 182.
-- [x] Cloudflare Worker bundle dry-run passed in run 182; no deployment occurred.
-- [x] Astro type/content checks passed in run 182.
-- [x] Production site build passed in run 182.
+- [x] SYPHON runtime contract tests passed in GitHub Actions run 186.
+- [x] Cloudflare Worker bundle dry-run passed in run 186; no deployment occurred.
+- [x] Astro type/content checks passed in run 186.
+- [x] Production site build passed in run 186.
 - [x] Evidence ledger appends fail closed before provider execution.
 - [x] Evidence verification is bounded and paginated (maximum 100 records per page).
 - [x] Ledger validates event lifecycle, actor origin, provenance, identifiers, provider and outcome fields.
@@ -46,8 +46,8 @@ This checklist is deliberately evidence-based. A successful CI run proves the ch
 - Repository: `Jekylhyde82/7282ALLSPARXPRIME`
 - Pull request: [#15](https://github.com/Jekylhyde82/7282ALLSPARXPRIME/pull/15)
 - Branch: `syphon/permanent-evidence-ledger`
-- Last CI-confirmed commit at the time this checklist was written: `2a0697288a715e288a522126f070ff06ef273760`
-- CI run 182: terminal-success.
+- Latest CI-confirmed commit: `7cb0f9cc89212ec11f3e50c6b7454e4e3c296770`
+- CI run 186: terminal-success; all nine job steps completed successfully, including SYPHON tests, Wrangler dry-run, Astro checks and production build.
 - PR state: open, draft, unmerged.
 - Deployment state: not deployed; no production secrets or live endpoint have been verified by this checklist.
 
