@@ -6,10 +6,10 @@ This checklist is deliberately evidence-based. A successful CI run proves the ch
 
 ## Verified in repository automation
 
-- [x] SYPHON runtime contract tests passed in GitHub Actions run 196.
-- [x] Cloudflare Worker bundle dry-run passed in run 196; no deployment occurred.
-- [x] Astro type/content checks passed in run 196.
-- [x] Production site build passed in run 196.
+- [x] SYPHON runtime contract tests passed in GitHub Actions run 197.
+- [x] Cloudflare Worker bundle dry-run passed in run 197; no deployment occurred.
+- [x] Astro type/content checks passed in run 197.
+- [x] Production site build passed in run 197.
 - [x] Evidence ledger appends fail closed before provider execution.
 - [x] Evidence verification is bounded and paginated (maximum 100 records per page).
 - [x] Ledger validates event lifecycle, actor origin, provenance, identifiers, provider and outcome fields.
@@ -22,7 +22,8 @@ This checklist is deliberately evidence-based. A successful CI run proves the ch
 
 - [x] Implement a protected, bounded monthly evidence export-generation path with paginated record reads, per-page chain validation, a dedicated bearer secret, and size limits. Regression tests have been added; latest-head CI and a live export invocation are still required before treating it as verified.
 - [ ] Securely provision and rotate `EVIDENCE_EXPORT_TOKEN`, restrict the route at the Cloudflare edge where supported, and perform a live export against a non-production ledger.
-- [ ] Implement a separately administered signed-checkpoint process outside the Cloudflare Worker and Durable Object trust boundary.
+- [x] Implement offline Ed25519 checkpoint signing and verification tools with signature, tamper, key-mismatch, genesis, and previous-checkpoint-chain regression tests.
+- [ ] Provision and operate a separately administered signer outside the Cloudflare Worker and Durable Object trust boundary; pin/distribute its public key out of band, establish the genesis trust anchor, and verify key custody, rotation, revocation, and checkpoint hand-off.
 - [ ] Establish immutable external retention and verify custody, retention, access control and tamper evidence.
 - [ ] Complete backup and restore exercises, including a measured recovery procedure and verification of restored ledger continuity.
 - [ ] Decide and implement authenticated end-user/actor identity if production audit requirements need attribution beyond anonymous origin.
@@ -47,8 +48,8 @@ This checklist is deliberately evidence-based. A successful CI run proves the ch
 - Repository: `Jekylhyde82/7282ALLSPARXPRIME`
 - Pull request: [#15](https://github.com/Jekylhyde82/7282ALLSPARXPRIME/pull/15)
 - Branch: `syphon/permanent-evidence-ledger`
-- Latest CI-confirmed commit: `e85255b69d3f37af9359a53491ae7f5489bb5086`.
-- CI run 196: terminal-success on the latest evidence-export implementation; all nine job steps passed, including export regression tests within SYPHON, Wrangler dry-run, Astro checks and production build.
+- Latest CI-confirmed commit before the checkpoint-tooling changes: `3462d4fca93ec573df14d0bb518815e19db71709` (run 197). The current PR head has advanced and requires its own CI run.
+- CI run 197: terminal-success on the latest evidence-export implementation; all nine job steps passed, including export regression tests within SYPHON, Wrangler dry-run, Astro checks and production build.
 - The CI run validates the export implementation in the repository; it does not establish that the secret is provisioned or that a live export/independent checkpoint has been exercised.
 - PR state: open, draft, unmerged.
 - Deployment state: not deployed; no production secrets or live endpoint have been verified by this checklist.
