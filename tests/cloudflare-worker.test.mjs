@@ -138,3 +138,99 @@ test("Durable Object rejects malformed snapshot jobs before touching storage", a
   assert.equal(response.status, 400);
   assert.equal(reads, 0);
 });
+
+test("Durable Object pins the source commit, hashes the archive and stores immutable provenance", async () => {
+  const originalFetch = globalThis.fetch;
+  const stored = new Map();
+  let calls = 0;
+  globalThis.fetch = async (url) => {
+    calls += 1;
+    if (String(url).includes("/commits/")) {
+      return new Response(JSON.stringify({ sha: "b".repeat(40) }), { headers: { "content-type": "application/json" } });
+    }
+    if (String(url).includes("/tarball/")) {
+      return new Response(null, { status: 302, headers: { location: "https://codeload.github.com/archive.tar.gz" } });
+    }
+    if (String(url).startsWith("https://codeload.github.com/")) {
+      return new Response(new Uint8Array([0x1f, 0x8b, 0x08, 0x00, 0x01]));
+    }
+    throw new Error("unexpected_url");
+  };
+  const state = {
+    values: new Map(),
+    storage: {
+      async get(key) { return this.values.get(key); },
+      async put(key, value) { this.values.set(key, value); },
+    },
+    async blockConcurrencyWhile(fn) { return fn(); },
+  };
+  const bucket = {
+    async head(key) { return stored.get(key) ?? null; },
+    async put(key, body, options) {
+      stored.set(key, { customMetadata: options.customMetadata, body });
+    },
+  };
+  try {
+    const coordinator = new SnapshotCoordinator(state, { SNAPSHOTS: bucket });
+    const response = await coordinator.fetch(new Request("https://snapshot.internal/process", {
+      method: "POST",
+      body: JSON.stringify({
+        delivery_id: "delivery-1",
+        repository_full_name: "Jekylhyde82/7282ALLSPARXPRIME",
+        source_commit_sha: "b".repeat(40),
+        merge_commit_sha: "a".repeat(40),
+        pull_request_number: 22,
+        license_expression: "MIT",
+      }),
+    }));
+    const result = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(result.status, "stored");
+    assert.match(result.archive_digest, /^sha256:[a-f0-9]{64}$/);
+    const object = stored.get(result.object_key);
+    assert.equal(object.customMetadata.source_commit_sha, "b".repeat(40));
+    assert.equal(object.customMetadata.license_expression, "MIT");
+    assert.equal(object.customMetadata.executed_source_code, "false");
+    assert.equal(object.customMetadata.extracted, "false");
+    assert.equal(calls, 3);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("Durable Object verifies the R2 object before treating a retry as already stored", async () => {
+  let fetchCalls = 0;
+  const previous = {
+    status: "stored",
+    source_commit_sha: "b".repeat(40),
+    archive_digest: "sha256:" + "c".repeat(64),
+    object_key: "snapshots/repo/b.tar.gz",
+  };
+  const state = {
+    storage: { async get() { return previous; }, async put() {} },
+    async blockConcurrencyWhile(fn) { return fn(); },
+  };
+  const bucket = {
+    async head() { return { customMetadata: { archive_digest: previous.archive_digest, source_commit_sha: previous.source_commit_sha } }; },
+  };
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => { fetchCalls += 1; throw new Error("must_not_download"); };
+  try {
+    const coordinator = new SnapshotCoordinator(state, { SNAPSHOTS: bucket });
+    const response = await coordinator.fetch(new Request("https://snapshot.internal/process", {
+      method: "POST",
+      body: JSON.stringify({
+        repository_full_name: "Jekylhyde82/7282ALLSPARXPRIME",
+        source_commit_sha: "b".repeat(40),
+        merge_commit_sha: "a".repeat(40),
+        pull_request_number: 22,
+        license_expression: "MIT",
+      }),
+    }));
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).status, "already_present");
+    assert.equal(fetchCalls, 0);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
