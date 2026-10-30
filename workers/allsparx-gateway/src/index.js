@@ -131,6 +131,10 @@ function extractSummary(text) {
 }
 export default {
   async fetch(request, env) {
+    const url = new URL(request.url);
+    if (url.pathname === "/healthz" && request.method === "GET") {
+      return json({ status: "ok", service: "allsparx-prime-gateway" });
+    }
     const origin = safeOrigin(request, env);
     if (!origin) return json({ error: "ORIGIN_NOT_ALLOWED" }, 403);
     const headers = cors(origin);
