@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import worker, { RateLimiter, SpendBudget } from "../workers/allsparx-gateway/src/index.js";
+import worker, { EvidenceLedger, RateLimiter, SpendBudget } from "../workers/allsparx-gateway/src/index.js";
 
 const originalFetch = globalThis.fetch;
 test.beforeEach(() => {
@@ -22,6 +22,7 @@ function env(overrides = {}) {
     ALLOWED_ORIGINS: "https://cloudcredits.io",
     RATE_LIMITER: stubNamespace(),
     SPEND_BUDGET: stubNamespace(),
+    EVIDENCE_LEDGER: stubNamespace(async () => Response.json({ stored: true }, { status: 201 })),
     TURNSTILE_SECRET_KEY: "test-secret",
     ...overrides,
   };
@@ -163,4 +164,90 @@ test("monthly reservation guard refuses reservations above its configured ceilin
   });
   assert.equal((await budget.fetch()).status, 200);
   assert.equal((await budget.fetch()).status, 429);
+});
+
+test("fails closed when durable evidence storage is unavailable", async () => {
+  const response = await worker.fetch(request(), env({ EVIDENCE_LEDGER: undefined }));
+  assert.equal(response.status, 503);
+  assert.deepEqual(await response.json(), { error: "GATEWAY_NOT_CONFIGURED" });
+});
+test("records attempt and success before returning a provider response", async () => {
+  const events = [];
+  const evidenceNamespace = stubNamespace(async (_url, options) => {
+    events.push(JSON.parse(options.body));
+    return Response.json({ stored: true }, { status: 201 });
+  });
+  globalThis.fetch = async (url) => {
+    if (String(url).includes("/siteverify")) return Response.json({
+      success: true, hostname: "cloudcredits.io", action: "allsparx_assistant",
+    });
+    if (String(url) === "https://api.openai.com/v1/responses") return Response.json({
+      output: [{ content: [{ type: "output_text", text: JSON.stringify({ summary: "Recorded", programs: [] }) }] }],
+    });
+    throw new Error("Unexpected outbound request");
+  };
+  const response = await worker.fetch(request("/v1/ask", {
+    body: JSON.stringify({ prompt: "Find startup credits", task: "startup-deal-recommendation", provider: "openai", contractVersion: 1 }),
+  }), env({ OPENAI_API_KEY: "test-provider-key", EVIDENCE_LEDGER: evidenceNamespace }));
+  assert.equal(response.status, 200);
+  assert.deepEqual(events.map((event) => event.eventType), ["ATTEMPTED", "SUCCEEDED"]);
+  assert.equal(events[0].operationId, "test-request-001");
+  assert.match(events[0].promptSha256, /^[a-f0-9]{64}$/);
+  assert.equal(JSON.stringify(events).includes("Find startup credits"), false);
+  assert.equal(events[1].provider, "openai");
+});
+test("hash-chained evidence ledger verifies appended records and detects tampering", async () => {
+  const store = new Map();
+  const storage = {
+    get: async (key) => store.get(key),
+    put: async (key, value) => store.set(key, value),
+    transaction: async (callback) => callback({
+      get: async (key) => store.get(key),
+      put: async (key, value) => store.set(key, value),
+    }),
+  };
+  const ledger = new EvidenceLedger({ storage });
+  const event = {
+    operationId: "operation-1",
+    eventType: "ATTEMPTED",
+    status: "ATTEMPTED",
+    timestamp: "2026-10-30T02:00:00.000Z",
+    provenance: { system: "ALLSPARX PRIME", producer: "gateway", environment: "test", deploymentId: "test-build" },
+    objective: "startup-deal-recommendation",
+    promptSha256: "a".repeat(64),
+    provider: null,
+    outcomeCode: "REQUEST_ACCEPTED",
+  };
+  const appended = await ledger.fetch(new Request("https://evidence/append", {
+    method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(event),
+  }));
+  assert.equal(appended.status, 201);
+  const verified = await ledger.fetch(new Request("https://evidence/verify"));
+  assert.equal(verified.status, 200);
+  assert.equal((await verified.json()).valid, true);
+  const stored = store.get("event:000000000001");
+  store.set("event:000000000001", { ...stored, outcomeCode: "ALTERED" });
+  const tampered = await ledger.fetch(new Request("https://evidence/verify"));
+  assert.equal(tampered.status, 409);
+  assert.equal((await tampered.json()).valid, false);
+});
+test("evidence ledger rejects invalid and oversized records", async () => {
+  const store = new Map();
+  const storage = {
+    get: async (key) => store.get(key),
+    put: async (key, value) => store.set(key, value),
+    transaction: async (callback) => callback({
+      get: async (key) => store.get(key),
+      put: async (key, value) => store.set(key, value),
+    }),
+  };
+  const ledger = new EvidenceLedger({ storage });
+  const invalid = await ledger.fetch(new Request("https://evidence/append", {
+    method: "POST", body: JSON.stringify({ operationId: "bad" }),
+  }));
+  assert.equal(invalid.status, 400);
+  const oversized = await ledger.fetch(new Request("https://evidence/append", {
+    method: "POST", body: "x".repeat(5000),
+  }));
+  assert.equal(oversized.status, 400);
 });
