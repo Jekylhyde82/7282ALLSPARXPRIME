@@ -278,3 +278,182 @@ This specification is **IMPLEMENTED as documentation only** when committed. The 
 - Record stage evidence by immutable references (commit SHA, workflow run, deployment ID, test report, reviewer decision).
 - Never place secrets or sensitive user data in evidence artifacts.
 - Review the pipeline after incidents, material architecture changes, or demonstrated process gaps.
+
+
+---
+
+# Expansion Pack — 8-Dimension Fusion, 256 Capability Cells, and Operational Governance
+
+## 1. Eight-dimension capability architecture
+
+The nine lifecycle stages are the delivery spine. They are governed by the eight ALLSPARX PRIME capability dimensions below. These dimensions are not extra sequential stages; each dimension contributes controls and specialist work across all nine stages.
+
+| Dimension | Paired operating perspectives | Required contribution |
+|---|---|---|
+| 1. Intelligence | Primary / Independent | Think, reason, analyse, challenge conclusions, and distinguish evidence from inference. |
+| 2. Coverage | Internal / External | Examine internal system behaviour and external dependencies, threats, users, providers, and operating conditions. |
+| 3. Resilience | Prevention / Recovery | Prevent foreseeable failures and demonstrate recovery when prevention fails. |
+| 4. Independent Scrutiny | Technical / Adversarial | Conduct technical review and deliberately challenge assumptions, abuse cases, and failure boundaries. |
+| 5. Governed Autonomy | Autonomous execution / Human oversight | Automate bounded work while retaining human authority for sensitive, irreversible, financial, security, and release decisions. |
+| 6. Knowledge and Learning | Institutional memory / Evolutionary intelligence | Preserve decisions, provenance, failures, lessons, and trusted checkpoints; evolve only from evidence. |
+| 7. Interoperability | Universal interoperability / Distributed coordination | Use stable contracts and coordinate independent services, agents, providers, and teams without collapsing their boundaries. |
+| 8. Security and Trust Architecture | Proactive security / Continuous trust verification | Protect identity, detect threats, control access, prevent vulnerabilities, contain incidents, audit permissions, check integrity and provenance, assess trust, and verify incidents. |
+
+The paired perspectives are complementary controls, not mutually exclusive choices. Both sides must be considered in design and operation.
+
+## 2. The 256 coordinated capability cells
+
+The architecture target is eight binary dimensions, giving:
+
+**2⁸ = 256 coordinated capability cells.**
+
+A cell represents one combination of the eight paired perspectives. The 256 count is an architectural coverage model—not a claim that 256 agents, tools, modules, tests, or production capabilities already exist.
+
+Each cell should eventually have:
+- a stable cell identifier and a plain-language purpose;
+- a named accountable owner or coordinating division;
+- defined inputs, outputs, interfaces, and trust boundary;
+- required controls and applicable lifecycle stages;
+- evidence requirements and verification method;
+- dependencies, failure modes, and escalation path;
+- implementation status and last verified commit/environment.
+
+Do not create 256 empty placeholders merely to satisfy a number. Populate cells when there is a defined responsibility, measurable value, and testable outcome. Merge redundant cells only through a recorded decision that preserves required coverage.
+
+### Cell identity model
+
+Use a stable eight-bit coordinate, one bit per dimension. The bit records which perspective is active for that dimension in that cell; it does not imply that the opposite perspective can be ignored elsewhere.
+
+| Bit | Dimension | 0 perspective | 1 perspective |
+|---|---|---|---|
+| b1 | Intelligence | Primary | Independent |
+| b2 | Coverage | Internal | External |
+| b3 | Resilience | Prevention | Recovery |
+| b4 | Independent Scrutiny | Technical | Adversarial |
+| b5 | Governed Autonomy | Autonomous execution | Human oversight |
+| b6 | Knowledge and Learning | Institutional memory | Evolutionary intelligence |
+| b7 | Interoperability | Universal interoperability | Distributed coordination |
+| b8 | Security and Trust Architecture | Proactive security | Continuous trust verification |
+
+A cell ID may be represented as `AP-XXXXXXXX`, where each X is 0 or 1 in the dimension order above. The identifier is a coordinate, not a maturity score or priority ranking.
+
+## 3. Nine-stage × eight-dimension execution matrix
+
+Every stage must be examined through all eight dimensions. This matrix defines minimum coverage; project-specific controls may add detail but must not remove a relevant dimension without documented rationale.
+
+| Stage | Intelligence | Coverage | Resilience | Independent scrutiny | Governed autonomy | Knowledge and learning | Interoperability | Security and trust |
+|---|---|---|---|---|---|---|---|---|
+| 1. Baseline | Verify source facts | Inventory internal and external dependencies | Establish recovery point | Challenge repository/source assumptions | Human confirms authoritative target | Preserve prior decisions and failures | Map existing contracts | Identify identities, secrets, and trust boundaries |
+| 2. Architecture | Compare design options | Model internal/external flows | Design prevention and recovery | Threat-model and adversarially review | Set approval and autonomy boundaries | Record architecture decisions | Define versioned interfaces | Design least privilege and continuous trust |
+| 3. Build | Validate implementation reasoning | Cover all affected components | Implement safe failure handling | Review code and abuse paths | Restrict automated write/deploy powers | Record change provenance | Implement tested adapters/contracts | Enforce secure defaults and secret isolation |
+| 4. Quality | Analyse results and anomalies | Test integration edges | Exercise failure cases | Independent test review | CI may gate; cannot self-approve release | Retain reproducible reports | Contract and compatibility tests | Scan and test security properties |
+| 5. Security | Assess threat evidence | Include supply-chain and external exposure | Contain and recover from compromise | Adversarial security review | Human approval for sensitive actions | Preserve incident and key history | Verify identity federation boundaries | Verify identity, permissions, integrity, provenance |
+| 6. Resilience | Interpret failure data | Include provider/cloud/service failures | Prove restore and rollback | Challenge recovery claims | Bound automated retries and spend | Retain recovery evidence | Test failover and portability | Verify recovery access and evidence integrity |
+| 7. Staging | Compare expected/actual | Validate real dependencies | Test operational failure modes | Independent staging challenge | Staging automation only within scope | Record config provenance | Test real integrations | Verify live configuration without exposing secrets |
+| 8. Approval | Synthesize evidence and uncertainty | Confirm scope completeness | Review residual risks | Independent approver challenges evidence | Explicit human GO/NO-GO | Freeze decision record | Confirm dependency owners | Validate evidence authenticity and trust anchors |
+| 9. Release | Evaluate live signals | Monitor users and dependencies | Halt/rollback on thresholds | Review release outcome | Controlled rollout with authorized limits | Feed verified lessons forward | Monitor service contracts | Monitor access, integrity, incidents, and trust |
+
+A stage cannot be marked VERIFIED if a relevant dimension is unassessed. If a dimension is genuinely not applicable, record the reason, reviewer, scope, and evidence.
+
+## 4. Stage contracts: mandatory machine-readable evidence
+
+For each stage execution, create a durable record containing at least:
+
+- `stage_id`, `stage_version`, `execution_id`;
+- repository, branch, immutable commit SHA, and artifact digest where applicable;
+- environment and deployment identity where applicable;
+- start/end timestamps and executing principal;
+- entry criteria and exit criteria;
+- checks performed, tool/workflow references, and individual results;
+- evidence references, provenance, integrity/checkpoint information;
+- exceptions, unresolved risks, and risk owner;
+- decision: `PASS`, `FAIL`, `BLOCKED`, or `NOT_APPLICABLE`;
+- reviewer identity and approval timestamp where independent review is required.
+
+Never store credentials, raw authentication tokens, private keys, or unnecessary personal data in the evidence record. Store references to approved secret-management systems, not secret values.
+
+### Evidence quality levels
+
+- **E0 — Assertion:** a claim without supporting artefact; never sufficient for a gate.
+- **E1 — Recorded attempt:** command/action and result recorded; may prove an attempt, not intended outcome.
+- **E2 — Test evidence:** reproducible test or check with target identity and result.
+- **E3 — Outcome verification:** intended result independently observed in the target environment.
+- **E4 — Durable independent assurance:** integrity-protected evidence, trusted provenance, independent review, and required retention/recovery proof.
+
+Each gate defines its minimum evidence level. Production release normally requires E3 for operational outcomes and E4 for critical security, identity, evidence-integrity, and independent-approval controls.
+
+## 5. Decision and autonomy boundaries
+
+| Action class | Default authority |
+|---|---|
+| Read-only inspection, inventory, test execution | May be automated within granted permissions |
+| Reversible code edits on a dedicated branch | May be automated with traceable commits and review |
+| Dependency or schema changes | Require impact analysis, tests, and review |
+| Secret creation, rotation, revocation, or access-policy changes | Explicit authorized human approval and protected secret workflow |
+| Production data mutation or destructive migration | Explicit approval, verified backup, tested rollback/recovery |
+| Merge to protected release branch | Required reviews and repository policy |
+| Production deployment, traffic shift, or rollback override | Explicit release authority and recorded decision |
+| Financial commitments, paid services, or budget increases | Explicit human approval |
+
+Automation must fail closed when authority, identity, scope, or required evidence is missing. Never interpret a user request to “go faster” as permission to bypass security or release approval.
+
+## 6. Cross-cutting control planes
+
+The following control planes operate across all nine stages and all 256 target cells:
+
+1. **Identity and access:** principal identity, least privilege, short-lived credentials, scoped permissions, revocation, and periodic access review.
+2. **Evidence and provenance:** immutable commit/artifact references, trustworthy timestamps, signed checkpoints where required, retention, and independent verification.
+3. **Configuration and secrets:** environment separation, secret references, rotation, configuration validation, and no secret leakage.
+4. **Data governance:** classification, minimization, retention, deletion, backup, restore, and migration safety.
+5. **Observability:** structured logs, metrics, traces, alerts, correlation IDs, and privacy-aware redaction.
+6. **Cost and resource governance:** budget admission, usage metering, settlement, reconciliation, quotas, and spend alerts.
+7. **Change and release management:** review, versioning, staged rollout, approvals, rollback, and post-release verification.
+8. **Learning and continuity:** durable decisions, known failures, lessons, recovery checkpoints, and controlled evolution.
+
+A control plane is not complete merely because a document describes it. Each control needs an owner, implementation, test, operational evidence, and review cadence.
+
+## 7. Operational scorecard
+
+Report status per stage, dimension, and critical control—not one blended percentage that hides blockers.
+
+Recommended measures:
+- requirement-to-test traceability coverage;
+- mandatory gate pass/fail/block counts;
+- unresolved critical/high security findings;
+- exact-candidate CI success and reproducibility;
+- staging live-dependency success;
+- recovery exercise success and measured recovery time;
+- backup age and restore verification;
+- evidence completeness, integrity, and retention coverage;
+- access-review and key-rotation compliance;
+- provider usage-to-invoice reconciliation variance;
+- production error rate, latency, availability, and spend against approved limits;
+- rollback readiness and post-release verification completion.
+
+Every metric needs a definition, data source, owner, freshness timestamp, target, and known limitation. Do not publish a completion percentage until the denominator and evidence rules are defined.
+
+## 8. Continuous evolution loop
+
+After each release, incident, failed gate, or material change:
+
+1. Recover the last trusted checkpoint and identify the exact affected commit/environment.
+2. Preserve raw evidence and distinguish observed facts from hypotheses.
+3. Identify root cause and contributing conditions; do not stop at the first symptom.
+4. Map the lesson to affected stages, dimensions, cells, and control planes.
+5. Prioritize changes by risk reduction, user impact, reliability, cost, and implementation effort.
+6. Implement the smallest safe improvement with regression coverage.
+7. Re-run affected gates and any required end-to-end checks.
+8. Obtain independent verification for security- or release-critical changes.
+9. Update institutional memory and the next-cycle backlog only after evidence supports the conclusion.
+
+The improvement loop is: **Expand → Upgrade → Update → Strengthen → Verify → Learn → Repeat.**
+
+## 9. Current implementation boundary
+
+This expansion is an architecture and governance specification. It does not create 256 deployed capabilities, eight operational divisions, independent signers, external immutable retention, production secrets, live provider connectivity, or production deployment.
+
+The repository evidence checkpoint at the time of this update:
+- PR #15 remains the candidate integration branch and must remain draft pending independent approval.
+- CI run 207 completed successfully on commit `5a8436fbf6d76b36cfd6b6a471393dabb6e79491`, including all nine workflow steps and job teardown.
+- That run predates this expansion commit. A fresh CI run is required for the new head.
+- Production deployment remains NO-GO until all applicable operational blockers and independent approval are evidenced.
