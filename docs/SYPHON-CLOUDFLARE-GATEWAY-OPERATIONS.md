@@ -11,7 +11,7 @@ Gateway route: `POST /api/allsparx/v1/ask`.
 - Supabase Auth access-token verification against the project's JWKS endpoint using Web Crypto.
 - Fail-closed JWT policy: RS256 or ES256 only; exact issuer, authenticated audience, subject, role, expiry, and optional not-before checks.
 - Exact origin allowlist for browser-origin requests; CORS is not treated as authentication.
-- Cloudflare Workers Rate Limiting binding keyed by verified Supabase user ID (12 requests per 60 seconds).
+- A SQLite-backed Durable Object per verified Supabase user, using atomic synchronous KV operations to enforce a strict global limit of 12 requests per 60 seconds across Cloudflare locations. Limiter failures fail closed with HTTP 503.
 - Bounded request body (48 KiB), prompt (500 characters), model output (800 tokens), and response fields.
 - Program recommendations are restricted to exact titles from the existing public catalog supplied by the browser; invented titles are filtered out.
 - Provider credentials are read only from server-side Worker environment bindings.
@@ -22,7 +22,7 @@ Gateway route: `POST /api/allsparx/v1/ask`.
 
 ## Important limits and remaining gates
 
-Cloudflare's built-in Rate Limiting binding is approximate and local to each Cloudflare location; it is not a strict global quota or a provider spend cap. The 800-token output ceiling bounds an individual completion but does not establish a monthly spend limit. A strict cross-region budget requires a durable shared counter or provider-side billing limits and alerting.
+The per-user Durable Object counter is strict across locations for its 12-per-60-second window. This is an abuse/rate guard, not a provider spend cap: the 800-token output ceiling bounds one completion but does not establish a monthly budget. Provider-side billing limits and alerts are still required for spend control. SQLite-backed Durable Objects are available on Cloudflare Workers Free with included daily request, duration, and storage quotas; on the Free plan, operations beyond included limits fail rather than silently becoming paid overages. Verify the account remains on the Free plan before deployment.
 
 Supabase JWT verification requires an asymmetric signing key published in the project's JWKS endpoint. The Worker caches JWKS for 10 minutes, so key revocation/rotation is not instantaneous at this gateway; allow for cache expiry during planned rotation and treat urgent key compromise as an incident requiring a cache-bypass/redeploy strategy. Legacy HS256 projects with no JWKS keys fail closed and must be migrated to RS256 or ES256 before the gateway can authenticate users.
 
