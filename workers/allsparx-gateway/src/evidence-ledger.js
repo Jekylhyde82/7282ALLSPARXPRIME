@@ -1,6 +1,8 @@
 const ZERO_HASH = "0".repeat(64);
 const EVENT_TYPES = new Set(["ATTEMPTED", "SUCCEEDED", "FAILED", "VERIFIED", "CONTRADICTED"]);
 const MAX_BODY_BYTES = 4096;
+const MAX_VERIFY_PAGE = 100;
+const MAX_SEQUENCE = 10_000_000;
 
 function json(body, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -36,21 +38,29 @@ async function readBoundedJson(request) {
   for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
   return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
 }
+function boundedString(value, max) {
+  return typeof value === "string" && value.length > 0 && value.length <= max;
+}
+function validHead(head) {
+  return head && Number.isSafeInteger(head.sequence) && head.sequence >= 0 &&
+    head.sequence <= MAX_SEQUENCE && typeof head.hash === "string" &&
+    /^[a-f0-9]{64}$/.test(head.hash) && (head.sequence !== 0 || head.hash === ZERO_HASH);
+}
 function validEvent(event) {
+  let originIsCanonical = false;
+  let timestampIsCanonical = false;
+  try { const parsed = new URL(event?.actor?.origin); originIsCanonical = parsed.origin === event.actor.origin && (parsed.protocol === "https:" || parsed.protocol === "http:"); } catch {}
+  try { timestampIsCanonical = new Date(event?.timestamp).toISOString() === event.timestamp; } catch {}
   return event && typeof event === "object" &&
-    typeof event.operationId === "string" && /^[a-f0-9-]{36}$/.test(event.operationId) &&
-    typeof event.correlationId === "string" && /^[a-zA-Z0-9._:-]{1,128}$/.test(event.correlationId) &&
-    EVENT_TYPES.has(event.eventType) &&
-    typeof event.status === "string" && event.status.length <= 64 &&
-    typeof event.timestamp === "string" && !Number.isNaN(Date.parse(event.timestamp)) &&
-    event.actor && event.actor.type === "anonymous-origin" && typeof event.actor.origin === "string" &&
-    event.provenance && typeof event.provenance.system === "string" &&
-    typeof event.provenance.producer === "string" &&
-    typeof event.provenance.environment === "string" &&
-    typeof event.objective === "string" && event.objective.length <= 128 &&
-    typeof event.promptHmacSha256 === "string" && /^[a-f0-9]{64}$/.test(event.promptHmacSha256) &&
-    (event.provider === null || typeof event.provider === "string") &&
-    typeof event.outcomeCode === "string" && event.outcomeCode.length <= 64;
+    typeof event.operationId === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(event.operationId) &&
+    boundedString(event.correlationId, 128) && /^[a-zA-Z0-9._:-]+$/.test(event.correlationId) &&
+    EVENT_TYPES.has(event.eventType) && boundedString(event.status, 64) && timestampIsCanonical &&
+    event.actor?.type === "anonymous-origin" && originIsCanonical &&
+    boundedString(event.provenance?.system, 64) && boundedString(event.provenance?.producer, 96) &&
+    boundedString(event.provenance?.environment, 32) && boundedString(event.provenance?.deploymentId, 128) &&
+    boundedString(event.objective, 128) && typeof event.promptHmacSha256 === "string" && /^[a-f0-9]{64}$/.test(event.promptHmacSha256) &&
+    (event.provider === null || (boundedString(event.provider, 32) && ["openai", "anthropic", "google"].includes(event.provider))) &&
+    boundedString(event.outcomeCode, 64);
 }
 
 export class EvidenceLedger {
@@ -68,6 +78,7 @@ export class EvidenceLedger {
 
       const stored = await this.state.storage.transaction(async (txn) => {
         const head = await txn.get("head") || { sequence: 0, hash: ZERO_HASH };
+        if (!validHead(head) || head.sequence >= MAX_SEQUENCE) throw new Error("INVALID_LEDGER_HEAD");
         const sequence = head.sequence + 1;
         const record = {
           sequence,
@@ -95,21 +106,27 @@ export class EvidenceLedger {
 
     if (url.pathname === "/verify" && request.method === "GET") {
       const head = await this.state.storage.get("head") || { sequence: 0, hash: ZERO_HASH };
-      let previousHash = ZERO_HASH;
-      for (let sequence = 1; sequence <= head.sequence; sequence += 1) {
-        const record = await this.state.storage.get(`event:${String(sequence).padStart(12, "0")}`);
-        if (!record || record.sequence !== sequence || record.previousHash !== previousHash) {
-          return json({ valid: false, verifiedEvents: sequence - 1, expectedSequence: sequence }, 409);
-        }
+      if (!validHead(head)) return json({ valid: false, invalidHead: true }, 409);
+      const from = Number(url.searchParams.get("from") || "1");
+      const limit = Number(url.searchParams.get("limit") || String(MAX_VERIFY_PAGE));
+      const anchor = from === 1 ? ZERO_HASH : url.searchParams.get("previousHash");
+      if (!Number.isSafeInteger(from) || from < 1 || from > head.sequence + 1 || !Number.isSafeInteger(limit) || limit < 1 || limit > MAX_VERIFY_PAGE || typeof anchor !== "string" || !/^[a-f0-9]{64}$/.test(anchor) || (from === 1 && anchor !== ZERO_HASH)) return json({ error: "INVALID_VERIFY_CURSOR", maxPageSize: MAX_VERIFY_PAGE }, 400);
+      const end = Math.min(head.sequence, from + limit - 1);
+      let previousHash = anchor;
+      let verifiedEvents = 0;
+      for (let sequence = from; sequence <= end; sequence += 1) {
+        const key = "event:" + String(sequence).padStart(12, "0");
+        const record = await this.state.storage.get(key);
+        if (!record || record.sequence !== sequence || record.previousHash !== previousHash) return json({ valid: false, verifiedEvents, expectedSequence: sequence }, 409);
         const { eventHash, ...payload } = record;
         const calculated = await sha256(canonical(payload));
-        if (calculated !== eventHash) {
-          return json({ valid: false, verifiedEvents: sequence - 1, invalidSequence: sequence }, 409);
-        }
+        if (calculated !== eventHash) return json({ valid: false, verifiedEvents, invalidSequence: sequence }, 409);
         previousHash = eventHash;
+        verifiedEvents += 1;
       }
-      if (previousHash !== head.hash) return json({ valid: false, verifiedEvents: head.sequence, invalidHead: true }, 409);
-      return json({ valid: true, verifiedEvents: head.sequence, headHash: head.hash });
+      const complete = end === head.sequence;
+      if (complete && previousHash !== head.hash) return json({ valid: false, verifiedEvents, invalidHead: true }, 409);
+      return json({ valid: true, verifiedEvents, verifiedFrom: from, verifiedThrough: end, complete, headSequence: head.sequence, headHash: complete ? head.hash : undefined, next: complete ? null : { from: end + 1, previousHash } });
     }
 
     return json({ error: "NOT_FOUND" }, 404);
