@@ -215,6 +215,7 @@ export default {
       eventType,
       status,
       timestamp: new Date().toISOString(),
+      actor: { type: "anonymous-origin", origin },
       provenance: {
         system: "ALLSPARX PRIME",
         producer: "allsparx-prime-gateway",
