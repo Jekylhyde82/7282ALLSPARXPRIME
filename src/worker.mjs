@@ -82,7 +82,11 @@ async function verifySupabaseToken(request, env) {
   const supabaseUrl = (env.SUPABASE_URL || "").replace(/\/$/, "");
   if (!/^https:\/\//.test(supabaseUrl)) throw new Error("auth_not_configured");
   const jwks = await getJwks(supabaseUrl + "/auth/v1/.well-known/jwks.json");
-  const jwk = jwks.keys.find((key) => key.kid === header.kid && (key.alg === undefined || key.alg === header.alg) && (header.alg === "RS256" ? key.kty === "RSA" : key.kty === "EC" && key.crv === "P-256"));
+  const jwk = jwks.keys.find((key) => key.kid === header.kid &&
+    (key.alg === undefined || key.alg === header.alg) &&
+    (key.use === undefined || key.use === "sig") &&
+    (key.key_ops === undefined || key.key_ops.includes("verify")) &&
+    (header.alg === "RS256" ? key.kty === "RSA" : key.kty === "EC" && key.crv === "P-256"));
   if (!jwk) throw new Error("unauthorized");
   const algorithm = header.alg === "RS256"
     ? { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }
@@ -99,8 +103,9 @@ async function verifySupabaseToken(request, env) {
   const audience = Array.isArray(claims.aud) ? claims.aud : [claims.aud];
   if (claims.iss !== issuer || !audience.includes("authenticated") ||
       typeof claims.sub !== "string" || !claims.sub ||
+      typeof claims.iat !== "number" || claims.iat > now + 30 ||
       typeof claims.exp !== "number" || claims.exp <= now ||
-      (typeof claims.nbf === "number" && claims.nbf > now + 30) ||
+      (claims.nbf !== undefined && (typeof claims.nbf !== "number" || claims.nbf > now + 30)) ||
       claims.role !== "authenticated") throw new Error("unauthorized");
   return claims.sub;
 }
