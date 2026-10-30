@@ -2,9 +2,9 @@ name: SYPHON baseline checks
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, syphon/allsparx-prime-integration-plan]
   push:
-    branches: [syphon/allsparx-prime-integration-plan]
+    branches: [syphon/allsparx-prime-integration-plan, syphon/codex-runtime-integration]
 
 permissions:
   contents: read
@@ -36,6 +36,10 @@ jobs:
       - name: Install locked dependencies
         id: install
         run: pnpm install --frozen-lockfile
+
+      - name: Run SYPHON runtime contract tests
+        id: syphon-tests
+        run: pnpm test:syphon
 
       - name: Run Astro type and content checks
         id: check
