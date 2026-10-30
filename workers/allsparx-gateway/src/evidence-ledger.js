@@ -109,10 +109,16 @@ export class EvidenceLedger {
       if (!validHead(head)) return json({ valid: false, invalidHead: true }, 409);
       const from = Number(url.searchParams.get("from") || "1");
       const limit = Number(url.searchParams.get("limit") || String(MAX_VERIFY_PAGE));
-      const anchor = from === 1 ? ZERO_HASH : url.searchParams.get("previousHash");
-      if (!Number.isSafeInteger(from) || from < 1 || from > head.sequence + 1 || !Number.isSafeInteger(limit) || limit < 1 || limit > MAX_VERIFY_PAGE || typeof anchor !== "string" || !/^[a-f0-9]{64}$/.test(anchor) || (from === 1 && anchor !== ZERO_HASH)) return json({ error: "INVALID_VERIFY_CURSOR", maxPageSize: MAX_VERIFY_PAGE }, 400);
+      const suppliedAnchor = from === 1 ? ZERO_HASH : url.searchParams.get("previousHash");
+      if (!Number.isSafeInteger(from) || from < 1 || from > head.sequence + 1 || !Number.isSafeInteger(limit) || limit < 1 || limit > MAX_VERIFY_PAGE || typeof suppliedAnchor !== "string" || !/^[a-f0-9]{64}$/.test(suppliedAnchor) || (from === 1 && suppliedAnchor !== ZERO_HASH)) return json({ error: "INVALID_VERIFY_CURSOR", maxPageSize: MAX_VERIFY_PAGE }, 400);
+      let previousHash = ZERO_HASH;
+      if (from > 1) {
+        const priorKey = "event:" + String(from - 1).padStart(12, "0");
+        const priorRecord = await this.state.storage.get(priorKey);
+        if (!priorRecord || priorRecord.sequence !== from - 1 || priorRecord.eventHash !== suppliedAnchor) return json({ error: "INVALID_VERIFY_CURSOR" }, 400);
+        previousHash = priorRecord.eventHash;
+      }
       const end = Math.min(head.sequence, from + limit - 1);
-      let previousHash = anchor;
       let verifiedEvents = 0;
       for (let sequence = from; sequence <= end; sequence += 1) {
         const key = "event:" + String(sequence).padStart(12, "0");
