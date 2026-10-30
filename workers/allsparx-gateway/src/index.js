@@ -107,11 +107,18 @@ async function verifyTurnstile(token, request, env) {
   const expectedHostname = origin ? new URL(origin).hostname : "";
   return result.success === true && typeof result.hostname === "string" && result.hostname === expectedHostname && result.action === "allsparx_assistant";
 }
+function validModelId(value) {
+  return typeof value === "string" &&
+    value.length > 0 &&
+    value.length <= 128 &&
+    value.trim() === value &&
+    !/[\\u0000-\\u001f\\u007f]/.test(value);
+}
 function configuredProviders(env, preference) {
   const configured = PROVIDERS.filter((provider) => {
-    if (provider === "openai") return Boolean(env.OPENAI_API_KEY && env.OPENAI_MODEL);
-    if (provider === "anthropic") return Boolean(env.ANTHROPIC_API_KEY && env.ANTHROPIC_MODEL);
-    if (provider === "google") return Boolean(env.GOOGLE_API_KEY && env.GOOGLE_MODEL);
+    if (provider === "openai") return Boolean(env.OPENAI_API_KEY) && validModelId(env.OPENAI_MODEL);
+    if (provider === "anthropic") return Boolean(env.ANTHROPIC_API_KEY) && validModelId(env.ANTHROPIC_MODEL);
+    if (provider === "google") return Boolean(env.GOOGLE_API_KEY) && validModelId(env.GOOGLE_MODEL);
     return false;
   });
   if (preference === "auto") return configured;
