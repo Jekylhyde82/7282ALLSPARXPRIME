@@ -84,7 +84,7 @@ async function providerCall(provider, prompt, env) {
       response = await fetch("https://api.openai.com/v1/responses", {
         method: "POST",
         headers: { authorization: `Bearer ${env.OPENAI_API_KEY}`, "content-type": "application/json" },
-        body: JSON.stringify({ model: "gpt-4.1-mini", input: prompt, max_output_tokens: MAX_OUTPUT_TOKENS }),
+        body: JSON.stringify({ model: "gpt-6-luna", input: prompt, max_output_tokens: MAX_OUTPUT_TOKENS }),
         signal: controller.signal,
       });
       const data = await response.json();
@@ -94,14 +94,14 @@ async function providerCall(provider, prompt, env) {
       response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-        body: JSON.stringify({ model: "claude-3-5-haiku-latest", max_tokens: MAX_OUTPUT_TOKENS, messages: [{ role: "user", content: prompt }] }),
+        body: JSON.stringify({ model: "claude-haiku-5-5", max_tokens: MAX_OUTPUT_TOKENS, messages: [{ role: "user", content: prompt }] }),
         signal: controller.signal,
       });
       const data = await response.json();
       if (!response.ok) throw Object.assign(new Error("PROVIDER_FAILURE"), { retryable: response.status >= 500 || response.status === 429 });
       text = (data.content || []).filter((part) => part.type === "text").map((part) => part.text).join("\n");
     } else if (provider === "google") {
-      const model = "gemini-2.0-flash";
+      const model = "gemini-3.8-flash";
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
       response = await fetch(url, {
         method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": env.GOOGLE_API_KEY },
