@@ -41,14 +41,22 @@ async function readBoundedJson(request) {
 function boundedString(value, max) {
   return typeof value === "string" && value.length > 0 && value.length <= max;
 }
+function exactKeys(value, expected) {
+  return value && typeof value === "object" && !Array.isArray(value) &&
+    Object.keys(value).length === expected.length &&
+    expected.every((key) => Object.hasOwn(value, key));
+}
 function validHead(head) {
-  return head && Number.isSafeInteger(head.sequence) && head.sequence >= 0 &&
+  return exactKeys(head, ["sequence", "hash"]) &&
+    Number.isSafeInteger(head.sequence) && head.sequence >= 0 &&
     head.sequence <= MAX_SEQUENCE && typeof head.hash === "string" &&
     /^[a-f0-9]{64}$/.test(head.hash) && (head.sequence !== 0 || head.hash === ZERO_HASH);
 }
 function validEvent(event) {
-  // Keep lifecycle labels semantically aligned so malformed producers cannot
-  // make an attempted operation look successful in the audit trail.
+  const eventKeys = [
+    "operationId", "correlationId", "eventType", "status", "timestamp",
+    "actor", "provenance", "objective", "promptHmacSha256", "provider", "outcomeCode",
+  ];
   const lifecycleIsCanonical = event && (
     (event.eventType === "ATTEMPTED" && event.status === "ATTEMPTED") ||
     (event.eventType === "SUCCEEDED" && event.status === "PROVIDER_RESPONSE_RETURNED") ||
@@ -58,18 +66,30 @@ function validEvent(event) {
   );
   let originIsCanonical = false;
   let timestampIsCanonical = false;
-  try { const parsed = new URL(event?.actor?.origin); originIsCanonical = parsed.origin === event.actor.origin && (parsed.protocol === "https:" || parsed.protocol === "http:"); } catch {}
+  try {
+    const parsed = new URL(event?.actor?.origin);
+    originIsCanonical = parsed.origin === event.actor.origin &&
+      (parsed.protocol === "https:" || parsed.protocol === "http:") &&
+      parsed.hostname.length > 0 && !parsed.username && !parsed.password;
+  } catch {}
   try { timestampIsCanonical = new Date(event?.timestamp).toISOString() === event.timestamp; } catch {}
-  return event && typeof event === "object" &&
+  const actorIsCanonical = exactKeys(event?.actor, ["type", "origin"]) &&
+    event.actor.type === "anonymous-origin" && originIsCanonical;
+  const provenance = event?.provenance;
+  const provenanceIsCanonical = exactKeys(provenance, ["system", "producer", "environment", "deploymentId"]) &&
+    provenance.system === "ALLSPARX PRIME" &&
+    boundedString(provenance.producer, 96) && /^[a-z][a-z0-9-]*$/.test(provenance.producer) &&
+    boundedString(provenance.environment, 32) && /^[a-z][a-z0-9-]*$/.test(provenance.environment) &&
+    boundedString(provenance.deploymentId, 128) && /^[A-Za-z0-9][A-Za-z0-9._:-]*$/.test(provenance.deploymentId);
+  return exactKeys(event, eventKeys) &&
     typeof event.operationId === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(event.operationId) &&
     boundedString(event.correlationId, 128) && /^[a-zA-Z0-9._:-]+$/.test(event.correlationId) &&
-    EVENT_TYPES.has(event.eventType) && boundedString(event.status, 64) && lifecycleIsCanonical && timestampIsCanonical &&
-    event.actor?.type === "anonymous-origin" && originIsCanonical &&
-    boundedString(event.provenance?.system, 64) && boundedString(event.provenance?.producer, 96) &&
-    boundedString(event.provenance?.environment, 32) && boundedString(event.provenance?.deploymentId, 128) &&
-    boundedString(event.objective, 128) && typeof event.promptHmacSha256 === "string" && /^[a-f0-9]{64}$/.test(event.promptHmacSha256) &&
+    EVENT_TYPES.has(event.eventType) && boundedString(event.status, 64) && lifecycleIsCanonical &&
+    timestampIsCanonical && actorIsCanonical && provenanceIsCanonical &&
+    boundedString(event.objective, 128) && /^[a-z][a-z0-9-]*$/.test(event.objective) &&
+    typeof event.promptHmacSha256 === "string" && /^[a-f0-9]{64}$/.test(event.promptHmacSha256) &&
     (event.provider === null || (boundedString(event.provider, 32) && ["openai", "anthropic", "google"].includes(event.provider))) &&
-    boundedString(event.outcomeCode, 64);
+    boundedString(event.outcomeCode, 64) && /^[A-Z][A-Z0-9_]*$/.test(event.outcomeCode);
 }
 
 export class EvidenceLedger {
