@@ -205,9 +205,14 @@ export async function handleRequest(request, env) {
   if (!limit.success) return json({ error: "rate_limited" }, 429, { ...cors, "retry-after": "60" });
   const declared = Number(request.headers.get("content-length") || "0");
   if (declared > MAX_BODY_BYTES) return json({ error: "request_too_large" }, 413, cors);
+  const contentType = (request.headers.get("content-type") || "").split(";")[0].trim().toLowerCase();
+  if (contentType !== "application/json") return json({ error: "content_type_required" }, 415, cors);
   let raw;
-  try { raw = await request.text(); } catch { return json({ error: "invalid_request" }, 400, cors); }
-  if (new TextEncoder().encode(raw).byteLength > MAX_BODY_BYTES) return json({ error: "request_too_large" }, 413, cors);
+  try { raw = await readBoundedText(request, MAX_BODY_BYTES); }
+  catch (error) {
+    const tooLarge = error.message === "request_too_large";
+    return json({ error: tooLarge ? "request_too_large" : "invalid_request" }, tooLarge ? 413 : 400, cors);
+  }
   let body;
   try { body = JSON.parse(raw); } catch { return json({ error: "invalid_json" }, 400, cors); }
   if (!body || typeof body.prompt !== "string" || body.prompt.trim().length < 1 ||
