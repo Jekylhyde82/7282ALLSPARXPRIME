@@ -1,4 +1,5 @@
 import { EvidenceLedger } from "./evidence-ledger.js";
+export { EvidenceLedger };
 
 const PROVIDERS = ["openai", "anthropic", "google"];
 const MAX_BODY_BYTES = 8 * 1024;
