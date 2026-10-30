@@ -50,6 +50,29 @@ async function readJsonBounded(request) {
   for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
   return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
 }
+async function readProviderJson(response) {
+  const reader = response.body?.getReader();
+  if (!reader) throw new Error("EMPTY_PROVIDER_RESPONSE");
+  const chunks = [];
+  let size = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > MAX_RESPONSE_BYTES) {
+        await reader.cancel();
+        throw new Error("PROVIDER_RESPONSE_TOO_LARGE");
+      }
+      chunks.push(value);
+    }
+  } finally { reader.releaseLock(); }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+  return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
+}
+
 async function verifyTurnstile(token, request, env) {
   if (!env.TURNSTILE_SECRET_KEY || !token) return false;
   const form = new URLSearchParams({
@@ -88,7 +111,7 @@ async function providerCall(provider, prompt, env) {
         body: JSON.stringify({ model: "gpt-6-luna", input: prompt, max_output_tokens: MAX_OUTPUT_TOKENS }),
         signal: controller.signal,
       });
-      const data = await response.json();
+      const data = await readProviderJson(response);
       if (!response.ok) throw Object.assign(new Error("PROVIDER_FAILURE"), { retryable: response.status >= 500 || response.status === 429 });
       text = (data.output || []).flatMap((item) => item.content || []).filter((part) => part.type === "output_text").map((part) => part.text).join("\n");
     } else if (provider === "anthropic") {
@@ -98,7 +121,7 @@ async function providerCall(provider, prompt, env) {
         body: JSON.stringify({ model: "claude-haiku-5-5", max_tokens: MAX_OUTPUT_TOKENS, messages: [{ role: "user", content: prompt }] }),
         signal: controller.signal,
       });
-      const data = await response.json();
+      const data = await readProviderJson(response);
       if (!response.ok) throw Object.assign(new Error("PROVIDER_FAILURE"), { retryable: response.status >= 500 || response.status === 429 });
       text = (data.content || []).filter((part) => part.type === "text").map((part) => part.text).join("\n");
     } else if (provider === "google") {
@@ -109,7 +132,7 @@ async function providerCall(provider, prompt, env) {
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { maxOutputTokens: MAX_OUTPUT_TOKENS } }),
         signal: controller.signal,
       });
-      const data = await response.json();
+      const data = await readProviderJson(response);
       if (!response.ok) throw Object.assign(new Error("PROVIDER_FAILURE"), { retryable: response.status >= 500 || response.status === 429 });
       text = (data.candidates || []).flatMap((candidate) => candidate.content?.parts || []).map((part) => part.text || "").join("\n");
     }
