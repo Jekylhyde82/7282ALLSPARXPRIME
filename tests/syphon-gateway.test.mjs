@@ -173,10 +173,11 @@ test("Durable Object limiter enforces a serialized per-user window", async () =>
   const values = new Map();
   const state = {
     storage: {
-      get: async (key) => values.get(key),
-      put: async (key, value) => values.set(key, value),
+      kv: {
+        get: (key) => values.get(key),
+        put: (key, value) => values.set(key, value),
+      },
     },
-    blockConcurrencyWhile: async (callback) => callback(),
   };
   const limiter = new UserRateLimiter(state);
   for (let i = 0; i < 12; i++) {
