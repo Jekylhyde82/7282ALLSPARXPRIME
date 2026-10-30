@@ -8,8 +8,9 @@ const MAX_RESPONSE_BYTES = 64 * 1024;
 const MAX_OUTPUT_TOKENS = 512;
 const TIMEOUT_MS = 25_000;
 
-async function sha256Hex(value) {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+async function promptFingerprint(value, secret) {
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const digest = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(value));
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 async function recordEvidence(env, event) {
@@ -183,7 +184,7 @@ export default {
     if (url.pathname !== "/v1/ask") return json({ error: "NOT_FOUND" }, 404, headers);
     if (request.method !== "POST") return json({ error: "METHOD_NOT_ALLOWED" }, 405, headers);
     if (!request.headers.get("content-type")?.toLowerCase().startsWith("application/json")) return json({ error: "UNSUPPORTED_MEDIA_TYPE" }, 415, headers);
-    if (!env.RATE_LIMITER || !env.SPEND_BUDGET || !env.EVIDENCE_LEDGER || !env.TURNSTILE_SECRET_KEY) return json({ error: "GATEWAY_NOT_CONFIGURED" }, 503, headers);
+    if (!env.RATE_LIMITER || !env.SPEND_BUDGET || !env.EVIDENCE_LEDGER || !env.TURNSTILE_SECRET_KEY || !env.EVIDENCE_HMAC_KEY) return json({ error: "GATEWAY_NOT_CONFIGURED" }, 503, headers);
 
     const ip = request.headers.get("CF-Connecting-IP") || "unknown";
     const rate = await env.RATE_LIMITER.get(env.RATE_LIMITER.idFromName(ip)).fetch("https://rate-limit/check");
@@ -209,9 +210,11 @@ export default {
     if (!candidates.length) return json({ error: "PROVIDER_UNAVAILABLE" }, 503, headers);
 
     const timestamp = new Date().toISOString();
-    const promptSha256 = await sha256Hex(body.prompt.trim());
+    const promptHmacSha256 = await promptFingerprint(body.prompt.trim(), env.EVIDENCE_HMAC_KEY);
+    const operationId = crypto.randomUUID();
     const evidence = (eventType, status, provider, outcomeCode) => ({
-      operationId: requestId,
+      operationId,
+      correlationId: requestId,
       eventType,
       status,
       timestamp: new Date().toISOString(),
@@ -223,7 +226,7 @@ export default {
         deploymentId: env.CF_VERSION_METADATA?.id || env.APP_VERSION || "unavailable",
       },
       objective: body.task,
-      promptSha256,
+      promptHmacSha256,
       provider: provider || null,
       outcomeCode,
     });
