@@ -1,0 +1,113 @@
+name: SYPHON security and provenance gates
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: syphon-security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  security-and-provenance:
+    name: Secret, dependency, regression and provenance gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - name: Check out exact source commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.8.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+
+      - name: Scan repository history for exposed secrets
+        run: |
+          docker run --rm -v "$PWD:/path" zricethezav/gitleaks:v8.24.2 detect \
+            --source=/path --no-banner --redact --exit-code 1
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Enforce dependency vulnerability threshold
+        run: pnpm audit --audit-level high
+
+      - name: Run SYPHON security, tamper and fault-path regression suite
+        run: pnpm test:syphon
+
+      - name: Validate Cloudflare Worker bundle without deployment
+        run: npx --yes wrangler@4 deploy --dry-run --config workers/allsparx-gateway/wrangler.toml
+
+      - name: Run Astro checks and production build
+        run: |
+          pnpm check
+          pnpm build
+
+      - name: Create commit-bound evidence manifest and source bundle
+        id: evidence
+        shell: bash
+        run: |
+          mkdir -p dist/syphon-evidence
+          git archive --format=tar.gz --output=dist/syphon-evidence/allsparx-source.tar.gz HEAD
+          SOURCE_SHA256="$(sha256sum dist/syphon-evidence/allsparx-source.tar.gz | cut -d ' ' -f 1)"
+          node --input-type=module <<'NODE'
+          import { writeFileSync } from "node:fs";
+          const manifest = {
+            schema: "allsparx-syphon-ci-evidence-v1",
+            repository: process.env.GITHUB_REPOSITORY,
+            commit: process.env.GITHUB_SHA,
+            workflow: process.env.GITHUB_WORKFLOW,
+            workflowRunId: process.env.GITHUB_RUN_ID,
+            workflowRunAttempt: process.env.GITHUB_RUN_ATTEMPT,
+            event: process.env.GITHUB_EVENT_NAME,
+            sourceBundle: "allsparx-source.tar.gz",
+            sourceBundleSha256: process.env.SOURCE_SHA256,
+            gates: {
+              secretScan: "passed",
+              dependencyAudit: "passed",
+              syphonRegressionAndFaultPaths: "passed",
+              cloudflareDryRun: "passed",
+              astroCheck: "passed",
+              productionBuild: "passed"
+            },
+            statement: "These results describe this workflow run only; they do not establish live deployment, external ledger retention, independent signer custody, or recovery readiness."
+          };
+          writeFileSync("dist/syphon-evidence/ci-evidence.json", JSON.stringify(manifest, null, 2) + "\n", { flag: "wx" });
+          NODE
+        env:
+          SOURCE_SHA256: ${{ steps.evidence.outputs.source_sha256 }}
+
+      - name: Attest source bundle provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: dist/syphon-evidence/allsparx-source.tar.gz
+
+      - name: Attest SYPHON CI evidence manifest
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: dist/syphon-evidence/ci-evidence.json
+
+      - name: Retain inspectable SYPHON CI evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: syphon-ci-evidence-${{ github.sha }}
+          path: dist/syphon-evidence/
+          if-no-files-found: error
+          retention-days: 90
