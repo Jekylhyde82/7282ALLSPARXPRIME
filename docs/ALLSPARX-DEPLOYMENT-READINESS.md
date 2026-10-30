@@ -48,7 +48,7 @@ This checklist is deliberately evidence-based. A successful CI run proves the ch
 - Repository: `Jekylhyde82/7282ALLSPARXPRIME`
 - Pull request: [#15](https://github.com/Jekylhyde82/7282ALLSPARXPRIME/pull/15)
 - Branch: `syphon/permanent-evidence-ledger`
-- Latest CI-confirmed commit before the checkpoint-tooling changes: `3462d4fca93ec573df14d0bb518815e19db71709` (run 197). The current PR head has advanced and requires its own CI run.
+- Latest CI-confirmed code commit: `01cbaebbe777bcfdf9c28a0fd0b8c60f82abdfe1` (run 203). All baseline steps passed. Any subsequent commit requires its own CI run.
 - CI run 197: terminal-success on the latest evidence-export implementation; all nine job steps passed, including export regression tests within SYPHON, Wrangler dry-run, Astro checks and production build.
 - The CI run validates the export implementation in the repository; it does not establish that the secret is provisioned or that a live export/independent checkpoint has been exercised.
 - PR state: open, draft, unmerged.
