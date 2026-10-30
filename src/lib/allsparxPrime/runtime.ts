@@ -4,7 +4,12 @@
  * This calls a secured, vendor-neutral gateway. Provider credentials and
  * provider-specific API calls belong behind that gateway, never in this app.
  */
-import { isProviderId, type AllsparxProviderId, type ProviderPreference } from "./providers";
+import type { AllsparxProviderId, ProviderPreference } from "./providers";
+
+const SUPPORTED_PROVIDERS = ["openai", "anthropic", "google", "ollama"] as const;
+function isProviderId(value: unknown): value is AllsparxProviderId {
+  return typeof value === "string" && (SUPPORTED_PROVIDERS as readonly string[]).includes(value);
+}
 
 export interface AllsparxTaskEvidence {
   requestId: string;
