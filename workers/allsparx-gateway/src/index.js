@@ -234,12 +234,14 @@ export default {
       return json({ error: "EVIDENCE_UNAVAILABLE" }, 503, headers);
     }
 
-    const budget = await env.SPEND_BUDGET.get(env.SPEND_BUDGET.idFromName(timestamp.slice(0, 7))).fetch("https://budget/reserve", { method: "POST" });
-    if (!budget.ok) {
-      const recorded = await recordEvidence(env, evidence("FAILED", "FAILED", null, "MONTHLY_BUDGET_EXHAUSTED"));
-      return json({ error: recorded ? "MONTHLY_BUDGET_EXHAUSTED" : "EVIDENCE_UNAVAILABLE" }, recorded ? 429 : 503, headers);
-    }
     for (const provider of candidates) {
+      // Each provider attempt can incur its own cost. Reserve separately so
+      // automatic fallback cannot multiply spend beyond the configured ceiling.
+      const budget = await env.SPEND_BUDGET.get(env.SPEND_BUDGET.idFromName(timestamp.slice(0, 7))).fetch("https://budget/reserve", { method: "POST" });
+      if (!budget.ok) {
+        const recorded = await recordEvidence(env, evidence("FAILED", "FAILED", provider, "MONTHLY_BUDGET_EXHAUSTED"));
+        return json({ error: recorded ? "MONTHLY_BUDGET_EXHAUSTED" : "EVIDENCE_UNAVAILABLE" }, recorded ? 429 : 503, headers);
+      }
       try {
         const output = await providerCall(provider, body.prompt.trim(), env);
         const result = extractSummary(output);
