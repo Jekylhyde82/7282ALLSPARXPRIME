@@ -42,3 +42,5 @@ jobs:
         run: pnpm check
       - name: Build production static assets
         run: pnpm build
+      - name: Validate Cloudflare Worker and static assets without deploying
+        run: pnpm dlx wrangler@4.36.0 deploy --dry-run --outdir /tmp/allsparx-worker-build
