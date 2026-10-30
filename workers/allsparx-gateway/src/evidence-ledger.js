@@ -164,6 +164,50 @@ export class EvidenceLedger {
       return json({ valid: true, verifiedEvents, verifiedFrom: from, verifiedThrough: end, complete, headSequence: head.sequence, headHash: complete ? head.hash : undefined, next: complete ? null : { from: end + 1, previousHash } });
     }
 
+    if (url.pathname === "/export" && request.method === "GET") {
+      const head = await this.state.storage.get("head") || { sequence: 0, hash: ZERO_HASH };
+      if (!validHead(head)) return json({ valid: false, invalidHead: true }, 409);
+      const from = Number(url.searchParams.get("from") || "1");
+      const limit = Number(url.searchParams.get("limit") || String(MAX_VERIFY_PAGE));
+      const suppliedAnchor = from === 1 ? ZERO_HASH : url.searchParams.get("previousHash");
+      if (!Number.isSafeInteger(from) || from < 1 || from > head.sequence + 1 ||
+          !Number.isSafeInteger(limit) || limit < 1 || limit > MAX_VERIFY_PAGE ||
+          typeof suppliedAnchor !== "string" || !/^[a-f0-9]{64}$/.test(suppliedAnchor) ||
+          (from === 1 && suppliedAnchor !== ZERO_HASH)) {
+        return json({ error: "INVALID_EXPORT_CURSOR", maxPageSize: MAX_VERIFY_PAGE }, 400);
+      }
+      let previousHash = ZERO_HASH;
+      if (from > 1) {
+        const priorRecord = await this.state.storage.get("event:" + String(from - 1).padStart(12, "0"));
+        if (!priorRecord || priorRecord.sequence !== from - 1 || priorRecord.eventHash !== suppliedAnchor) {
+          return json({ error: "INVALID_EXPORT_CURSOR" }, 400);
+        }
+        previousHash = priorRecord.eventHash;
+      }
+      const end = Math.min(head.sequence, from + limit - 1);
+      const records = [];
+      for (let sequence = from; sequence <= end; sequence += 1) {
+        const record = await this.state.storage.get("event:" + String(sequence).padStart(12, "0"));
+        if (!record || record.sequence !== sequence || record.previousHash !== previousHash) {
+          return json({ valid: false, verifiedEvents: records.length, expectedSequence: sequence }, 409);
+        }
+        const { eventHash, ...payload } = record;
+        if (!validEvent(payload) || !/^[a-f0-9]{64}$/.test(eventHash || "") ||
+            await sha256(canonical(payload)) !== eventHash) {
+          return json({ valid: false, verifiedEvents: records.length, invalidSequence: sequence }, 409);
+        }
+        records.push(record);
+        previousHash = eventHash;
+      }
+      const complete = end === head.sequence;
+      if (complete && previousHash !== head.hash) return json({ valid: false, verifiedEvents: records.length, invalidHead: true }, 409);
+      return json({
+        valid: true, records, verifiedFrom: from, verifiedThrough: end, complete,
+        headSequence: head.sequence, headHash: complete ? head.hash : undefined,
+        next: complete ? null : { from: end + 1, previousHash },
+      });
+    }
+
     return json({ error: "NOT_FOUND" }, 404);
   }
 }
