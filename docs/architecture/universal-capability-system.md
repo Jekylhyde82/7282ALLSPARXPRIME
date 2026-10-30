@@ -283,3 +283,34 @@ Implemented safeguards:
 - Does not extract, install, import or execute downloaded source.
 
 **Remaining integration requirements:** this module is an acquisition primitive, not yet an operational webhook or durable storage deployment. A production caller must supply a verified webhook/event adapter, a durable immutable storage implementation with atomic create-if-absent semantics, quota/retention controls, and independently protected credentials. No storage provider or server runtime is assumed until the actual deployment architecture is verified. The CI contract tests exercise the injected interfaces; they do not prove live GitHub acquisition or production persistence.
+
+## Universal continuous improvement and assimilation rule
+
+**Default operating rule: discover broadly, evaluate continuously, assimilate every proven improvement, and keep the system improving.** ALLSPARX PRIME must automatically assess any capability, tool, model, integration, workflow, code pattern, dataset, security control, documentation, test method, or upstream change it legitimately encounters that could improve system capability, reliability, security, efficiency, maintainability, accessibility, or user outcomes.
+
+This rule applies across all eight architectural dimensions and the 256-cell target architecture. It is an ongoing system behaviour, not a one-time project or a promise that every discovered item is suitable.
+
+### Required automatic improvement cycle
+
+1. **Discover:** identify candidate improvements from connected and owner-authorized repositories, configured providers, approved feeds, local project sources, test findings, runtime telemetry and documented research sources. Record where each candidate came from and the exact version or revision.
+2. **Understand:** inspect the candidate's purpose, dependencies, interfaces, licence, provenance, permissions, operational assumptions, maintenance state and known limitations. Do not execute unknown candidate code during inspection.
+3. **Evaluate:** compare it against the current system and baseline. State the expected benefit, evidence, costs, risks, duplication, compatibility impact and confidence. Prefer measured improvements over feature counts or unsupported claims.
+4. **Select:** automatically reject candidates that are harmful, redundant, unmaintained beyond policy, incompatible, unauthorised, legally unclear or unsupported by evidence. Preserve useful dissent and record why a candidate was rejected or deferred.
+5. **Isolate:** prepare the smallest useful change in a disposable, least-privilege environment with no production secrets, restricted network access, resource limits and an auditable test boundary.
+6. **Integrate:** adapt only the components that provide the proven benefit. Preserve source attribution, licence notices, provenance, version pins, interface contracts and the original component's identity where required. Do not wholesale-copy or merge an entire project when a smaller integration is sufficient.
+7. **Verify:** run relevant unit, integration, security, licence, compatibility, performance, regression and recovery tests. Compare against the pre-change baseline. A candidate must demonstrate net benefit without unacceptable regression.
+8. **Assimilate:** when all pre-authorised low-risk gates pass, automatically merge or activate the validated change through the approved pipeline. Keep the original version and a tested rollback route. Apply staged or shadow rollout where runtime behaviour could affect users.
+9. **Learn and monitor:** record the result, evidence, source revision, decisions, tests, operational effects and rollback status. Monitor for drift, vulnerabilities, upstream changes and loss of the original benefit; automatically prepare a safe update or rollback when policy permits.
+
+### Autonomy and trust boundary
+
+- Discovery and evaluation are broad and proactive. Execution, installation, permission grants and production activation are separately controlled.
+- Only explicitly connected, owner-authorized sources may be automatically fetched. A public discovery result is not permission to clone, execute, install, or merge its contents.
+- Automatic assimilation is permitted only for changes within a pre-authorized risk envelope, with verified provenance and licence compatibility, least-privilege permissions, passing independent checks, and a tested rollback.
+- New repositories, new external providers, unclear or incompatible licences, credentials, elevated permissions, security-boundary changes, unrestricted network access, destructive operations, data/schema migrations, financial actions and production deployment require explicit authorized approval.
+- Unknown code is never executed as part of discovery. Downloaded source remains inert and isolated until separately reviewed and approved for testing.
+- If evidence is missing, tests fail, a security concern is unresolved, or the expected benefit cannot be demonstrated, the system must hold the candidate, preserve the known-good state, explain the blocker and retain an auditable decision record.
+- The system must not weaken security, privacy, reliability, legal compliance, user control or evidence standards merely to increase capability or integration counts.
+- Do not claim an improvement has been assimilated until the change is implemented, tested, independently verified where required, and its operational state is known.
+
+The target is a continuously improving, self-evaluating and safely self-upgrading ALLSPARX PRIME—not uncontrolled self-modifying software. Automatic assimilation becomes operational only after the real deployment architecture supplies verified identity, policy enforcement, isolated execution, durable evidence, monitoring and rollback controls.
