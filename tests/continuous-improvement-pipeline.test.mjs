@@ -126,3 +126,21 @@ test("requires an explicit source allowlist and every execution adapter", async 
   delete incomplete.acquireSnapshot;
   await assert.rejects(() => runContinuousImprovementCycle({ sources: ["acme/tool"], adapters: incomplete, policy }), { code: "PIPELINE_ADAPTER_MISSING" });
 });
+
+test("does not label a malformed positive merge response as a confirmed failure", async () => {
+  const f = fixture({ async merge() { return { merged: true }; } });
+  const result = await runContinuousImprovementCycle({ sources: ["acme/tool"], adapters: f.adapters, policy });
+  assert.equal(result.outcomes[0].status, "merge_unconfirmed");
+  assert.equal(result.outcomes[0].merged, null);
+});
+
+test("rejects a post-merge snapshot with a malformed digest", async () => {
+  const f = fixture({
+    async acquireSnapshot() {
+      return { status: "stored", key: "snapshot.tar.gz", metadata: { source_commit_sha: sourceSha, archive_digest: "sha256:not-a-digest" } };
+    },
+  });
+  const result = await runContinuousImprovementCycle({ sources: ["acme/tool"], adapters: f.adapters, policy });
+  assert.equal(result.outcomes[0].status, "snapshot_failed");
+  assert.equal(result.outcomes[0].merged, true);
+});
