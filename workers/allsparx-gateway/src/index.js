@@ -252,7 +252,7 @@ export default {
         return json({ error: "UNAUTHORIZED" }, 401, { "www-authenticate": "Bearer" });
       }
       const month = url.searchParams.get("month") || "";
-      if (!/^\\d{4}-(0[1-9]|1[0-2])$/.test(month)) {
+      if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) {
         return json({ error: "INVALID_LEDGER_MONTH" }, 400);
       }
       if (!env.EVIDENCE_LEDGER) return json({ error: "EVIDENCE_LEDGER_UNAVAILABLE" }, 503);
