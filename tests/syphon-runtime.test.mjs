@@ -9,7 +9,7 @@ const compiled = ts.transpileModule(source, {
 }).outputText;
 const runtimeUrl = `data:text/javascript;base64,${Buffer.from(compiled).toString("base64")}`;
 const { runAllsparxPrimeTask: runRuntime } = await import(runtimeUrl);
-const runAllsparxPrimeTask = (...args) => runRuntime(args[0], args[1], args[2] ?? "auto", "test-access-token", args[3] ?? []);
+const runAllsparxPrimeTask = (...args) => runRuntime(args[0], args[1], args[2] ?? "auto", "test-access-token", args[3] ?? [], args[4]);
 const originalFetch = globalThis.fetch;
 afterEach(() => { globalThis.fetch = originalFetch; });
 function jsonResponse(body, init = {}) {
@@ -142,4 +142,24 @@ test("requires an access token before sending a gateway request", async () => {
   globalThis.fetch = async () => { called = true; return jsonResponse({ summary: "unexpected" }); };
   await assert.rejects(runRuntime("find credits", "https://gateway.example/v1/ask", "auto", ""), /Sign in before/);
   assert.equal(called, false);
+});
+
+
+test("refreshes a previously signed access token once after a gateway 401", async () => {
+  const authorizationHeaders = [];
+  let refreshCalls = 0;
+  globalThis.fetch = async (_url, options) => {
+    authorizationHeaders.push(options.headers.Authorization);
+    if (authorizationHeaders.length === 1) return jsonResponse({ error: "unauthorized" }, { status: 401 });
+    return jsonResponse({ summary: "Recovered after signing-key rotation.", programs: [], provider: "openai" });
+  };
+  const result = await runAllsparxPrimeTask(
+    "find credits", "https://gateway.example/v1/ask", "auto", [],
+    async () => { refreshCalls++; return "refreshed-access-token"; },
+  );
+  assert.equal(refreshCalls, 1);
+  assert.deepEqual(authorizationHeaders, [
+    "Bearer test-access-token", "Bearer refreshed-access-token",
+  ]);
+  assert.match(result.summary, /Recovered after signing-key rotation/);
 });
