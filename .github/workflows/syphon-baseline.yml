@@ -43,6 +43,9 @@ jobs:
       - name: Run read-only capability discovery tests
         id: capability-discovery-tests
         run: pnpm test:capability-discovery
+      - name: Run evidence-based improvement assessment tests
+        id: improvement-assessment-tests
+        run: pnpm test:improvement-assessment
       - name: Run repository snapshot acquisition tests
         id: repository-snapshot-acquirer-tests
         run: pnpm test:repository-snapshot-acquirer
