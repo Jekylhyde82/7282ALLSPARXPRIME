@@ -5,7 +5,7 @@ import { acquireMergedRepositorySnapshot } from "../src/lib/allsparxPrime/reposi
 
 const SOURCE = "a".repeat(40);
 const MERGE = "b".repeat(40);
-const archiveBytes = Buffer.from("complete repository snapshot bytes");
+const archiveBytes = Buffer.from([0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0x01, 0x02, 0x03]);
 const digest = (bytes) => `sha256:${createHash("sha256").update(bytes).digest("hex")}`;
 
 function fixture(overrides = {}) {
@@ -126,4 +126,20 @@ test("treats duplicate merge deliveries as idempotent when storage confirms the 
   const duplicate = await acquireMergedRepositorySnapshot(f.input);
   assert.equal(duplicate.status, "already_present");
   assert.equal(f.stored.size, 1);
+});
+test("rejects a non-gzip response even when the HTTP request succeeds", async () => {
+  const f = fixture({
+    fetchImpl: async (url) => {
+      if (String(url).endsWith(`/commits/${SOURCE}`)) return new Response(JSON.stringify({ sha: SOURCE }), { status: 200 });
+      if (String(url).endsWith(`/tarball/${SOURCE}`)) return new Response(null, { status: 302, headers: { location: "https://codeload.github.com/acme/tool/archive.tar.gz" } });
+      return new Response("not an archive", { status: 200 });
+    },
+  });
+  await assert.rejects(() => acquireMergedRepositorySnapshot(f.input), { code: "ARCHIVE_FORMAT_INVALID" });
+  assert.equal(f.stored.size, 0);
+});
+
+test("rejects a storage receipt with a mismatched digest", async () => {
+  const f = fixture({ storage: { putIfAbsent: async () => ({ created: true, digest: "sha256:" + "0".repeat(64) }) } });
+  await assert.rejects(() => acquireMergedRepositorySnapshot(f.input), { code: "STORED_DIGEST_MISMATCH" });
 });
