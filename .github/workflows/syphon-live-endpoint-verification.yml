@@ -1,0 +1,90 @@
+name: SYPHON live endpoint verification
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live-endpoint:
+    name: Verify configured AI endpoint contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Send one bounded contract smoke test
+        env:
+          AI_CHAT_ENDPOINT: ${{ secrets.AI_CHAT_ENDPOINT }}
+        run: |
+          node --input-type=module <<'NODE'
+          const endpoint = process.env.AI_CHAT_ENDPOINT;
+          if (!endpoint) {
+            console.error("BLOCKED: add approved endpoint URL as repository Actions secret AI_CHAT_ENDPOINT.");
+            process.exit(2);
+          }
+          let url;
+          try { url = new URL(endpoint); }
+          catch { console.error("FAIL: AI_CHAT_ENDPOINT is not an absolute URL."); process.exit(1); }
+          if (url.protocol !== "https:" || url.username || url.password || url.hash) {
+            console.error("FAIL: endpoint must use HTTPS and contain no URL credentials or fragment.");
+            process.exit(1);
+          }
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 30000);
+          try {
+            const response = await fetch(url, {
+              method: "POST", redirect: "error",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ prompt: "SYPHON endpoint contract check. Return a short summary and an empty programs array." }),
+              signal: controller.signal
+            });
+            if (!response.ok) {
+              console.error(`FAIL: endpoint returned HTTP ${response.status}; URL and response content are not logged.`);
+              process.exit(1);
+            }
+            const mediaType = (response.headers.get("content-type") ?? "").split(";")[0].trim().toLowerCase();
+            if (mediaType !== "application/json" && !/^application\/[a-z0-9.+-]+\+json$/.test(mediaType)) {
+              console.error("FAIL: endpoint did not declare a valid JSON media type.");
+              process.exit(1);
+            }
+            const maxBytes = 64 * 1024;
+            const declared = Number(response.headers.get("content-length") ?? "0");
+            if (declared > maxBytes) { console.error("FAIL: response exceeded 64 KiB."); process.exit(1); }
+            if (!response.body) { console.error("FAIL: endpoint returned an empty body."); process.exit(1); }
+            const reader = response.body.getReader();
+            const chunks = [];
+            let total = 0;
+            try {
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                total += value.byteLength;
+                if (total > maxBytes) {
+                  await reader.cancel();
+                  console.error("FAIL: response exceeded 64 KiB.");
+                  process.exit(1);
+                }
+                chunks.push(value);
+              }
+            } finally { reader.releaseLock(); }
+            const bytes = new Uint8Array(total);
+            let offset = 0;
+            for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+            let body;
+            try { body = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)); }
+            catch { console.error("FAIL: invalid JSON or non-UTF-8 response."); process.exit(1); }
+            const validPrograms = body && (body.programs === undefined ||
+              (Array.isArray(body.programs) && body.programs.every(
+                (program) => program && typeof program === "object" && typeof program.title === "string"
+              )));
+            if (!body || typeof body.summary !== "string" || !validPrograms) {
+              console.error("FAIL: response does not match the Ask AI response contract.");
+              process.exit(1);
+            }
+            console.log("PASS: live HTTPS endpoint returned the expected bounded JSON contract.");
+          } catch (error) {
+            console.error(controller.signal.aborted ? "FAIL: endpoint exceeded 30-second timeout." :
+              `FAIL: request failed (${error instanceof Error ? error.name : "unknown"}); URL and response content are not logged.`);
+            process.exit(1);
+          } finally { clearTimeout(timeout); }
+          NODE
