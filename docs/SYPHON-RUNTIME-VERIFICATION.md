@@ -6,7 +6,7 @@ This document defines evidence gates for the ALLSPARX PRIME runtime adapter. A v
 
 ## Runtime contract
 
-The adapter at \`src/lib/allsparxPrime/runtime.ts\`:
+The adapter at `src/lib/allsparxPrime/runtime.ts`:
 - accepts trimmed prompts from 1 to 500 characters;
 - requires HTTPS except for localhost development;
 - rejects URL credentials and fragments;
@@ -14,7 +14,7 @@ The adapter at \`src/lib/allsparxPrime/runtime.ts\`:
 - enforces a 30-second timeout;
 - requires a JSON media type, valid UTF-8/JSON, and the expected response schema;
 - caps response bodies at 64 KiB, including streamed responses;
-- marks provider evidence as \`PROVIDER_RESPONSE_VALIDATED\` with \`verified: false\`.
+- marks provider evidence as `PROVIDER_RESPONSE_VALIDATED` with `verified: false`.
 
 Provider error details are not returned to the client. Never put credentials in endpoint URLs or logs.
 
@@ -22,21 +22,21 @@ Provider error details are not returned to the client. Never put credentials in 
 
 The baseline workflow runs:
 
-\`\`\`sh
+```sh
 pnpm install --frozen-lockfile
 pnpm test:syphon
 pnpm check
 pnpm build
-\`\`\`
+```
 
-The 13 runtime contract tests mock \`fetch\`; they do not contact a live provider. Earlier GitHub Actions run #35 recorded 13 passing tests and successful Astro checks/build. That evidence applies only to the tested commit; this reconciliation branch must pass its own checks.
+The 13 runtime contract tests mock `fetch`; they do not contact a live provider. Earlier GitHub Actions run #35 recorded 13 passing tests and successful Astro checks/build. That evidence applies only to the tested commit; this reconciliation branch must pass its own checks.
 
 ## Live endpoint verification
 
-The manual workflow \`.github/workflows/syphon-live-endpoint-verification.yml\` sends one bounded contract prompt and validates the returned JSON shape.
+The manual workflow `.github/workflows/syphon-live-endpoint-verification.yml` sends one bounded contract prompt and validates the returned JSON shape.
 
 1. Merge the workflow into the repository default branch before running it there.
-2. In repository Settings → Secrets and variables → Actions, add the approved HTTPS endpoint as repository secret \`AI_CHAT_ENDPOINT\`. Never commit it or paste it into chat, logs, or issue comments.
+2. In repository Settings → Secrets and variables → Actions, add the approved HTTPS endpoint as repository secret `AI_CHAT_ENDPOINT`. Never commit it or paste it into chat, logs, or issue comments.
 3. Run **SYPHON live endpoint verification** manually from GitHub Actions.
 4. Record the workflow run URL, commit SHA, time, and outcome without recording the secret or response content.
 
