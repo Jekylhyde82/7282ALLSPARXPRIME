@@ -51,5 +51,7 @@ test("rejects unsupported event types and malformed records", () => {
   assert.throws(() => createRegistryRecord({ ...base, event_type: "execute-arbitrary-code" }), /Unsupported registry event type/);
   assert.throws(() => createRegistryRecord({ ...base, capability_version: "latest" }), /semantic version/);
   assert.throws(() => createRegistryRecord({ ...base, sequence: 99 }), /reserved or unknown field/);
-  assert.throws(() => verifyRegistryChain([{ ...createRegistryRecord(base), injected: true }]), /unknown field/);
+  const malformed = verifyRegistryChain([{ ...createRegistryRecord(base), injected: true }]);
+  assert.equal(malformed.valid, false);
+  assert.equal(malformed.reason, "Registry record contains an unknown field.");
 });
