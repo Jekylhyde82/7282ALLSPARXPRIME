@@ -263,12 +263,17 @@ export class SnapshotCoordinator {
       if (previous?.status === "stored" &&
           previous.source_commit_sha === event.source_commit_sha &&
           previous.archive_digest && previous.object_key) {
-        return response(200, {
-          status: "already_present",
-          source_commit_sha: previous.source_commit_sha,
-          archive_digest: previous.archive_digest,
-          object_key: previous.object_key,
-        });
+        const retained = await this.env.SNAPSHOTS.head(previous.object_key);
+        if (retained && retained.customMetadata?.archive_digest === previous.archive_digest &&
+            retained.customMetadata?.source_commit_sha === event.source_commit_sha) {
+          return response(200, {
+            status: "already_present",
+            source_commit_sha: previous.source_commit_sha,
+            archive_digest: previous.archive_digest,
+            object_key: previous.object_key,
+          });
+        }
+        if (retained) return response(409, { error: "snapshot_object_conflict", retryable: false });
       }
 
       const now = new Date().toISOString();
