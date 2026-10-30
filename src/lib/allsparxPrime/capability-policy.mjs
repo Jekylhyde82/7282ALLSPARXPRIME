@@ -1,3 +1,5 @@
+import { validateCapabilityManifest } from "./capability-manifest-validator.mjs";
+
 // Deterministic, deny-by-default policy evaluation. This module never executes capability code.
 const BASE_ALLOWED_PERMISSIONS = new Set([
   "read:declared-input",
@@ -29,6 +31,11 @@ function deny(reason, details = {}) {
 export function evaluateCapabilityPolicy(manifest, policy = {}) {
   if (!isObject(manifest)) return deny("MANIFEST_INVALID", { detail: "Manifest must be an object." });
   if (!isObject(policy)) return deny("POLICY_INVALID", { detail: "Policy must be an object." });
+
+  const manifestValidation = validateCapabilityManifest(manifest);
+  if (!manifestValidation.valid) {
+    return deny("MANIFEST_SCHEMA_INVALID", { errors: manifestValidation.errors });
+  }
 
   const policyVersion = typeof policy.version === "string" && policy.version.trim()
     ? policy.version.trim()
