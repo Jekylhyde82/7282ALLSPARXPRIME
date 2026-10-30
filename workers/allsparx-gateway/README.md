@@ -4,7 +4,7 @@ This directory contains the isolated Cloudflare Worker API boundary for the brow
 
 ## Provider models
 
-The Worker currently pins these API model IDs: OpenAI `gpt-6-luna`, Anthropic `claude-haiku-4-5-20251001`, and Google `gemini-3.8-flash`. Ollama remains in the shared provider preference vocabulary but is intentionally unavailable through this public Cloudflare Worker; a local Ollama process is not a trusted remote provider endpoint. An explicit Ollama request fails closed as unavailable.
+The Worker requires explicit model IDs in the server-side `OPENAI_MODEL`, `ANTHROPIC_MODEL`, and `GOOGLE_MODEL` variables. No model-name defaults are embedded in code: select IDs supported by the corresponding provider account/API, then validate them with the live smoke test before enabling traffic. Ollama remains in the shared provider preference vocabulary but is intentionally unavailable through this public Cloudflare Worker; a local Ollama process is not a trusted remote provider endpoint. An explicit Ollama request fails closed as unavailable.
 
 ## Request path
 
@@ -19,7 +19,7 @@ Worker vars are declared in `wrangler.toml`. Before deployment, configure:
 
 - `TURNSTILE_SECRET_KEY` — Cloudflare Turnstile secret.
 - `EVIDENCE_HMAC_KEY` — high-entropy secret used to HMAC prompt fingerprints; do not reuse a provider key.
-- At least one of `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or `GOOGLE_API_KEY`.
+- At least one complete provider pair: `OPENAI_API_KEY` + `OPENAI_MODEL`, `ANTHROPIC_API_KEY` + `ANTHROPIC_MODEL`, or `GOOGLE_API_KEY` + `GOOGLE_MODEL`. Model IDs are server-side Worker variables, not secrets; API keys remain Worker secrets. A provider missing either value is treated as unconfigured.
 
 Set secrets using the Cloudflare account that owns the Worker:
 
@@ -28,12 +28,14 @@ npx wrangler@4 login
 npx wrangler@4 secret put TURNSTILE_SECRET_KEY --config workers/allsparx-gateway/wrangler.toml
 npx wrangler@4 secret put EVIDENCE_HMAC_KEY --config workers/allsparx-gateway/wrangler.toml
 npx wrangler@4 secret put OPENAI_API_KEY --config workers/allsparx-gateway/wrangler.toml
+npx wrangler@4 secret put ANTHROPIC_API_KEY --config workers/allsparx-gateway/wrangler.toml
+npx wrangler@4 secret put GOOGLE_API_KEY --config workers/allsparx-gateway/wrangler.toml
 # Optional additional providers:
 npx wrangler@4 secret put ANTHROPIC_API_KEY --config workers/allsparx-gateway/wrangler.toml
 npx wrangler@4 secret put GOOGLE_API_KEY --config workers/allsparx-gateway/wrangler.toml
 ```
 
-Create a Turnstile widget restricted to the production site hostnames. Configure the Astro build environment with:
+Set the model IDs as Worker variables using `wrangler.toml` or the Cloudflare dashboard (for example, `OPENAI_MODEL`, `ANTHROPIC_MODEL`, `GOOGLE_MODEL`). Keep API keys in Worker secrets. Create a Turnstile widget restricted to the production site hostnames. Configure the Astro build environment with:
 
 - `PUBLIC_ALLSPARX_GATEWAY_URL=https://allsparx-prime-gateway.<account-subdomain>.workers.dev/v1/ask`
 - `PUBLIC_ALLSPARX_TURNSTILE_SITE_KEY=<Turnstile site key>`
