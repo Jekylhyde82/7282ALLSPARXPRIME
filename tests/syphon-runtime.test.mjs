@@ -60,6 +60,22 @@ test("sends an explicit provider preference without silently changing it", async
   assert.equal(result.evidence.requestedProvider, "google");
 });
 
+test("rejects a gateway that silently substitutes a different provider", async () => {
+  globalThis.fetch = async () => jsonResponse({ summary: "Wrong provider.", programs: [], provider: "anthropic" });
+  await assert.rejects(
+    runAllsparxPrimeTask("find credits", "https://gateway.example/v1/ask", "google"),
+    /did not honor the explicitly selected provider/,
+  );
+});
+
+test("requires actual provider identity for explicit provider selection", async () => {
+  globalThis.fetch = async () => jsonResponse({ summary: "Provider omitted.", programs: [] });
+  await assert.rejects(
+    runAllsparxPrimeTask("find credits", "https://gateway.example/v1/ask", "google"),
+    /did not honor the explicitly selected provider/,
+  );
+});
+
 test("rejects unsupported provider preferences before making a request", async () => {
   let called = false;
   globalThis.fetch = async () => { called = true; return jsonResponse({ summary: "unexpected" }); };
