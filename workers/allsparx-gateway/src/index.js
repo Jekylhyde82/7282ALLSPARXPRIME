@@ -63,7 +63,7 @@ async function verifyTurnstile(token, request, env) {
   const result = await response.json();
   const origin = request.headers.get("Origin");
   const expectedHostname = origin ? new URL(origin).hostname : "";
-  return result.success === true && (!result.hostname || result.hostname === expectedHostname);
+  return result.success === true && typeof result.hostname === "string" && result.hostname === expectedHostname;
 }
 function configuredProviders(env, preference) {
   const configured = PROVIDERS.filter((provider) => {
@@ -159,11 +159,11 @@ export default {
     const requestId = request.headers.get("X-ALLSPARX-Request-ID") || crypto.randomUUID();
     if (requestId.length > 128 || !/^[a-zA-Z0-9._:-]+$/.test(requestId)) return json({ error: "INVALID_REQUEST_ID" }, 400, headers);
 
-    const budget = await env.SPEND_BUDGET.get(env.SPEND_BUDGET.idFromName(new Date().toISOString().slice(0, 7))).fetch("https://budget/reserve", { method: "POST" });
-    if (!budget.ok) return json({ error: "MONTHLY_BUDGET_EXHAUSTED" }, 429, headers);
-
     const candidates = configuredProviders(env, body.provider);
     if (!candidates.length) return json({ error: "PROVIDER_UNAVAILABLE" }, 503, headers);
+
+    const budget = await env.SPEND_BUDGET.get(env.SPEND_BUDGET.idFromName(new Date().toISOString().slice(0, 7))).fetch("https://budget/reserve", { method: "POST" });
+    if (!budget.ok) return json({ error: "MONTHLY_BUDGET_EXHAUSTED" }, 429, headers);
     for (const provider of candidates) {
       try {
         const output = await providerCall(provider, body.prompt.trim(), env);
