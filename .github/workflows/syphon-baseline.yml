@@ -34,6 +34,9 @@ jobs:
       - name: Run SYPHON runtime contract tests
         id: syphon-tests
         run: pnpm test:syphon
+      - name: Run capability manifest contract tests
+        id: capability-manifest-tests
+        run: pnpm test:capability-manifest
       - name: Run Astro type and content checks
         id: check
         run: pnpm check
