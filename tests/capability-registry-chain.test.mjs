@@ -50,4 +50,6 @@ test("detects reordered, missing and broken-link records", () => {
 test("rejects unsupported event types and malformed records", () => {
   assert.throws(() => createRegistryRecord({ ...base, event_type: "execute-arbitrary-code" }), /Unsupported registry event type/);
   assert.throws(() => createRegistryRecord({ ...base, capability_version: "latest" }), /semantic version/);
+  assert.throws(() => createRegistryRecord({ ...base, sequence: 99 }), /reserved or unknown field/);
+  assert.throws(() => verifyRegistryChain([{ ...createRegistryRecord(base), injected: true }]), /unknown field/);
 });
