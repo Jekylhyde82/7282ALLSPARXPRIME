@@ -27,7 +27,7 @@ interface AssistantApiResponse {
 }
 function createRequestId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
-  return \`syphon-\${Date.now()}-\${Math.random().toString(36).slice(2, 10)}\`;
+  return `syphon-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 function isAssistantApiResponse(value: unknown): value is AssistantApiResponse {
   if (typeof value !== "object" || value === null) return false;
