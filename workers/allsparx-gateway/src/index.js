@@ -8,7 +8,7 @@ const TIMEOUT_MS = 25_000;
 function json(body, status = 200, headers = {}) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", ...headers },
+    headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", "x-content-type-options": "nosniff", "referrer-policy": "no-referrer", ...headers },
   });
 }
 function safeOrigin(request, env) {
@@ -22,6 +22,7 @@ function cors(origin) {
     "access-control-allow-methods": "POST, OPTIONS",
     "access-control-allow-headers": "content-type, x-allsparx-request-id, x-allsparx-turnstile-token",
     "access-control-max-age": "600",
+    "access-control-expose-headers": "x-allsparx-request-id",
     "vary": "Origin",
   };
 }
@@ -57,13 +58,13 @@ async function verifyTurnstile(token, request, env) {
     remoteip: request.headers.get("CF-Connecting-IP") || "",
   });
   const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-    method: "POST", body: form, signal: AbortSignal.timeout(5000),
+    method: "POST", body: form, redirect: "error", signal: AbortSignal.timeout(5000),
   });
   if (!response.ok) return false;
   const result = await response.json();
   const origin = request.headers.get("Origin");
   const expectedHostname = origin ? new URL(origin).hostname : "";
-  return result.success === true && typeof result.hostname === "string" && result.hostname === expectedHostname;
+  return result.success === true && typeof result.hostname === "string" && result.hostname === expectedHostname && result.action === "allsparx_assistant";
 }
 function configuredProviders(env, preference) {
   const configured = PROVIDERS.filter((provider) => {
@@ -82,7 +83,7 @@ async function providerCall(provider, prompt, env) {
     let response, text = "";
     if (provider === "openai") {
       response = await fetch("https://api.openai.com/v1/responses", {
-        method: "POST",
+        method: "POST", redirect: "error",
         headers: { authorization: `Bearer ${env.OPENAI_API_KEY}`, "content-type": "application/json" },
         body: JSON.stringify({ model: "gpt-6-luna", input: prompt, max_output_tokens: MAX_OUTPUT_TOKENS }),
         signal: controller.signal,
@@ -92,7 +93,7 @@ async function providerCall(provider, prompt, env) {
       text = (data.output || []).flatMap((item) => item.content || []).filter((part) => part.type === "output_text").map((part) => part.text).join("\n");
     } else if (provider === "anthropic") {
       response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
+        method: "POST", redirect: "error",
         headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" },
         body: JSON.stringify({ model: "claude-haiku-5-5", max_tokens: MAX_OUTPUT_TOKENS, messages: [{ role: "user", content: prompt }] }),
         signal: controller.signal,
@@ -104,7 +105,7 @@ async function providerCall(provider, prompt, env) {
       const model = "gemini-3.8-flash";
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
       response = await fetch(url, {
-        method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": env.GOOGLE_API_KEY },
+        method: "POST", redirect: "error", headers: { "content-type": "application/json", "x-goog-api-key": env.GOOGLE_API_KEY },
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { maxOutputTokens: MAX_OUTPUT_TOKENS } }),
         signal: controller.signal,
       });
@@ -139,6 +140,7 @@ export default {
     if (!origin) return json({ error: "ORIGIN_NOT_ALLOWED" }, 403);
     const headers = cors(origin);
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers });
+    if (url.pathname !== "/v1/ask") return json({ error: "NOT_FOUND" }, 404, headers);
     if (request.method !== "POST") return json({ error: "METHOD_NOT_ALLOWED" }, 405, headers);
     if (!request.headers.get("content-type")?.toLowerCase().startsWith("application/json")) return json({ error: "UNSUPPORTED_MEDIA_TYPE" }, 415, headers);
     if (!env.RATE_LIMITER || !env.SPEND_BUDGET || !env.TURNSTILE_SECRET_KEY) return json({ error: "GATEWAY_NOT_CONFIGURED" }, 503, headers);
