@@ -156,13 +156,18 @@ test("Durable Object pins the source commit, hashes the archive and stores immut
     }
     throw new Error("unexpected_url");
   };
+  const stateValues = new Map();
   const state = {
-    values: new Map(),
     storage: {
-      async get(key) { return this.values.get(key); },
-      async put(key, value) { this.values.set(key, value); },
+      async get(key) { return stateValues.get(key); },
+      async put(key, value) { stateValues.set(key, value); },
+      async transaction(fn) {
+        return fn({
+          get: async (key) => stateValues.get(key),
+          put: async (key, value) => stateValues.set(key, value),
+        });
+      },
     },
-    async blockConcurrencyWhile(fn) { return fn(); },
   };
   const bucket = {
     async head(key) { return stored.get(key) ?? null; },
@@ -207,8 +212,13 @@ test("Durable Object verifies the R2 object before treating a retry as already s
     object_key: "snapshots/repo/b.tar.gz",
   };
   const state = {
-    storage: { async get() { return previous; }, async put() {} },
-    async blockConcurrencyWhile(fn) { return fn(); },
+    storage: {
+      async get() { return previous; },
+      async put() {},
+      async transaction(fn) {
+        return fn({ get: async () => previous, put: async () => {} });
+      },
+    },
   };
   const bucket = {
     async head() { return { customMetadata: { archive_digest: previous.archive_digest, source_commit_sha: previous.source_commit_sha } }; },
