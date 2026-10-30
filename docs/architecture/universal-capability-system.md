@@ -143,6 +143,27 @@ A change may be configured for automatic merge only when every gate is satisfied
 
 If any gate is absent, ambiguous, stale or failed, the system must stop before merge, preserve the current working version, and produce a review request explaining the blocker. Human approval remains mandatory for new sources, licence uncertainty, security-boundary changes, elevated permissions, schema migrations, data changes, production deployment and destructive operations.
 
+
+### Mandatory post-merge repository snapshot acquisition
+
+**Rule: whenever ALLSPARX PRIME successfully merges or integrates a repository contribution, it must automatically acquire and retain a complete source snapshot of the contributing repository at the exact immutable source commit used for that integration.** This is a required lifecycle action, not an optional recommendation.
+
+The acquisition workflow must:
+1. Trigger only from a verified successful merge/integration event. A proposed PR, failed merge, untrusted webhook or unmerged connection must never trigger an acquisition marked as integrated.
+2. Resolve the canonical repository identity and exact source commit from the approved repository record. Never download a moving branch name such as `main` or `latest` as the retained source.
+3. Fetch the complete repository snapshot at that commit into an isolated, managed source archive/cache. Preserve the original directory structure, licence files, copyright notices and source metadata.
+4. Verify the downloaded archive against a locally computed cryptographic digest and, where supplied, the source platform's verified commit identity or signed attestation. Record both the source commit and the downloaded artifact digest.
+5. Store the snapshot read-only with repository URL, source commit, merge PR, merge commit, acquisition timestamp, archive digest, licence decision and evidence references. Link the snapshot to every capability extracted from it.
+6. Make acquisition idempotent: the same repository ID and commit resolve to one immutable snapshot record. A retry must verify the existing object rather than silently overwrite it.
+7. Never execute install scripts, build scripts, binaries or other imported code as part of downloading, unpacking, indexing or verifying the snapshot. Apply archive path-traversal, symlink, file-count, expanded-size and compression-ratio protections before extraction.
+8. Keep the downloaded source snapshot separate from installed capability packages and from production runtime files. Downloading is not approval, installation, trust or deployment.
+9. Retry transient network failures with bounded backoff. If acquisition or integrity verification fails, mark the integration record `merged_source_snapshot_pending` or `acquisition_failed`, alert the owner and block capability extraction/installation until the exact source snapshot is safely retained and verified.
+10. Retain the snapshot for the configured source-retention period and preserve an auditable deletion/retention decision. Never delete or overwrite the last verified snapshot as part of an update.
+
+The acquisition service must use narrowly scoped read-only repository access, avoid persisting access tokens in the snapshot or logs, and enforce storage quotas. The automatic download applies to every repository that actually passes the approved merge/integration process; it does not authorize crawling or downloading arbitrary repositories merely because they are discoverable.
+
+**Acceptance evidence:** a successful merge event produces a verified immutable source snapshot; a repeated event is idempotent; a changed source commit produces a separate snapshot; tampered archives, unsafe paths, oversized archives, missing licence metadata or failed integrity checks are rejected; and no imported code is executed.
+
 ### Fusion rules
 
 - Prefer adapters and narrow interfaces over copying entire repositories.
