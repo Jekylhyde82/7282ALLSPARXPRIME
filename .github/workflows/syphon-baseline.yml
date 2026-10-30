@@ -34,6 +34,8 @@ jobs:
       - name: Run SYPHON runtime contract tests
         id: syphon-tests
         run: pnpm test:syphon
+      - name: Run isolated Cloudflare gateway security tests
+        run: node --test tests/allsparx-gateway.test.mjs
       - name: Run Astro type and content checks
         id: check
         run: pnpm check
