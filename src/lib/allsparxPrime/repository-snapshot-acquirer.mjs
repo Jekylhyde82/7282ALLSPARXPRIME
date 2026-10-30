@@ -143,6 +143,9 @@ export async function acquireMergedRepositorySnapshot({
     token,
     maxArchiveBytes,
   );
+  if (archive.length < 2 || archive[0] !== 0x1f || archive[1] !== 0x8b) {
+    fail("ARCHIVE_FORMAT_INVALID", "The pinned GitHub source archive is not a gzip stream.");
+  }
   const digest = createHash("sha256").update(archive).digest("hex");
   const key = `${repository.repository_id}/${sourceCommit}.tar.gz`;
   const metadata = Object.freeze({
@@ -165,6 +168,9 @@ export async function acquireMergedRepositorySnapshot({
   const stored = await storage.putIfAbsent({ key, body: archive, metadata });
   if (!stored || typeof stored.digest !== "string") {
     fail("STORAGE_RECEIPT_INVALID", "Storage must return the digest of the stored or existing immutable object.");
+  }
+  if (typeof stored.created !== "boolean") {
+    fail("STORAGE_RECEIPT_INVALID", "Storage must identify whether it created a new immutable object.");
   }
   if (stored.digest !== metadata.archive_digest) {
     fail("STORED_DIGEST_MISMATCH", "The immutable storage object does not match the downloaded archive digest.");
