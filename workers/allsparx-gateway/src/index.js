@@ -5,6 +5,7 @@ const PROVIDERS = ["openai", "anthropic", "google"];
 const MAX_BODY_BYTES = 8 * 1024;
 const MAX_PROMPT_CHARS = 500;
 const MAX_RESPONSE_BYTES = 64 * 1024;
+const MAX_TURNSTILE_RESPONSE_BYTES = 16 * 1024;
 const MAX_OUTPUT_TOKENS = 512;
 const TIMEOUT_MS = 25_000;
 
@@ -91,6 +92,34 @@ async function readProviderJson(response) {
   return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
 }
 
+async function readTurnstileJson(response) {
+  const declared = Number(response.headers.get("content-length") || 0);
+  if (declared > MAX_TURNSTILE_RESPONSE_BYTES) return null;
+  const reader = response.body?.getReader();
+  if (!reader) return null;
+  const chunks = [];
+  let size = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > MAX_TURNSTILE_RESPONSE_BYTES) {
+        await reader.cancel();
+        return null;
+      }
+      chunks.push(value);
+    }
+  } finally { reader.releaseLock(); }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+  try {
+    const parsed = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : null;
+  } catch { return null; }
+}
+
 async function verifyTurnstile(token, request, env) {
   if (!env.TURNSTILE_SECRET_KEY || !token) return false;
   const form = new URLSearchParams({
@@ -102,7 +131,8 @@ async function verifyTurnstile(token, request, env) {
     method: "POST", body: form, redirect: "error", signal: AbortSignal.timeout(5000),
   });
   if (!response.ok) return false;
-  const result = await response.json();
+  const result = await readTurnstileJson(response);
+  if (!result) return false;
   const origin = request.headers.get("Origin");
   const expectedHostname = origin ? new URL(origin).hostname : "";
   return result.success === true && typeof result.hostname === "string" && result.hostname === expectedHostname && result.action === "allsparx_assistant";
