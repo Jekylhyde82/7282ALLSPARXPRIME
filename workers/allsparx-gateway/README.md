@@ -60,7 +60,7 @@ The evidence ledger records requests only after they pass origin admission, rate
 
 ## Evidence ledger limitations
 
-The ledger is durable within Cloudflare Durable Object storage and records append-only hash-linked events. It does not yet provide cross-account immutable retention, external timestamping, signed exports, retention/backup policy, or an independent verifier outside the same Cloudflare trust boundary. Request identity is anonymous origin context, not authenticated end-user identity. The prompt is represented by a keyed HMAC-SHA-256 fingerprint; raw prompt content is deliberately excluded.
+The ledger is durable within Cloudflare Durable Object storage and records append-only hash-linked events. Offline Ed25519 checkpoint signing and verification utilities are now implemented, but an independently administered signer is not yet operational. The system does not yet provide cross-account immutable retention, external timestamping, an exercised retention/backup policy, or a production independent-verification service outside the Cloudflare trust boundary. Request identity is anonymous origin context, not authenticated end-user identity. The prompt is represented by a keyed HMAC-SHA-256 fingerprint; raw prompt content is deliberately excluded.
 
 ## Evidence export and offline verification
 
@@ -85,7 +85,7 @@ The sequence and SHA-256 checkpoint must be obtained through a separately contro
 
 ## Independent Ed25519 checkpoint signing
 
-The repository provides offline tooling in `scripts/evidence-checkpoint.mjs`, `scripts/sign-evidence-checkpoint.mjs`, and `scripts/verify-evidence-checkpoint.mjs`. It uses Ed25519 and a signed, canonical JSON payload. The signed checkpoint binds the ledger month, sequence, final event hash, issue time, algorithm, and SHA-256 digest of the preceding month's signed checkpoint.
+The repository provides offline tooling in `scripts/evidence-checkpoint.mjs`, `scripts/sign-evidence-checkpoint.mjs`, and `scripts/verify-evidence-checkpoint.mjs`. The tools are implemented and regression-tested in CI; operational signer custody and independent checkpoint publication remain unconfigured. It uses Ed25519 and a signed, canonical JSON payload. The signed checkpoint binds the ledger month, sequence, final event hash, issue time, algorithm, and SHA-256 digest of the preceding month's signed checkpoint.
 
 Generate a dedicated key pair on an independently administered signing workstation. Keep the private key offline or in a separately controlled signing service; never commit it, upload it to the Worker, or place it in a browser or ordinary CI secret. Pin and distribute the public key fingerprint through an independent channel.
 
