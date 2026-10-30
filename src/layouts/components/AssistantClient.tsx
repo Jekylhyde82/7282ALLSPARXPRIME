@@ -8,6 +8,7 @@ import {
   runAllsparxPrimeTask,
   type AllsparxTaskEvidence,
 } from "@/lib/allsparxPrime/runtime";
+import { getAuthAccessToken, restoreAuthSession, signInWithPassword, signOut, signUpWithPassword } from "@/lib/allsparxPrime/auth";
 
 interface Program {
   id: string;
@@ -57,6 +58,14 @@ export default function AssistantClient({
   allProviders,
 }: AssistantClientProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [authToken, setAuthToken] = useState("");
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
+  const [authBusy, setAuthBusy] = useState(false);
+  const [authMessage, setAuthMessage] = useState("");
+  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || "";
+  const supabasePublishableKey = import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY || "";
   const [error, setError] = useState("");
   const [summary, setSummary] = useState("");
   const [runtimeEvidence, setRuntimeEvidence] =
@@ -65,6 +74,16 @@ export default function AssistantClient({
   const [prompt, setPrompt] = useState("");
   const [hasProcessedUrlPrompt, setHasProcessedUrlPrompt] = useState(false);
   const { shouldShow, triggerStarCTA, closeStarCTA } = useStarCTA();
+
+  useEffect(() => {
+    if (!supabaseUrl || !supabasePublishableKey) {
+      setAuthMessage("Authentication is not configured for this deployment. Set PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_PUBLISHABLE_KEY.");
+      return;
+    }
+    restoreAuthSession(supabaseUrl, supabasePublishableKey)
+      .then((token) => setAuthToken(token || ""))
+      .catch(() => setAuthMessage("Could not restore your sign-in session. Please sign in again."));
+  }, []);
 
   // Restore cached results on mount
   useEffect(() => {
@@ -94,7 +113,7 @@ export default function AssistantClient({
     const urlParams = new URLSearchParams(window.location.search);
     const urlPrompt = urlParams.get("prompt");
 
-    if (urlPrompt && !hasProcessedUrlPrompt) {
+    if (urlPrompt && authToken && !hasProcessedUrlPrompt) {
       setPrompt(urlPrompt);
       setHasProcessedUrlPrompt(true);
 
@@ -105,7 +124,7 @@ export default function AssistantClient({
 
       handleAPICall(urlPrompt);
     }
-  }, [hasProcessedUrlPrompt]);
+  }, [hasProcessedUrlPrompt, authToken]);
 
   const handleAPICall = async (inputPrompt: string) => {
     setIsLoading(true);
@@ -122,7 +141,10 @@ export default function AssistantClient({
           "ALLSPARX PRIME is not configured for this deployment. Set PUBLIC_ALLSPARX_GATEWAY_URL to the secured gateway URL, then rebuild the site.",
         );
       }
-      const apiResponse = await runAllsparxPrimeTask(inputPrompt, aiEndpoint, providerPreference as "auto" | "openai" | "anthropic" | "google" | "ollama");
+      const accessToken = await getAuthAccessToken(supabaseUrl, supabasePublishableKey);
+      if (!accessToken) { setAuthToken(""); throw new Error("Your sign-in session has expired. Please sign in again."); }
+      setAuthToken(accessToken);
+      const apiResponse = await runAllsparxPrimeTask(inputPrompt, aiEndpoint, providerPreference as "auto" | "openai" | "anthropic" | "google" | "ollama", accessToken, allPrograms.map((program) => program.data.title).slice(0, 200));
 
       setSummary(apiResponse.summary);
       setRuntimeEvidence(apiResponse.evidence);
@@ -161,6 +183,26 @@ export default function AssistantClient({
     }
   };
 
+  const handleAuthSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!supabaseUrl || !supabasePublishableKey) return;
+    setAuthBusy(true); setAuthMessage("");
+    try {
+      const token = authMode === "signin"
+        ? await signInWithPassword(authEmail, authPassword, supabaseUrl, supabasePublishableKey)
+        : await signUpWithPassword(authEmail, authPassword, supabaseUrl, supabasePublishableKey);
+      if (token) { setAuthToken(token); setAuthPassword(""); setAuthMessage("Signed in successfully."); }
+      else setAuthMessage("Check your email to confirm your account, then sign in.");
+    } catch (err) { setAuthMessage(err instanceof Error ? err.message : "Authentication failed."); }
+    finally { setAuthBusy(false); }
+  };
+
+  const handleSignOut = async () => {
+    await signOut(supabaseUrl, supabasePublishableKey);
+    setAuthToken(""); setSummary(""); setMatchedPrograms([]); setRuntimeEvidence(null); sessionStorage.removeItem("ai-assistant-results");
+    setAuthMessage("You have signed out.");
+  };
+
   const handleSubmit = async (value: string) => {
     setPrompt(value);
 
@@ -174,10 +216,22 @@ export default function AssistantClient({
       {/* AI Input Section - Full width but with max-width for the input */}
       <div className="container">
         <div className="max-w-3xl mx-auto mb-8 mt-8">
-          <AIInput onSubmit={handleSubmit} loading={isLoading} />
-          <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
-            ⏱️ I usually respond within 30 seconds - hang tight!
-          </p>
+          {!authToken ? (
+            <form onSubmit={handleAuthSubmit} className="max-w-md mx-auto rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+              <h2 className="text-xl font-semibold text-center">{authMode === "signin" ? "Sign in to ALLSPARX PRIME" : "Create your account"}</h2>
+              <label className="block text-sm">Email<input type="email" required autoComplete="email" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} className="mt-1 w-full rounded-md border p-3 dark:bg-gray-900" /></label>
+              <label className="block text-sm">Password<input type="password" required minLength={8} autoComplete={authMode === "signin" ? "current-password" : "new-password"} value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} className="mt-1 w-full rounded-md border p-3 dark:bg-gray-900" /></label>
+              <button type="submit" disabled={authBusy || !supabaseUrl || !supabasePublishableKey} className="btn bg-primary text-white px-6 py-3 rounded-md w-full disabled:opacity-50">{authBusy ? "Please wait…" : authMode === "signin" ? "Sign in" : "Create account"}</button>
+              <button type="button" onClick={() => setAuthMode(authMode === "signin" ? "signup" : "signin")} className="text-sm underline w-full">{authMode === "signin" ? "Create an account" : "Already have an account? Sign in"}</button>
+              {authMessage && <p role="status" className="text-sm text-center text-gray-600 dark:text-gray-300">{authMessage}</p>}
+            </form>
+          ) : (
+            <>
+              <div className="flex justify-end"><button type="button" onClick={handleSignOut} className="text-sm underline">Sign out</button></div>
+              <AIInput onSubmit={handleSubmit} loading={isLoading} />
+              <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">⏱️ I usually respond within 30 seconds - hang tight!</p>
+            </>
+          )}
         </div>
       </div>
 
