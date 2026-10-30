@@ -33,12 +33,14 @@ test("sends one POST, rejects redirects, and accepts valid bounded JSON", async 
   const result = await runAllsparxPrimeTask("find credits", "https://example.com/ai");
   assert.equal(captured.method, "POST");
   assert.equal(captured.redirect, "error");
-  assert.deepEqual(JSON.parse(captured.body), { prompt: "find credits" });
+  assert.deepEqual(JSON.parse(captured.body), {
+    prompt: "find credits", task: "startup-deal-recommendation", provider: "auto", contractVersion: 1,
+  });
   assert.equal(result.summary, "Found.");
   assert.deepEqual(result.programs, [{ title: "Starter" }]);
   assert.equal(result.evidence.verified, false);
 });
-test("rejects a response with a non-JSON content type", async () => {
+test("records the actual provider reported by the gateway", async () => {\n  globalThis.fetch = async () => jsonResponse({ summary: "Routed.", programs: [], provider: "anthropic" });\n  const result = await runAllsparxPrimeTask("find credits", "https://gateway.example/v1/ask", "auto");\n  assert.equal(result.evidence.provider, "anthropic");\n  assert.equal(result.evidence.requestedProvider, "auto");\n});\n\ntest("rejects an unknown provider in the gateway response", async () => {\n  globalThis.fetch = async () => jsonResponse({ summary: "Routed.", programs: [], provider: "unknown-vendor" });\n  await assert.rejects(runAllsparxPrimeTask("find credits", "https://gateway.example/v1/ask"), /invalid response format/);\n});\n\ntest("sends an explicit provider preference without silently changing it", async () => {\n  let payload;\n  globalThis.fetch = async (_url, options) => { payload = JSON.parse(options.body); return jsonResponse({ summary: "Selected.", provider: "google" }); };\n  const result = await runAllsparxPrimeTask("find credits", "https://gateway.example/v1/ask", "google");\n  assert.equal(payload.provider, "google");\n  assert.equal(result.evidence.requestedProvider, "google");\n});\n\ntest("rejects unsupported provider preferences before making a request", async () => {\n  let called = false;\n  globalThis.fetch = async () => { called = true; return jsonResponse({ summary: "unexpected" }); };\n  await assert.rejects(runAllsparxPrimeTask("find credits", "https://gateway.example/v1/ask", "mystery"), /Unsupported AI provider preference/);\n  assert.equal(called, false);\n});\n\ntest("rejects a response with a non-JSON content type", async () => {
   globalThis.fetch = async () => new Response("not json", { headers: { "content-type": "text/plain" } });
   await assert.rejects(runAllsparxPrimeTask("find credits", "https://example.com/ai"), /did not return JSON/);
 });
