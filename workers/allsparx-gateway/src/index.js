@@ -136,7 +136,7 @@ async function providerCall(provider, prompt, env) {
       response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST", redirect: "error",
         headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-        body: JSON.stringify({ model: "claude-haiku-5-5", max_tokens: MAX_OUTPUT_TOKENS, messages: [{ role: "user", content: prompt }] }),
+        body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: MAX_OUTPUT_TOKENS, messages: [{ role: "user", content: prompt }] }),
         signal: controller.signal,
       });
       const data = await readProviderJson(response);
@@ -266,12 +266,17 @@ export class RateLimiter {
     const now = Date.now();
     const windowMs = 60_000;
     const limit = Number(this.env.RATE_LIMIT_PER_MINUTE || 10);
-    const current = await this.state.storage.get("window");
-    const window = !current || now - current.startedAt >= windowMs ? { startedAt: now, count: 0 } : current;
-    if (window.count >= limit) return new Response("limited", { status: 429 });
-    window.count += 1;
-    await this.state.storage.put("window", window, { expirationTtl: 120 });
-    return new Response("ok");
+    const admitted = await this.state.storage.transaction(async (txn) => {
+      const current = await txn.get("window");
+      const window = !current || now - current.startedAt >= windowMs
+        ? { startedAt: now, count: 0 }
+        : current;
+      if (window.count >= limit) return false;
+      window.count += 1;
+      await txn.put("window", window, { expirationTtl: 120 });
+      return true;
+    });
+    return admitted ? new Response("ok") : new Response("limited", { status: 429 });
   }
 }
 
@@ -282,12 +287,20 @@ export class SpendBudget {
     const key = `reserved:${month}`;
     const reservation = Number(this.env.MAX_REQUEST_COST_MICROS || 50000);
     const cap = Number(this.env.MONTHLY_SPEND_LIMIT_MICROS || 20000000);
-    const current = Number(await this.state.storage.get(key) || 0);
-    if (!Number.isSafeInteger(reservation) || reservation < 1 || !Number.isSafeInteger(cap) || cap < reservation || current + reservation > cap)
+    if (!Number.isSafeInteger(reservation) || reservation < 1 ||
+        !Number.isSafeInteger(cap) || cap < reservation) {
       return new Response("budget exhausted", { status: 429 });
-    // Conservatively reserve the full configured request ceiling. Reservations
-    // are not refunded until usage-based settlement is independently verified.
-    await this.state.storage.put(key, current + reservation);
-    return new Response("reserved");
+    }
+    // Read-modify-write must be atomic: concurrent requests must not reserve
+    // against the same stale balance and exceed the configured admission cap.
+    const admitted = await this.state.storage.transaction(async (txn) => {
+      const current = Number(await txn.get(key) || 0);
+      if (!Number.isSafeInteger(current) || current < 0 || current + reservation > cap) return false;
+      // Conservatively reserve the full configured request ceiling. Reservations
+      // are not refunded until usage-based settlement is independently verified.
+      await txn.put(key, current + reservation);
+      return true;
+    });
+    return admitted ? new Response("reserved") : new Response("budget exhausted", { status: 429 });
   }
 }
