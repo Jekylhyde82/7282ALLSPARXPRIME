@@ -1,0 +1,47 @@
+name: ALLSPARX PRIME agent evaluation baseline
+
+on:
+  pull_request:
+    branches:
+      - syphon/server-gateway-security
+    paths:
+      - "promptfooconfig.yaml"
+      - ".github/workflows/agent-evals.yml"
+      - "docs/AGENT-FOUNDATION.md"
+  push:
+    branches:
+      - syphon/agent-foundation-promptfoo
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agent-evals-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deterministic-evaluation:
+    name: Promptfoo deterministic baseline (no provider credentials)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PROMPTFOO_DISABLE_TELEMETRY: "1"
+      PROMPTFOO_DISABLE_UPDATE: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Run pinned Promptfoo evaluation
+        run: npx --yes promptfoo@0.125.1 eval -c promptfooconfig.yaml --no-cache -o /tmp/allsparx-promptfoo-results.json
+      - name: Preserve evaluation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allsparx-promptfoo-evaluation
+          path: /tmp/allsparx-promptfoo-results.json
+          if-no-files-found: ignore
+          retention-days: 7
