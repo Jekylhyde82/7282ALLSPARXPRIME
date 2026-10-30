@@ -94,6 +94,13 @@ test("does not reserve budget when the requested provider is unavailable", async
   assert.equal(response.status, 503);
   assert.equal(reservations, 0);
 });
+test("does not route local Ollama through the public Worker", async () => {
+  const response = await worker.fetch(request("/v1/ask", {
+    body: JSON.stringify({ prompt: "x", task: "startup-deal-recommendation", provider: "ollama", contractVersion: 1 }),
+  }), env());
+  assert.equal(response.status, 503);
+  assert.deepEqual(await response.json(), { error: "PROVIDER_UNAVAILABLE" });
+});
 test("successful OpenAI request returns the validated response contract and request ID", async () => {
   globalThis.fetch = async (url) => {
     if (String(url).includes("/siteverify")) {
