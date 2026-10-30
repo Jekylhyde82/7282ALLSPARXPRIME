@@ -2,6 +2,17 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import worker, { RateLimiter, SpendBudget } from "../workers/allsparx-gateway/src/index.js";
 
+const originalFetch = globalThis.fetch;
+test.beforeEach(() => {
+  globalThis.fetch = async (url) => {
+    if (String(url).includes("/siteverify")) {
+      return Response.json({ success: true, hostname: "cloudcredits.io" });
+    }
+    throw new Error("Unexpected outbound request in test");
+  };
+});
+test.after(() => { globalThis.fetch = originalFetch; });
+
 function env(overrides = {}) {
   return {
     ALLOWED_ORIGINS: "https://cloudcredits.io",
@@ -12,42 +23,115 @@ function env(overrides = {}) {
   };
 }
 const request = (path = "/v1/ask", options = {}) => new Request("https://gateway.example" + path, {
-  method: "POST", headers: { Origin: "https://cloudcredits.io", "content-type": "application/json", ...options.headers },
-  body: options.body ?? JSON.stringify({ prompt: "Find startup credits", task: "startup-deal-recommendation", provider: "auto", contractVersion: 1 }),
+  method: "POST",
+  headers: {
+    Origin: "https://cloudcredits.io",
+    "content-type": "application/json",
+    "X-ALLSPARX-Turnstile-Token": "valid-test-token",
+    "X-ALLSPARX-Request-ID": "test-request-001",
+    ...options.headers,
+  },
+  body: options.body ?? JSON.stringify({
+    prompt: "Find startup credits",
+    task: "startup-deal-recommendation",
+    provider: "auto",
+    contractVersion: 1,
+  }),
 });
 
+test("health endpoint reports liveness without exposing configuration", async () => {
+  const response = await worker.fetch(new Request("https://gateway.example/healthz"), {});
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { status: "ok", service: "allsparx-prime-gateway" });
+});
 test("rejects an unapproved origin before invoking dependencies", async () => {
-  const response = await worker.fetch(new Request("https://gateway.example/v1/ask", { method: "POST", headers: { Origin: "https://evil.example" } }), env());
+  const response = await worker.fetch(new Request("https://gateway.example/v1/ask", {
+    method: "POST", headers: { Origin: "https://evil.example" },
+  }), env());
   assert.equal(response.status, 403);
 });
 test("rejects methods other than POST and OPTIONS", async () => {
-  const response = await worker.fetch(new Request("https://gateway.example/v1/ask", { method: "GET", headers: { Origin: "https://cloudcredits.io" } }), env());
+  const response = await worker.fetch(new Request("https://gateway.example/v1/ask", {
+    method: "GET", headers: { Origin: "https://cloudcredits.io" },
+  }), env());
   assert.equal(response.status, 405);
 });
 test("fails closed when Turnstile is not configured", async () => {
   const response = await worker.fetch(request(), env({ TURNSTILE_SECRET_KEY: undefined }));
   assert.equal(response.status, 503);
 });
+test("rejects a Turnstile hostname mismatch", async () => {
+  globalThis.fetch = async () => Response.json({ success: true, hostname: "attacker.example" });
+  const response = await worker.fetch(request(), env());
+  assert.equal(response.status, 403);
+});
 test("rejects non-JSON content types", async () => {
-  const response = await worker.fetch(request("/v1/ask", { headers: { "content-type": "text/plain" } }), env());
+  const response = await worker.fetch(request("/v1/ask", {
+    headers: { "content-type": "text/plain" },
+  }), env());
   assert.equal(response.status, 415);
 });
-test("rejects invalid task and provider contract", async () => {
-  const response = await worker.fetch(request("/v1/ask", { body: JSON.stringify({ prompt: "x", task: "other", provider: "auto", contractVersion: 1 }) }), env());
+test("rejects invalid task and provider contract after challenge validation", async () => {
+  const response = await worker.fetch(request("/v1/ask", {
+    body: JSON.stringify({ prompt: "x", task: "other", provider: "auto", contractVersion: 1 }),
+  }), env());
   assert.equal(response.status, 400);
+});
+test("rejects request bodies above the 8 KiB limit", async () => {
+  const response = await worker.fetch(request("/v1/ask", {
+    body: JSON.stringify({ prompt: "x".repeat(9000), task: "startup-deal-recommendation", provider: "auto", contractVersion: 1 }),
+  }), env());
+  assert.equal(response.status, 400);
+  assert.deepEqual(await response.json(), { error: "BODY_TOO_LARGE" });
+});
+test("does not reserve budget when the requested provider is unavailable", async () => {
+  let reservations = 0;
+  const response = await worker.fetch(request("/v1/ask", {
+    body: JSON.stringify({ prompt: "x", task: "startup-deal-recommendation", provider: "openai", contractVersion: 1 }),
+  }), env({
+    SPEND_BUDGET: { get: () => ({ fetch: async () => { reservations += 1; return new Response("ok"); } }) },
+  }));
+  assert.equal(response.status, 503);
+  assert.equal(reservations, 0);
+});
+test("successful OpenAI request returns the validated response contract and request ID", async () => {
+  globalThis.fetch = async (url) => {
+    if (String(url).includes("/siteverify")) {
+      return Response.json({ success: true, hostname: "cloudcredits.io" });
+    }
+    if (String(url) === "https://api.openai.com/v1/responses") {
+      return Response.json({
+        output: [{ content: [{ type: "output_text", text: JSON.stringify({
+          summary: "Validated summary", programs: [{ title: "Startup credits" }],
+        }) }] }],
+      });
+    }
+    throw new Error("Unexpected outbound request");
+  };
+  const response = await worker.fetch(request("/v1/ask", {
+    body: JSON.stringify({ prompt: "Find startup credits", task: "startup-deal-recommendation", provider: "openai", contractVersion: 1 }),
+  }), env({ OPENAI_API_KEY: "test-provider-key" }));
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("x-allsparx-request-id"), "test-request-001");
+  assert.deepEqual(await response.json(), {
+    summary: "Validated summary", programs: [{ title: "Startup credits" }], provider: "openai",
+  });
 });
 test("rate limiter enforces a fixed one-minute window", async () => {
   const store = new Map();
-  const state = { storage: { get: async (k) => store.get(k), put: async (k, v) => store.set(k, v) } };
+  const state = { storage: { get: async (key) => store.get(key), put: async (key, value) => store.set(key, value) } };
   const limiter = new RateLimiter(state, { RATE_LIMIT_PER_MINUTE: "2" });
   assert.equal((await limiter.fetch()).status, 200);
   assert.equal((await limiter.fetch()).status, 200);
   assert.equal((await limiter.fetch()).status, 429);
 });
-test("monthly spend guard refuses reservations above the configured ceiling", async () => {
+test("monthly reservation guard refuses reservations above its configured ceiling", async () => {
   const store = new Map();
-  const state = { storage: { get: async (k) => store.get(k), put: async (k, v) => store.set(k, v) } };
-  const budget = new SpendBudget(state, { MAX_REQUEST_COST_MICROS: "50000", MONTHLY_SPEND_LIMIT_MICROS: "50000" });
+  const state = { storage: { get: async (key) => store.get(key), put: async (key, value) => store.set(key, value) } };
+  const budget = new SpendBudget(state, {
+    MAX_REQUEST_COST_MICROS: "50000",
+    MONTHLY_SPEND_LIMIT_MICROS: "50000",
+  });
   assert.equal((await budget.fetch()).status, 200);
   assert.equal((await budget.fetch()).status, 429);
 });
