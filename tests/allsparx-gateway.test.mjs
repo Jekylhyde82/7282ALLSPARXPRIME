@@ -6,7 +6,7 @@ const originalFetch = globalThis.fetch;
 test.beforeEach(() => {
   globalThis.fetch = async (url) => {
     if (String(url).includes("/siteverify")) {
-      return Response.json({ success: true, hostname: "cloudcredits.io" });
+      return Response.json({ success: true, hostname: "cloudcredits.io", action: "allsparx_assistant" });
     }
     throw new Error("Unexpected outbound request in test");
   };
@@ -61,6 +61,11 @@ test("answers preflight only for approved origins and allowed headers", async ()
   assert.equal(response.status, 204);
   assert.equal(response.headers.get("access-control-allow-origin"), "https://cloudcredits.io");
   assert.match(response.headers.get("access-control-allow-headers"), /x-allsparx-turnstile-token/);
+  assert.match(response.headers.get("access-control-expose-headers"), /x-allsparx-request-id/);
+});
+test("rejects unknown API paths", async () => {
+  const response = await worker.fetch(request("/v1/unknown"), env());
+  assert.equal(response.status, 404);
 });
 test("rejects methods other than POST and OPTIONS", async () => {
   const response = await worker.fetch(new Request("https://gateway.example/v1/ask", {
@@ -73,7 +78,7 @@ test("fails closed when Turnstile is not configured", async () => {
   assert.equal(response.status, 503);
 });
 test("rejects a Turnstile hostname mismatch", async () => {
-  globalThis.fetch = async () => Response.json({ success: true, hostname: "attacker.example" });
+  globalThis.fetch = async () => Response.json({ success: true, hostname: "attacker.example", action: "allsparx_assistant" });
   const response = await worker.fetch(request(), env());
   assert.equal(response.status, 403);
 });
