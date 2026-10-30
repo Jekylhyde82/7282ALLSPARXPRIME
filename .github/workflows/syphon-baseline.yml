@@ -37,6 +37,9 @@ jobs:
       - name: Run capability manifest contract tests
         id: capability-manifest-tests
         run: pnpm test:capability-manifest
+      - name: Run capability registry contract tests
+        id: capability-registry-tests
+        run: pnpm test:capability-registry
       - name: Run Astro type and content checks
         id: check
         run: pnpm check
