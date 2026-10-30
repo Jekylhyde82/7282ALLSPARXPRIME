@@ -360,6 +360,33 @@ test("evidence ledger rejects invalid and oversized records", async () => {
 });
 
 
+
+test("automatic provider fallback handles transient network failures", async () => {
+  globalThis.fetch = async (url) => {
+    if (String(url).includes("/siteverify")) return Response.json({
+      success: true, hostname: "cloudcredits.io", action: "allsparx_assistant",
+    });
+    if (String(url) === "https://api.openai.com/v1/responses") {
+      throw new TypeError("simulated transient network failure");
+    }
+    if (String(url) === "https://api.anthropic.com/v1/messages") {
+      return Response.json({ content: [{ type: "text", text: "Fallback succeeded" }] });
+    }
+    throw new Error("Unexpected outbound request");
+  };
+  const response = await worker.fetch(request("/v1/ask", {
+    body: JSON.stringify({
+      prompt: "Find startup credits", task: "startup-deal-recommendation",
+      provider: "auto", contractVersion: 1,
+    }),
+  }), env({
+    OPENAI_API_KEY: "test-openai-key",
+    ANTHROPIC_API_KEY: "test-anthropic-key",
+  }));
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).provider, "anthropic");
+});
+
 test("automatic provider fallback handles non-JSON retryable provider errors", async () => {
   globalThis.fetch = async (url) => {
     if (String(url).includes("/siteverify")) return Response.json({
