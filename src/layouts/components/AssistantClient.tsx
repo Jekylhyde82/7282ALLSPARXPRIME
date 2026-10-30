@@ -84,6 +84,7 @@ export default function AssistantClient({
   const turnstileContainer = useRef<HTMLDivElement | null>(null);
   const turnstileWidgetId = useRef<string | null>(null);
   const [hasProcessedUrlPrompt, setHasProcessedUrlPrompt] = useState(false);
+  const [pendingUrlPrompt, setPendingUrlPrompt] = useState("");
   const { shouldShow, triggerStarCTA, closeStarCTA } = useStarCTA();
 
   useEffect(() => {
@@ -164,7 +165,7 @@ export default function AssistantClient({
       newUrl.searchParams.delete("prompt");
       window.history.replaceState({}, "", newUrl.toString());
 
-      handleAPICall(urlPrompt);
+      setPendingUrlPrompt(urlPrompt);
     }
   }, [hasProcessedUrlPrompt]);
 
@@ -226,6 +227,14 @@ export default function AssistantClient({
       if (turnstileWidgetId.current && window.turnstile) window.turnstile.reset(turnstileWidgetId.current);
     }
   };
+
+  useEffect(() => {
+    if (pendingUrlPrompt && turnstileToken && !isLoading) {
+      const queuedPrompt = pendingUrlPrompt;
+      setPendingUrlPrompt("");
+      handleAPICall(queuedPrompt);
+    }
+  }, [pendingUrlPrompt, turnstileToken]);
 
   const handleSubmit = async (value: string) => {
     setPrompt(value);
