@@ -49,9 +49,10 @@ This checklist is deliberately evidence-based. A successful CI run proves the ch
 - Repository: `Jekylhyde82/7282ALLSPARXPRIME`
 - Pull request: [#15](https://github.com/Jekylhyde82/7282ALLSPARXPRIME/pull/15)
 - Branch: `syphon/permanent-evidence-ledger`
-- Latest CI-confirmed code commit at this checkpoint: `3b75154ab382e354cfe5d9953e8ff568a42e9604` (run 206, run ID `41018455189`); all nine workflow steps completed successfully, including dependency installation, SYPHON tests, Wrangler dry-run, Astro checks, production build, and job teardown.
-- Run 206 is terminal-success for the exact PR head above. It does not verify this subsequent documentation-only update or any live Cloudflare resources, credentials, provider calls, external retention, signer custody or recovery exercise.
+- Latest CI-confirmed application/code commit recorded at this checkpoint: `3b75154ab382e354cfe5d9953e8ff568a42e9604` (run 206, run ID `41018455189`). Subsequent documentation commit `5a8436fbf6d76b36cfd6b6a471393dabb6e79491` passed run 207 (run ID `41112613904`), including all nine workflow steps and job teardown.
+- Run 206 is terminal-success for code commit `3b75154ab382e354cfe5d9953e8ff568a42e9604`. Run 207 (run ID `41112613904`) is also terminal-success for documentation commit `5a8436fbf6d76b36cfd6b6a471393dabb6e79491`; all nine workflow steps and job teardown completed successfully. Run 207 does not verify live Cloudflare resources, credentials, provider calls, external retention, signer custody or recovery exercise.
 - CI verifies repository code and tests only. It does not establish secret provisioning, a live export, operational independent signer custody, immutable external retention or recovery.
+- The evolved nine-stage lifecycle pipeline and eight-dimension/256-cell architecture governance specification are documented in `docs/ALLSPARX-9-STAGE-PIPELINE.md`. They are architecture/documentation deliverables, not proof that all stages, dimensions, cells, or controls are operational.
 - PR state: open, draft, unmerged.
 - Deployment state: not deployed; no production secrets or live endpoint have been verified by this checklist.
 
