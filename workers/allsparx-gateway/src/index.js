@@ -156,6 +156,13 @@ async function providerCall(provider, prompt, env) {
     }
     if (!text.trim()) throw Object.assign(new Error("EMPTY_PROVIDER_RESPONSE"), { retryable: true });
     return text.slice(0, 48_000);
+  } catch (error) {
+    // Transient network failures and timeouts should advance the automatic
+    // provider route; explicit provider selection remains strict at the caller.
+    if (error?.name === "AbortError" || error?.name === "TypeError" || controller.signal.aborted) {
+      throw Object.assign(new Error("PROVIDER_TRANSPORT_FAILURE"), { retryable: true });
+    }
+    throw error;
   } finally { clearTimeout(timer); }
 }
 function extractSummary(text) {
