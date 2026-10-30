@@ -2,13 +2,12 @@ import { createHash, sign as cryptoSign, verify as cryptoVerify } from "node:cry
 
 const HASH = /^[a-f0-9]{64}$/;
 const ZERO_HASH = "0".repeat(64);
-
 function fail(code) { throw new Error(code); }
 function canonical(value) { return JSON.stringify(value); }
 function digest(value) { return createHash("sha256").update(canonical(value), "utf8").digest("hex"); }
 
 export function signEvidenceCheckpoint({ ledgerMonth, sequence, hash, previousCheckpointSha256 = null, issuedAt, privateKey }) {
-  if (typeof ledgerMonth !== "string" || !/^\\d{4}-(0[1-9]|1[0-2])$/.test(ledgerMonth)) fail("INVALID_LEDGER_MONTH");
+  if (typeof ledgerMonth !== "string" || !/^\d{4}-(0[1-9]|1[0-2])$/.test(ledgerMonth)) fail("INVALID_LEDGER_MONTH");
   if (!Number.isSafeInteger(sequence) || sequence < 0 || sequence > 10_000_000 || !HASH.test(hash || "") || (sequence === 0 && hash !== ZERO_HASH)) fail("INVALID_LEDGER_HEAD");
   if (previousCheckpointSha256 !== null && !HASH.test(previousCheckpointSha256)) fail("INVALID_PREVIOUS_CHECKPOINT");
   if (typeof issuedAt !== "string" || !Number.isFinite(Date.parse(issuedAt)) || new Date(issuedAt).toISOString() !== issuedAt) fail("INVALID_ISSUED_AT");
@@ -24,7 +23,7 @@ export function verifyEvidenceCheckpoint(checkpoint, publicKey, expectedPrevious
       Object.keys(checkpoint).length !== keys.length || keys.some((key) => !Object.hasOwn(checkpoint, key))) fail("INVALID_CHECKPOINT_SCHEMA");
   const { signature, ...payload } = checkpoint;
   if (payload.format !== "allsparx-signed-evidence-checkpoint-v1" || payload.algorithm !== "Ed25519") fail("UNSUPPORTED_CHECKPOINT_FORMAT");
-  if (typeof payload.ledgerMonth !== "string" || !/^\\d{4}-(0[1-9]|1[0-2])$/.test(payload.ledgerMonth)) fail("INVALID_LEDGER_MONTH");
+  if (typeof payload.ledgerMonth !== "string" || !/^\d{4}-(0[1-9]|1[0-2])$/.test(payload.ledgerMonth)) fail("INVALID_LEDGER_MONTH");
   if (!Number.isSafeInteger(payload.sequence) || payload.sequence < 0 || payload.sequence > 10_000_000 || !HASH.test(payload.hash || "") || (payload.sequence === 0 && payload.hash !== ZERO_HASH)) fail("INVALID_LEDGER_HEAD");
   if (payload.previousCheckpointSha256 !== null && !HASH.test(payload.previousCheckpointSha256 || "")) fail("INVALID_PREVIOUS_CHECKPOINT");
   if (payload.previousCheckpointSha256 !== expectedPreviousCheckpointSha256) fail("PREVIOUS_CHECKPOINT_MISMATCH");
