@@ -103,3 +103,46 @@ test("offline verifier rejects semantically invalid records even when their hash
     assert.throws(() => verifyEvidenceExport(bundle, checkpoint), /INVALID_RECORD_CONTENT/);
   }
 });
+
+
+import { generateKeyPairSync } from "node:crypto";
+import { signEvidenceCheckpoint, verifyEvidenceCheckpoint } from "../scripts/evidence-checkpoint.mjs";
+
+test("Ed25519 checkpoint signatures verify against a separately held public key", () => {
+  const { privateKey, publicKey } = generateKeyPairSync("ed25519");
+  const checkpoint = signEvidenceCheckpoint({
+    ledgerMonth: "2026-10", sequence: 2, hash: "a".repeat(64),
+    previousCheckpointSha256: null, issuedAt: "2026-10-30T03:00:00.000Z", privateKey,
+  });
+  const verified = verifyEvidenceCheckpoint(checkpoint, publicKey, null);
+  assert.equal(verified.valid, true);
+  assert.equal(verified.sequence, 2);
+  assert.equal(verified.hash, "a".repeat(64));
+});
+
+test("signed checkpoint rejects tampering, wrong keys and an unexpected prior checkpoint", () => {
+  const keys = generateKeyPairSync("ed25519");
+  const otherKeys = generateKeyPairSync("ed25519");
+  const priorDigest = "b".repeat(64);
+  const checkpoint = signEvidenceCheckpoint({
+    ledgerMonth: "2026-10", sequence: 2, hash: "a".repeat(64),
+    previousCheckpointSha256: priorDigest, issuedAt: "2026-10-30T03:00:00.000Z", privateKey: keys.privateKey,
+  });
+  assert.throws(() => verifyEvidenceCheckpoint(checkpoint, keys.publicKey, null), /PREVIOUS_CHECKPOINT_MISMATCH/);
+  assert.throws(() => verifyEvidenceCheckpoint(checkpoint, otherKeys.publicKey, priorDigest), /SIGNATURE_VERIFICATION_FAILED/);
+  const tampered = { ...checkpoint, hash: "c".repeat(64) };
+  assert.throws(() => verifyEvidenceCheckpoint(tampered, keys.publicKey, priorDigest), /SIGNATURE_VERIFICATION_FAILED/);
+  assert.equal(verifyEvidenceCheckpoint(checkpoint, keys.publicKey, priorDigest).valid, true);
+});
+
+test("signed checkpoint enforces canonical month and genesis head", () => {
+  const { privateKey } = generateKeyPairSync("ed25519");
+  assert.throws(() => signEvidenceCheckpoint({
+    ledgerMonth: "2026-13", sequence: 0, hash: "0".repeat(64),
+    issuedAt: "2026-10-30T03:00:00.000Z", privateKey,
+  }), /INVALID_LEDGER_MONTH/);
+  assert.throws(() => signEvidenceCheckpoint({
+    ledgerMonth: "2026-10", sequence: 0, hash: "a".repeat(64),
+    issuedAt: "2026-10-30T03:00:00.000Z", privateKey,
+  }), /INVALID_LEDGER_HEAD/);
+});
