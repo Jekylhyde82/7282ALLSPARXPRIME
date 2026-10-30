@@ -246,7 +246,14 @@ export async function handleRequest(request, env) {
   let userId;
   try { userId = await verifySupabaseToken(request, env); }
   catch (error) {
-    return json({ error: error.message === "auth_not_configured" || error.message === "jwks_unavailable" || error.message === "jwks_empty" ? "authentication_unavailable" : "unauthorized" }, 401, cors);
+    const unavailable = error.message === "auth_not_configured" ||
+      error.message === "jwks_unavailable" || error.message === "jwks_empty" ||
+      error instanceof TypeError || error.name === "AbortError" || error.name === "TimeoutError";
+    return json(
+      { error: unavailable ? "authentication_unavailable" : "unauthorized" },
+      unavailable ? 503 : 401,
+      unavailable ? { ...cors, "retry-after": "5" } : cors,
+    );
   }
   let limit;
   try {
