@@ -60,12 +60,21 @@ function decodeJsonPart(value) {
 }
 async function getJwks(url) {
   if (jwksCache.url === url && jwksCache.value && Date.now() < jwksCache.expiresAt) return jwksCache.value;
-  const response = await fetch(url, { headers: { accept: "application/json" }, signal: AbortSignal.timeout(5000) });
-  if (!response.ok) throw new Error("jwks_unavailable");
-  const data = await readBoundedJson(response);
-  if (!data || !Array.isArray(data.keys) || data.keys.length === 0) throw new Error("jwks_empty");
-  jwksCache = { url, value: data, expiresAt: Date.now() + 10 * 60 * 1000 };
-  return data;
+  try {
+    const response = await fetch(url, { headers: { accept: "application/json" }, signal: AbortSignal.timeout(5000) });
+    if (!response.ok) throw new Error("jwks_unavailable");
+    let data;
+    try { data = await readBoundedJson(response); }
+    catch { throw new Error("jwks_unavailable"); }
+    if (!data || typeof data !== "object" || !Array.isArray(data.keys) || data.keys.length === 0) {
+      throw new Error("jwks_empty");
+    }
+    jwksCache = { url, value: data, expiresAt: Date.now() + 10 * 60 * 1000 };
+    return data;
+  } catch (error) {
+    if (error.message === "jwks_unavailable" || error.message === "jwks_empty") throw error;
+    throw new Error("jwks_unavailable");
+  }
 }
 async function verifySupabaseToken(request, env) {
   const authorization = request.headers.get("authorization") || "";
@@ -78,7 +87,11 @@ async function verifySupabaseToken(request, env) {
   let header, claims;
   try { header = decodeJsonPart(parts[0]); claims = decodeJsonPart(parts[1]); }
   catch { throw new Error("unauthorized"); }
-  if (!["RS256", "ES256"].includes(header.alg) || typeof header.kid !== "string") throw new Error("unauthorized");
+  if (!header || typeof header !== "object" || Array.isArray(header) ||
+      !claims || typeof claims !== "object" || Array.isArray(claims) ||
+      !["RS256", "ES256"].includes(header.alg) || typeof header.kid !== "string") {
+    throw new Error("unauthorized");
+  }
   const supabaseUrl = (env.SUPABASE_URL || "").replace(/\/$/, "");
   if (!/^https:\/\//.test(supabaseUrl)) throw new Error("auth_not_configured");
   const jwks = await getJwks(supabaseUrl + "/auth/v1/.well-known/jwks.json");
