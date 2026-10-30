@@ -161,11 +161,12 @@ test("does not route local Ollama through the public Worker", async () => {
   assert.deepEqual(await response.json(), { error: "PROVIDER_UNAVAILABLE" });
 });
 test("successful OpenAI request returns the validated response contract and request ID", async () => {
-  globalThis.fetch = async (url) => {
+  globalThis.fetch = async (url, init) => {
     if (String(url).includes("/siteverify")) {
       return Response.json({ success: true, hostname: "cloudcredits.io", action: "allsparx_assistant" });
     }
     if (String(url) === "https://api.openai.com/v1/responses") {
+      assert.equal(JSON.parse(init?.body || "{}").model, "test-openai-model");
       return Response.json({
         output: [{ content: [{ type: "output_text", text: JSON.stringify({
           summary: "Validated summary", programs: [{ title: "Startup credits" }],
