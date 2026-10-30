@@ -189,20 +189,16 @@ export class UserRateLimiter {
   async fetch(request) {
     if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405);
     const now = Date.now();
-    const result = await this.state.blockConcurrencyWhile(async () => {
-      const bucket = await this.state.storage.get("user-rate-limit");
-      if (!bucket || now >= bucket.resetAt) {
-        const next = { count: 1, resetAt: now + 60_000 };
-        await this.state.storage.put("user-rate-limit", next);
-        return { success: true, retryAfter: 60 };
-      }
-      if (bucket.count >= 12) {
-        return { success: false, retryAfter: Math.max(1, Math.ceil((bucket.resetAt - now) / 1000)) };
-      }
-      await this.state.storage.put("user-rate-limit", { ...bucket, count: bucket.count + 1 });
-      return { success: true, retryAfter: Math.max(1, Math.ceil((bucket.resetAt - now) / 1000)) };
-    });
-    return json(result);
+    const bucket = this.state.storage.kv.get("user-rate-limit");
+    if (!bucket || now >= bucket.resetAt) {
+      this.state.storage.kv.put("user-rate-limit", { count: 1, resetAt: now + 60_000 });
+      return json({ success: true, retryAfter: 60 });
+    }
+    if (bucket.count >= 12) {
+      return json({ success: false, retryAfter: Math.max(1, Math.ceil((bucket.resetAt - now) / 1000)) });
+    }
+    this.state.storage.kv.put("user-rate-limit", { ...bucket, count: bucket.count + 1 });
+    return json({ success: true, retryAfter: Math.max(1, Math.ceil((bucket.resetAt - now) / 1000)) });
   }
 }
 
