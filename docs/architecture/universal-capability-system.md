@@ -325,3 +325,26 @@ The gate returns one of three outcomes:
 - **reject** when the candidate is invalid, demonstrates no measured benefit, or exceeds regression/duplication limits.
 
 The evaluator is a pure decision function: it does not fetch, execute, install, merge or deploy candidate code. Its boolean trust and evidence fields are assertions supplied by its caller, not cryptographic proof. A production integration must populate those fields only from authenticated source records, verified CI attestations, trusted licence/security review records and a protected policy service. The current implementation therefore makes the decision logic testable but does not yet enable autonomous production assimilation.
+
+### Phase 5 implementation: continuous-improvement pipeline coordinator
+
+A fail-closed coordinator now exists at `src/lib/allsparxPrime/continuous-improvement-pipeline.mjs`. It connects the improvement assessment decision to explicit discovery, inspection, isolated preparation, evidence verification, merge and post-merge snapshot adapters.
+
+The coordinator:
+- Requires an explicit non-empty source allowlist and all required adapters.
+- Processes discovered candidates independently and records a result for each.
+- Requires an isolated preparation result with no production secrets before evidence verification.
+- Requires a separate evidence-verification adapter before passing the normalized candidate to the improvement assessment gate.
+- Calls the merge adapter only when the assessment returns `assimilate`.
+- Requires a confirmed merge result containing exact source and merge commit SHAs and a pull-request number before snapshot acquisition.
+- Triggers snapshot acquisition only after a confirmed merge and checks that the retained snapshot metadata names the exact source commit and includes a SHA-256 digest.
+- Distinguishes a confirmed merge followed by snapshot failure from an uncertain merge response. An uncertain merge is recorded as unknown and is not reported as a success or failure.
+- Exposes an outcome sink for durable audit recording.
+
+Eight orchestration tests cover the successful path and fail-closed paths. The tests use injected fake adapters; they prove coordinator behaviour, not live repository merging, isolation, authenticated evidence, webhook handling or durable storage.
+
+### Verified deployment constraint
+
+The current repository's `wrangler.toml` configures only static assets from `./dist`. It has no Worker `main` entrypoint, R2 bucket binding, D1 database binding, queue, durable object, webhook route or server-side secret binding. The current baseline GitHub workflow runs on pull requests and has read-only `contents: read` permission. Therefore there is no verified deployed server boundary or durable snapshot store to connect the coordinator to yet.
+
+Do not enable automatic production merging or claim a live post-merge downloader until the deployment architecture is implemented and verified. The next required work is to design and implement an authenticated server-side event boundary, a durable immutable storage adapter, protected policy/evidence records, isolated test execution, audit persistence, and rollback/reconciliation. The coordinator deliberately uses injected adapters so those controls can be implemented against the actual approved runtime rather than guessed.
