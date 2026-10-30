@@ -19,7 +19,8 @@
     "test:capability-registry": "node --test tests/capability-registry.test.mjs",
     "test:capability-registry-chain": "node --test tests/capability-registry-chain.test.mjs",
     "test:capability-policy": "node --test tests/capability-policy.test.mjs",
-    "test:capability-manifest-validation": "node --test tests/capability-manifest-validation.test.mjs"
+    "test:capability-manifest-validation": "node --test tests/capability-manifest-validation.test.mjs",
+    "test:source-repository-record": "node --test tests/source-repository-record.test.mjs"
   },
   "dependencies": {
     "@astrojs/check": "0.9.4",
