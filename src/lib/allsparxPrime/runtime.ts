@@ -90,6 +90,7 @@ export async function runAllsparxPrimeTask(
   prompt: string,
   gatewayEndpoint: string,
   providerPreference: ProviderPreference = "auto",
+  turnstileToken: string,
 ): Promise<AssistantTaskResult> {
   const normalizedPrompt = prompt.trim();
   if (!normalizedPrompt) throw new Error("Enter a request before starting an ALLSPARX PRIME task.");
@@ -111,7 +112,7 @@ export async function runAllsparxPrimeTask(
   try {
     const response = await fetch(endpointUrl.toString(), {
       method: "POST", redirect: "error",
-      headers: { "Content-Type": "application/json", "X-ALLSPARX-Request-ID": requestId },
+      headers: { "Content-Type": "application/json", "X-ALLSPARX-Request-ID": requestId, "X-ALLSPARX-Turnstile-Token": turnstileToken },
       signal: controller.signal,
       body: JSON.stringify({
         prompt: normalizedPrompt,
