@@ -71,7 +71,7 @@ jobs:
           pnpm add @astrojs/markdown-remark@latest
           # GHSA-mrhx-c7xc-m3w5 affects every Zod release below 4.6.6.
           # Pin the fixed release across the dependency graph, then regenerate the lockfile.
-          pnpm pkg set 'pnpm.overrides.zod=4.6.6'
+          pnpm pkg set 'pnpm.overrides.zod=4.6.6' 'pnpm.overrides.motion-dom=12.4.5' 'pnpm.overrides.motion-utils=12.0.0'
           # TypeScript 7 removed the default compiler export used by the existing
           # runtime contract harness; keep the supported 5.9 compiler line.
           pnpm pkg set 'devDependencies.typescript=5.9.3'
