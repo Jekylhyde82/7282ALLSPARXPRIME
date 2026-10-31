@@ -39,6 +39,10 @@ jobs:
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Bind exact checked-out source SHA
+        if: steps.loop.outputs.skip != 'true'
+        run: echo "BASELINE_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
       - name: Install pnpm
         if: steps.loop.outputs.skip != 'true'
         uses: pnpm/action-setup@v4
@@ -130,8 +134,8 @@ jobs:
           writeFileSync("docs/security/dependency-remediation-ledger.json", JSON.stringify({
             schemaVersion: 1,
             repository: process.env.GITHUB_REPOSITORY,
-            baselineCommit: process.env.GITHUB_EVENT_BEFORE ?? "see workflow run source SHA",
-            remediationSourceCommit: process.env.GITHUB_SHA,
+            baselineCommit: process.env.BASELINE_COMMIT,
+            remediationSourceCommit: process.env.BASELINE_COMMIT,
             workflowRunId: process.env.GITHUB_RUN_ID,
             generatedAt: new Date().toISOString(),
             policy: { unresolvedHigh: 0, unresolvedCritical: 0, auditScope: "all dependencies and production dependencies" },
