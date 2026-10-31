@@ -1,0 +1,204 @@
+name: ALLSPARX PRIME — gated dependency remediation build
+
+on:
+  pull_request:
+    branches:
+      - syphon/permanent-evidence-ledger
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: allsparx-dependency-remediation-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  remediate-build-verify:
+    name: Remediate dependencies, verify build, commit evidence
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout exact pull-request head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Prevent remediation commit loop
+        id: loop
+        shell: bash
+        run: |
+          subject="$(git log -1 --format=%s)"
+          if [[ "$subject" == "security: commit verified dependency remediation ledger" ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install pnpm
+        if: steps.loop.outputs.skip != 'true'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.8.1
+
+      - name: Set up Node.js
+        if: steps.loop.outputs.skip != 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+
+      - name: Capture original dependency audit
+        if: steps.loop.outputs.skip != 'true'
+        shell: bash
+        run: |
+          mkdir -p /tmp/allsparx-audit
+          pnpm install --frozen-lockfile
+          pnpm audit --json > /tmp/allsparx-audit/baseline.json || true
+
+      - name: Upgrade direct and transitive dependency resolution
+        if: steps.loop.outputs.skip != 'true'
+        run: |
+          pnpm up --latest
+          pnpm add @astrojs/markdown-remark@latest
+          pnpm install --no-frozen-lockfile
+
+      - name: Apply recorded Astro compatibility correction
+        if: steps.loop.outputs.skip != 'true'
+        run: sed -i '/^  >$/d' src/pages/index.astro
+
+      - name: Capture final dependency audit
+        if: steps.loop.outputs.skip != 'true'
+        shell: bash
+        run: |
+          pnpm audit --json > /tmp/allsparx-audit/final.json || true
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+          const report = JSON.parse(readFileSync("/tmp/allsparx-audit/final.json", "utf8"));
+          const counts = report.metadata?.vulnerabilities ?? {};
+          const high = Number(counts.high ?? 0);
+          const critical = Number(counts.critical ?? 0);
+          process.stdout.write(JSON.stringify({ high, critical, counts }, null, 2) + "\n");
+          if (high !== 0 || critical !== 0) {
+            process.stderr.write("REMEDIATION_BLOCKED: unresolved high/critical dependency advisories remain.\n");
+            process.exit(1);
+          }
+          NODE
+          pnpm audit --audit-level high
+          pnpm audit --prod --audit-level high
+
+      - name: Generate committed baseline-to-remediation vulnerability ledger
+        if: steps.loop.outputs.skip != 'true'
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+          const read = (path) => JSON.parse(readFileSync(path, "utf8"));
+          const summarize = (report) => {
+            const counts = report.metadata?.vulnerabilities ?? {};
+            const source = report.advisories ?? {};
+            const advisories = Object.values(source).map((item) => ({
+              package: item.module_name ?? item.name ?? "unknown",
+              severity: item.severity ?? "unknown",
+              title: item.title ?? "",
+              url: item.url ?? "",
+              vulnerableVersions: item.vulnerable_versions ?? "",
+              patchedVersions: item.patched_versions ?? ""
+            })).sort((a, b) => a.package.localeCompare(b.package) || a.title.localeCompare(b.title));
+            return {
+              counts: {
+                info: Number(counts.info ?? 0),
+                low: Number(counts.low ?? 0),
+                moderate: Number(counts.moderate ?? 0),
+                high: Number(counts.high ?? 0),
+                critical: Number(counts.critical ?? 0),
+                total: Number(counts.total ?? advisories.length)
+              },
+              advisories
+            };
+          };
+          const baseline = summarize(read("/tmp/allsparx-audit/baseline.json"));
+          const remediated = summarize(read("/tmp/allsparx-audit/final.json"));
+          if (remediated.counts.high !== 0 || remediated.counts.critical !== 0) {
+            throw new Error("HIGH_OR_CRITICAL_FINDINGS_REMAIN");
+          }
+          mkdirSync("docs/security", { recursive: true });
+          writeFileSync("docs/security/dependency-remediation-ledger.json", JSON.stringify({
+            schemaVersion: 1,
+            repository: process.env.GITHUB_REPOSITORY,
+            baselineCommit: process.env.GITHUB_EVENT_BEFORE ?? "see workflow run source SHA",
+            remediationSourceCommit: process.env.GITHUB_SHA,
+            workflowRunId: process.env.GITHUB_RUN_ID,
+            generatedAt: new Date().toISOString(),
+            policy: { unresolvedHigh: 0, unresolvedCritical: 0, auditScope: "all dependencies and production dependencies" },
+            baseline,
+            remediated,
+            delta: {
+              info: remediated.counts.info - baseline.counts.info,
+              low: remediated.counts.low - baseline.counts.low,
+              moderate: remediated.counts.moderate - baseline.counts.moderate,
+              high: remediated.counts.high - baseline.counts.high,
+              critical: remediated.counts.critical - baseline.counts.critical,
+              total: remediated.counts.total - baseline.counts.total
+            }
+          }, null, 2) + "\n");
+          NODE
+
+      - name: Run SYPHON and gateway contract tests
+        if: steps.loop.outputs.skip != 'true'
+        run: pnpm test:syphon
+
+      - name: Run full regression suite
+        if: steps.loop.outputs.skip != 'true'
+        run: node --test tests/*.test.mjs
+
+      - name: Run Astro checks
+        if: steps.loop.outputs.skip != 'true'
+        run: pnpm check
+
+      - name: Build production static assets
+        if: steps.loop.outputs.skip != 'true'
+        run: pnpm build
+
+      - name: Validate patch hygiene
+        if: steps.loop.outputs.skip != 'true'
+        run: |
+          git diff --check
+          if git grep -n -E '^(<<<<<<<|=======|>>>>>>>)' -- ':!pnpm-lock.yaml'; then
+            echo "Conflict markers detected."
+            exit 1
+          fi
+
+      - name: Commit remediation only after every gate passes
+        if: steps.loop.outputs.skip != 'true'
+        shell: bash
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json pnpm-lock.yaml src/pages/index.astro docs/security/dependency-remediation-ledger.json
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo "No remediation changes to commit."
+            exit 1
+          fi
+          git commit -m "security: commit verified dependency remediation ledger"
+          git push origin "HEAD:$HEAD_REF"
+
+      - name: Preserve audit and build evidence
+        if: always() && steps.loop.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: allsparx-dependency-remediation-evidence
+          path: |
+            /tmp/allsparx-audit/*.json
+            docs/security/dependency-remediation-ledger.json
+            package.json
+            pnpm-lock.yaml
+          if-no-files-found: warn
+          retention-days: 30
