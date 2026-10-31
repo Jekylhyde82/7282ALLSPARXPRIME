@@ -37,6 +37,7 @@ jobs:
           astro
           @astrojs/check
           @astrojs/mdx
+          @astrojs/markdown-remark
           @astrojs/react
           @astrojs/rss
           @astrojs/sitemap
