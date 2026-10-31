@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import AIInput from "./AIInput";
 import ProgramCard from "./ProgramCard";
 import LoadingIndicator from "./LoadingIndicator";
@@ -8,6 +8,23 @@ import {
   runAllsparxPrimeTask,
   type AllsparxTaskEvidence,
 } from "@/lib/allsparxPrime/runtime";
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (container: HTMLElement, options: {
+        sitekey: string;
+        callback: (token: string) => void;
+        "expired-callback"?: () => void;
+        "error-callback"?: () => void;
+        action?: string;
+        theme?: "light" | "dark" | "auto";
+      }) => string;
+      reset: (widgetId?: string) => void;
+      remove: (widgetId: string) => void;
+    };
+  }
+}
 
 interface Program {
   id: string;
@@ -63,8 +80,55 @@ export default function AssistantClient({
     useState<AllsparxTaskEvidence | null>(null);
   const [matchedPrograms, setMatchedPrograms] = useState<Program[]>([]);
   const [prompt, setPrompt] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileError, setTurnstileError] = useState("");
+  const turnstileContainer = useRef<HTMLDivElement | null>(null);
+  const turnstileWidgetId = useRef<string | null>(null);
   const [hasProcessedUrlPrompt, setHasProcessedUrlPrompt] = useState(false);
+  const [pendingUrlPrompt, setPendingUrlPrompt] = useState("");
   const { shouldShow, triggerStarCTA, closeStarCTA } = useStarCTA();
+
+  useEffect(() => {
+    const sitekey = import.meta.env.PUBLIC_ALLSPARX_TURNSTILE_SITE_KEY;
+    if (!sitekey) {
+      setTurnstileError("Security challenge is not configured for this deployment.");
+      return;
+    }
+    let active = true;
+    const scriptId = "cloudflare-turnstile-script";
+    const load = () => new Promise<void>((resolve, reject) => {
+      if (window.turnstile) return resolve();
+      let script = document.getElementById(scriptId) as HTMLScriptElement | null;
+      if (!script) {
+        script = document.createElement("script");
+        script.id = scriptId;
+        script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+      script.addEventListener("load", () => resolve(), { once: true });
+      script.addEventListener("error", () => reject(new Error("Cloudflare security challenge could not load.")), { once: true });
+    });
+    load().then(() => {
+      if (!active || !turnstileContainer.current || !window.turnstile) return;
+      turnstileWidgetId.current = window.turnstile.render(turnstileContainer.current, {
+        sitekey,
+        action: "allsparx_assistant",
+        callback: (token) => { setTurnstileToken(token); setTurnstileError(""); },
+        "expired-callback": () => setTurnstileToken(""),
+        "error-callback": () => { setTurnstileToken(""); setTurnstileError("Security challenge failed. Please reload the challenge."); },
+        theme: "auto",
+      });
+    }).catch((error) => {
+      if (active) setTurnstileError(error instanceof Error ? error.message : "Security challenge unavailable.");
+    });
+    return () => {
+      active = false;
+      if (turnstileWidgetId.current && window.turnstile) window.turnstile.remove(turnstileWidgetId.current);
+      turnstileWidgetId.current = null;
+    };
+  }, []);
 
   // Restore cached results on mount
   useEffect(() => {
@@ -103,7 +167,7 @@ export default function AssistantClient({
       newUrl.searchParams.delete("prompt");
       window.history.replaceState({}, "", newUrl.toString());
 
-      handleAPICall(urlPrompt);
+      setPendingUrlPrompt(urlPrompt);
     }
   }, [hasProcessedUrlPrompt]);
 
@@ -122,7 +186,10 @@ export default function AssistantClient({
           "ALLSPARX PRIME is not configured for this deployment. Set PUBLIC_ALLSPARX_GATEWAY_URL to the secured gateway URL, then rebuild the site.",
         );
       }
-      const apiResponse = await runAllsparxPrimeTask(inputPrompt, aiEndpoint, providerPreference as "auto" | "openai" | "anthropic" | "google" | "ollama");
+      if (!turnstileToken) {
+        throw new Error("Complete the Cloudflare security check before sending your request.");
+      }
+      const apiResponse = await runAllsparxPrimeTask(inputPrompt, aiEndpoint, providerPreference as "auto" | "openai" | "anthropic" | "google" | "ollama", turnstileToken);
 
       setSummary(apiResponse.summary);
       setRuntimeEvidence(apiResponse.evidence);
@@ -158,8 +225,18 @@ export default function AssistantClient({
       );
     } finally {
       setIsLoading(false);
+      setTurnstileToken("");
+      if (turnstileWidgetId.current && window.turnstile) window.turnstile.reset(turnstileWidgetId.current);
     }
   };
+
+  useEffect(() => {
+    if (pendingUrlPrompt && turnstileToken && !isLoading) {
+      const queuedPrompt = pendingUrlPrompt;
+      setPendingUrlPrompt("");
+      handleAPICall(queuedPrompt);
+    }
+  }, [pendingUrlPrompt, turnstileToken]);
 
   const handleSubmit = async (value: string) => {
     setPrompt(value);
@@ -174,7 +251,13 @@ export default function AssistantClient({
       {/* AI Input Section - Full width but with max-width for the input */}
       <div className="container">
         <div className="max-w-3xl mx-auto mb-8 mt-8">
-          <AIInput onSubmit={handleSubmit} loading={isLoading} />
+          <AIInput onSubmit={handleSubmit} loading={isLoading || !turnstileToken} />
+          <div className="mt-4 flex justify-center" aria-label="Cloudflare security verification">
+            <div ref={turnstileContainer} />
+          </div>
+          {turnstileError && (
+            <p role="alert" className="mt-2 text-center text-sm text-red-600">{turnstileError}</p>
+          )}
           <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
             ⏱️ I usually respond within 30 seconds - hang tight!
           </p>
