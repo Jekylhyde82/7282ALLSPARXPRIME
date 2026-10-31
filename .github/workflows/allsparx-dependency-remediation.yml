@@ -75,6 +75,9 @@ jobs:
           # TypeScript 7 removed the default compiler export used by the existing
           # runtime contract harness; keep the supported 5.9 compiler line.
           pnpm pkg set 'devDependencies.typescript=5.9.3'
+          # Preserve the repository's Tailwind v3 configuration. The Astro
+          # integration invokes the v3 PostCSS plugin and is not a Tailwind v4 migration.
+          pnpm pkg set 'devDependencies.tailwindcss=3.4.17'
           pnpm install --no-frozen-lockfile
 
       - name: Apply recorded Astro compatibility correction
