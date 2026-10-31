@@ -1,0 +1,1341 @@
+{
+  "schemaVersion": 1,
+  "repository": "Jekylhyde82/7282ALLSPARXPRIME",
+  "baselineCommit": "4587382e3c6289ae89fad62ae6e357b12447e1e3",
+  "remediationSourceCommit": "4587382e3c6289ae89fad62ae6e357b12447e1e3",
+  "workflowRunId": "41165570312",
+  "generatedAt": "2026-10-31T03:43:34.588Z",
+  "policy": {
+    "unresolvedHigh": 0,
+    "unresolvedCritical": 0,
+    "auditScope": "all dependencies and production dependencies"
+  },
+  "baseline": {
+    "counts": {
+      "info": 0,
+      "low": 23,
+      "moderate": 68,
+      "high": 70,
+      "critical": 3,
+      "total": 159
+    },
+    "advisories": [
+      {
+        "package": "@astrojs/rss",
+        "severity": "moderate",
+        "title": "@astrojs/rss: XML Injection via Unescaped RSS Feed Fields",
+        "url": "https://github.com/advisories/GHSA-8j5q-mfj2-5q9q",
+        "vulnerableVersions": ">=1.0.0 <4.0.19",
+        "patchedVersions": ">=4.0.19"
+      },
+      {
+        "package": "@babel/core",
+        "severity": "low",
+        "title": "@babel/core: Arbitrary File Read via sourceMappingURL Comment",
+        "url": "https://github.com/advisories/GHSA-4x5r-pxfx-6jf8",
+        "vulnerableVersions": "<=7.29.0",
+        "patchedVersions": ">=7.29.6"
+      },
+      {
+        "package": "@babel/helpers",
+        "severity": "moderate",
+        "title": "Babel has inefficient RegExp complexity in generated code with .replace when transpiling named capturing groups",
+        "url": "https://github.com/advisories/GHSA-968p-4wvh-cqc8",
+        "vulnerableVersions": "<7.26.10",
+        "patchedVersions": ">=7.26.10"
+      },
+      {
+        "package": "@eslint/plugin-kit",
+        "severity": "low",
+        "title": "@eslint/plugin-kit is vulnerable to Regular Expression Denial of Service attacks through ConfigCommentParser",
+        "url": "https://github.com/advisories/GHSA-xffm-g5w8-qvg7",
+        "vulnerableVersions": "<0.3.4",
+        "patchedVersions": ">=0.3.4"
+      },
+      {
+        "package": "@humanfs/node",
+        "severity": "moderate",
+        "title": "humanfs: Recursive copy follows symlinked files and copies data from outside the source tree",
+        "url": "https://github.com/advisories/GHSA-p498-v437-472g",
+        "vulnerableVersions": "<0.16.8",
+        "patchedVersions": ">=0.16.8"
+      },
+      {
+        "package": "ajv",
+        "severity": "moderate",
+        "title": "ajv has ReDoS when using `$data` option",
+        "url": "https://github.com/advisories/GHSA-2g4f-4pwh-qvx6",
+        "vulnerableVersions": "<6.14.0",
+        "patchedVersions": ">=6.14.0"
+      },
+      {
+        "package": "ajv",
+        "severity": "moderate",
+        "title": "ajv has ReDoS when using `$data` option",
+        "url": "https://github.com/advisories/GHSA-2g4f-4pwh-qvx6",
+        "vulnerableVersions": ">=7.0.0-alpha.0 <8.18.0",
+        "patchedVersions": ">=8.18.0"
+      },
+      {
+        "package": "astro",
+        "severity": "moderate",
+        "title": "Astro allows unauthorized third-party images in _image endpoint",
+        "url": "https://github.com/advisories/GHSA-xf8x-j4p2-f749",
+        "vulnerableVersions": ">=5.0.0-alpha.0 <5.13.2",
+        "patchedVersions": ">=5.13.2"
+      },
+      {
+        "package": "astro",
+        "severity": "moderate",
+        "title": "Astro Cloudflare adapter has Stored Cross-site Scripting vulnerability in /_image endpoint",
+        "url": "https://github.com/advisories/GHSA-fvmw-cj7j-j39q",
+        "vulnerableVersions": "<5.15.9",
+        "patchedVersions": ">=5.15.9"
+      },
+      {
+        "package": "astro",
+        "severity": "low",
+        "title": "Astro Development Server has Arbitrary Local File Read",
+        "url": "https://github.com/advisories/GHSA-x3h8-62x9-952g",
+        "vulnerableVersions": "<5.14.3",
+        "patchedVersions": ">=5.14.3"
+      },
+      {
+        "package": "astro",
+        "severity": "moderate",
+        "title": "Astro has an Authentication Bypass via Double URL Encoding, a bypass for CVE-2025-64765",
+        "url": "https://github.com/advisories/GHSA-whqg-ppgf-wp8c",
+        "vulnerableVersions": "<5.15.8",
+        "patchedVersions": ">=5.15.8"
+      },
+      {
+        "package": "astro",
+        "severity": "high",
+        "title": "Astro vulnerable to reflected XSS via the server islands feature",
+        "url": "https://github.com/advisories/GHSA-wrwg-2hg8-v723",
+        "vulnerableVersions": "<=5.15.6",
+        "patchedVersions": ">=5.15.8"
+      },
+      {
+        "package": "astro",
+        "severity": "moderate",
+        "title": "Astro vulnerable to URL manipulation via headers, leading to middleware and CVE-2025-61925 bypass",
+        "url": "https://github.com/advisories/GHSA-hr2q-hp5q-x767",
+        "vulnerableVersions": ">=2.16.0 <5.15.5",
+        "patchedVersions": ">=5.15.5"
+      },
+      {
+        "package": "astro",
+        "severity": "moderate",
+        "title": "Astro: Authorization bypass from missing path-segment boundary check when stripping the configured base",
+        "url": "https://github.com/advisories/GHSA-376h-93r7-7g6f",
+        "vulnerableVersions": "<=7.2.3",
+        "patchedVersions": ">=7.2.4"
+      },
+      {
+        "package": "astro",
+        "severity": "low",
+        "title": "Astro: Cross-site scripting via unescaped transition:* directive values on hydrated islands",
+        "url": "https://github.com/advisories/GHSA-7pw4-f3q4-r2p2",
+        "vulnerableVersions": ">=3.10.0 <7.0.4",
+        "patchedVersions": ">=7.0.4"
+      },
+      {
+        "package": "astro",
+        "severity": "high",
+        "title": "Astro: Host header SSRF in prerendered error page fetch",
+        "url": "https://github.com/advisories/GHSA-2pvr-wf23-7pc7",
+        "vulnerableVersions": "<6.4.6",
+        "patchedVersions": ">=6.4.6"
+      },
+      {
+        "package": "astro",
+        "severity": "high",
+        "title": "Astro: Reflected XSS via unescaped slot name",
+        "url": "https://github.com/advisories/GHSA-8hv8-536x-4wqp",
+        "vulnerableVersions": "<6.3.3",
+        "patchedVersions": ">=6.3.3"
+      },
+      {
+        "package": "astro",
+        "severity": "moderate",
+        "title": "Astro: Reflected XSS via unescaped View Transition animation properties",
+        "url": "https://github.com/advisories/GHSA-4g3v-8h47-v7g6",
+        "vulnerableVersions": ">=2.9.0 <=7.0.9",
+        "patchedVersions": ">=7.1.0"
+      },
+      {
+        "package": "astro",
+        "severity": "moderate",
+        "title": "Astro: Reflected/Stored XSS via unescaped <script>/<style> tag content in JSX/MDX rendering",
+        "url": "https://github.com/advisories/GHSA-98hj-9722-w3j8",
+        "vulnerableVersions": "<7.3.2",
+        "patchedVersions": ">=7.3.2"
+      },
+      {
+        "package": "astro",
+        "severity": "low",
+        "title": "Astro: Remote allowlist bypass via unanchored matchPathname wildcard",
+        "url": "https://github.com/advisories/GHSA-g735-7g2w-hh3f",
+        "vulnerableVersions": ">=2.10.10 <5.18.1",
+        "patchedVersions": ">=5.18.1"
+      },
+      {
+        "package": "astro",
+        "severity": "critical",
+        "title": "Astro: Remote code execution through AVIF image optimization",
+        "url": "https://github.com/advisories/GHSA-26w7-cxv4-gfx2",
+        "vulnerableVersions": "<7.2.8",
+        "patchedVersions": ">=7.2.8"
+      },
+      {
+        "package": "astro",
+        "severity": "low",
+        "title": "Astro: Server island encrypted parameters vulnerable to cross-component replay",
+        "url": "https://github.com/advisories/GHSA-xr5h-phrj-8vxv",
+        "vulnerableVersions": "<6.1.10",
+        "patchedVersions": ">=6.1.10"
+      },
+      {
+        "package": "astro",
+        "severity": "moderate",
+        "title": "Astro: XSS in define:vars via incomplete </script> tag sanitization",
+        "url": "https://github.com/advisories/GHSA-j687-52p2-xcff",
+        "vulnerableVersions": "<6.1.6",
+        "patchedVersions": ">=6.1.6"
+      },
+      {
+        "package": "astro",
+        "severity": "moderate",
+        "title": "Astro: XSS via Unescaped Attribute Names in Spread Props",
+        "url": "https://github.com/advisories/GHSA-jrpj-wcv7-9fh9",
+        "vulnerableVersions": "<6.4.6",
+        "patchedVersions": ">=6.4.6"
+      },
+      {
+        "package": "astro",
+        "severity": "moderate",
+        "title": "Astro: XSS via unescaped spread attribute names in renderHTMLElement (incomplete fix for CVE-2026-54298)",
+        "url": "https://github.com/advisories/GHSA-f48w-9m4c-m7f5",
+        "vulnerableVersions": "<7.0.6",
+        "patchedVersions": ">=7.0.6"
+      },
+      {
+        "package": "astro",
+        "severity": "moderate",
+        "title": "Astro's `X-Forwarded-Host` is reflected without validation",
+        "url": "https://github.com/advisories/GHSA-5ff5-9fcw-vg88",
+        "vulnerableVersions": "<5.14.3",
+        "patchedVersions": ">=5.14.3"
+      },
+      {
+        "package": "astro",
+        "severity": "moderate",
+        "title": "Astro's middleware authentication checks based on url.pathname can be bypassed via url encoded values",
+        "url": "https://github.com/advisories/GHSA-ggxq-hp9w-j794",
+        "vulnerableVersions": "<5.15.8",
+        "patchedVersions": ">=5.15.8"
+      },
+      {
+        "package": "brace-expansion",
+        "severity": "low",
+        "title": "brace-expansion Regular Expression Denial of Service vulnerability",
+        "url": "https://github.com/advisories/GHSA-v6h2-p8h4-qcjw",
+        "vulnerableVersions": ">=1.0.0 <=1.1.11",
+        "patchedVersions": ">=1.1.12"
+      },
+      {
+        "package": "brace-expansion",
+        "severity": "low",
+        "title": "brace-expansion Regular Expression Denial of Service vulnerability",
+        "url": "https://github.com/advisories/GHSA-v6h2-p8h4-qcjw",
+        "vulnerableVersions": ">=2.0.0 <=2.0.1",
+        "patchedVersions": ">=2.0.2"
+      },
+      {
+        "package": "brace-expansion",
+        "severity": "high",
+        "title": "brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups",
+        "url": "https://github.com/advisories/GHSA-3jxr-9vmj-r5cp",
+        "vulnerableVersions": ">=2.0.0 <2.1.2",
+        "patchedVersions": ">=2.1.2"
+      },
+      {
+        "package": "brace-expansion",
+        "severity": "high",
+        "title": "brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups",
+        "url": "https://github.com/advisories/GHSA-3jxr-9vmj-r5cp",
+        "vulnerableVersions": "<1.1.16",
+        "patchedVersions": ">=1.1.16"
+      },
+      {
+        "package": "brace-expansion",
+        "severity": "high",
+        "title": "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash",
+        "url": "https://github.com/advisories/GHSA-mh99-v99m-4gvg",
+        "vulnerableVersions": "<1.1.17",
+        "patchedVersions": ">=1.1.17"
+      },
+      {
+        "package": "brace-expansion",
+        "severity": "high",
+        "title": "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash",
+        "url": "https://github.com/advisories/GHSA-mh99-v99m-4gvg",
+        "vulnerableVersions": ">=2.0.0 <2.1.3",
+        "patchedVersions": ">=2.1.3"
+      },
+      {
+        "package": "brace-expansion",
+        "severity": "high",
+        "title": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+        "url": "https://github.com/advisories/GHSA-rgw5-rvv9-x895",
+        "vulnerableVersions": ">=2.0.0 <2.1.4",
+        "patchedVersions": ">=2.1.4"
+      },
+      {
+        "package": "brace-expansion",
+        "severity": "high",
+        "title": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+        "url": "https://github.com/advisories/GHSA-rgw5-rvv9-x895",
+        "vulnerableVersions": "<1.1.18",
+        "patchedVersions": ">=1.1.18"
+      },
+      {
+        "package": "brace-expansion",
+        "severity": "high",
+        "title": "brace-expansion: DoS via uncontrolled recursion in parseCommaParts causing stack exhaustion",
+        "url": "https://github.com/advisories/GHSA-6j4f-fj2g-mc7p",
+        "vulnerableVersions": "<1.1.19",
+        "patchedVersions": ">=1.1.19"
+      },
+      {
+        "package": "brace-expansion",
+        "severity": "high",
+        "title": "brace-expansion: DoS via uncontrolled recursion in parseCommaParts causing stack exhaustion",
+        "url": "https://github.com/advisories/GHSA-6j4f-fj2g-mc7p",
+        "vulnerableVersions": ">=2.0.0 <2.1.5",
+        "patchedVersions": ">=2.1.5"
+      },
+      {
+        "package": "brace-expansion",
+        "severity": "high",
+        "title": "brace-expansion: DoS via uncontrolled recursion on nested brace groups causing stack exhaustion",
+        "url": "https://github.com/advisories/GHSA-qhr7-859c-m2p7",
+        "vulnerableVersions": "<1.1.20",
+        "patchedVersions": ">=1.1.20"
+      },
+      {
+        "package": "brace-expansion",
+        "severity": "high",
+        "title": "brace-expansion: DoS via uncontrolled recursion on nested brace groups causing stack exhaustion",
+        "url": "https://github.com/advisories/GHSA-qhr7-859c-m2p7",
+        "vulnerableVersions": ">=2.0.0 <2.1.6",
+        "patchedVersions": ">=2.1.6"
+      },
+      {
+        "package": "brace-expansion",
+        "severity": "moderate",
+        "title": "brace-expansion: Quadratic-time expansion of the `{a},b}` rewrite causes CPU denial of service",
+        "url": "https://github.com/advisories/GHSA-q2hr-2g5m-vwhr",
+        "vulnerableVersions": "<1.1.21",
+        "patchedVersions": ">=1.1.21"
+      },
+      {
+        "package": "brace-expansion",
+        "severity": "moderate",
+        "title": "brace-expansion: Quadratic-time expansion of the `{a},b}` rewrite causes CPU denial of service",
+        "url": "https://github.com/advisories/GHSA-q2hr-2g5m-vwhr",
+        "vulnerableVersions": ">=2.0.0 <2.1.7",
+        "patchedVersions": ">=2.1.7"
+      },
+      {
+        "package": "brace-expansion",
+        "severity": "moderate",
+        "title": "brace-expansion: Zero-step sequence causes process hang and memory exhaustion",
+        "url": "https://github.com/advisories/GHSA-f886-m6hf-6m8v",
+        "vulnerableVersions": "<1.1.13",
+        "patchedVersions": ">=1.1.13"
+      },
+      {
+        "package": "brace-expansion",
+        "severity": "moderate",
+        "title": "brace-expansion: Zero-step sequence causes process hang and memory exhaustion",
+        "url": "https://github.com/advisories/GHSA-f886-m6hf-6m8v",
+        "vulnerableVersions": ">=2.0.0 <2.0.3",
+        "patchedVersions": ">=2.0.3"
+      },
+      {
+        "package": "browserslist",
+        "severity": "high",
+        "title": "Browserslist: Unbounded memory growth (no cache eviction) via distinct query results, leading to eventual OOM",
+        "url": "https://github.com/advisories/GHSA-c83g-rgw3-j3cx",
+        "vulnerableVersions": "<=4.28.6",
+        "patchedVersions": ">=4.28.7"
+      },
+      {
+        "package": "browserslist",
+        "severity": "high",
+        "title": "Browserslist: Uncaught crash / prototype write via untrusted browserslist-stats.json custom stats (normalizeStats)",
+        "url": "https://github.com/advisories/GHSA-73wf-gq98-2v4g",
+        "vulnerableVersions": "<=4.28.6",
+        "patchedVersions": ">=4.28.7"
+      },
+      {
+        "package": "colord",
+        "severity": "moderate",
+        "title": "Colord: Slow rejection of oversized malformed color strings",
+        "url": "https://github.com/advisories/GHSA-2wm5-q62r-hmrv",
+        "vulnerableVersions": "<2.9.4",
+        "patchedVersions": ">=2.9.4"
+      },
+      {
+        "package": "deepmerge",
+        "severity": "low",
+        "title": "deepmerge mergeObject() allows prototype poisoning of returned objects",
+        "url": "https://github.com/advisories/GHSA-gcqx-w48m-w2h4",
+        "vulnerableVersions": ">=4.2.0 <=4.3.1",
+        "patchedVersions": "<0.0.0"
+      },
+      {
+        "package": "defu",
+        "severity": "high",
+        "title": "defu: Prototype pollution via `__proto__` key in defaults argument",
+        "url": "https://github.com/advisories/GHSA-737v-mqg7-c878",
+        "vulnerableVersions": "<=6.1.4",
+        "patchedVersions": ">=6.1.5"
+      },
+      {
+        "package": "devalue",
+        "severity": "low",
+        "title": "devalue `uneval`ed code can create objects with polluted prototypes when `eval`ed",
+        "url": "https://github.com/advisories/GHSA-8qm3-746x-r74r",
+        "vulnerableVersions": "<=5.6.2",
+        "patchedVersions": ">=5.6.3"
+      },
+      {
+        "package": "devalue",
+        "severity": "low",
+        "title": "devalue affected by CPU and memory amplification from sparse arrays",
+        "url": "https://github.com/advisories/GHSA-33hq-fvwr-56pm",
+        "vulnerableVersions": "<=5.6.2",
+        "patchedVersions": ">=5.6.3"
+      },
+      {
+        "package": "devalue",
+        "severity": "moderate",
+        "title": "devalue has prototype pollution in devalue.parse and devalue.unflatten",
+        "url": "https://github.com/advisories/GHSA-cfw5-2vxh-hr84",
+        "vulnerableVersions": "<5.6.4",
+        "patchedVersions": ">=5.6.4"
+      },
+      {
+        "package": "devalue",
+        "severity": "high",
+        "title": "devalue prototype pollution vulnerability",
+        "url": "https://github.com/advisories/GHSA-vj54-72f3-p5jv",
+        "vulnerableVersions": "<5.3.2",
+        "patchedVersions": ">=5.3.2"
+      },
+      {
+        "package": "devalue",
+        "severity": "high",
+        "title": "devalue vulnerable to denial of service due to memory/CPU exhaustion in devalue.parse",
+        "url": "https://github.com/advisories/GHSA-g2pg-6438-jwpf",
+        "vulnerableVersions": ">=5.1.0 <5.6.2",
+        "patchedVersions": ">=5.6.2"
+      },
+      {
+        "package": "devalue",
+        "severity": "high",
+        "title": "devalue: `stringify`/`uneval` serialize shared memory",
+        "url": "https://github.com/advisories/GHSA-j22f-vq7h-c4qm",
+        "vulnerableVersions": ">=5.1.0 <=5.9.2",
+        "patchedVersions": ">=5.9.3"
+      },
+      {
+        "package": "devalue",
+        "severity": "high",
+        "title": "devalue: Custom ArrayBuffer revivers can bypass typed-array allocation validation",
+        "url": "https://github.com/advisories/GHSA-r9w8-h9r3-54w4",
+        "vulnerableVersions": "<=5.9.2",
+        "patchedVersions": ">=5.9.3"
+      },
+      {
+        "package": "devalue",
+        "severity": "moderate",
+        "title": "devalue: Malformed null-prototype object keys bypass __proto__ rejection via property-key coercion",
+        "url": "https://github.com/advisories/GHSA-4q55-j62x-fr9h",
+        "vulnerableVersions": "<=5.9.2",
+        "patchedVersions": ">=5.9.3"
+      },
+      {
+        "package": "devalue",
+        "severity": "high",
+        "title": "devalue: Repeated primitive strings cause quadratic expansion in uneval",
+        "url": "https://github.com/advisories/GHSA-mcm9-63f2-9j32",
+        "vulnerableVersions": "<=5.9.2",
+        "patchedVersions": ">=5.9.3"
+      },
+      {
+        "package": "devalue",
+        "severity": "moderate",
+        "title": "devalue: Residual sparse-array CPU amplification in uneval",
+        "url": "https://github.com/advisories/GHSA-hx4r-w6wj-j8fg",
+        "vulnerableVersions": "<=5.9.2",
+        "patchedVersions": ">=5.9.3"
+      },
+      {
+        "package": "devalue",
+        "severity": "low",
+        "title": "devalue: Sparse arrays emitted by uneval cause eager allocation when evaluated",
+        "url": "https://github.com/advisories/GHSA-wf3x-273g-mvxv",
+        "vulnerableVersions": ">=1.0.0 <=5.9.2",
+        "patchedVersions": ">=5.9.3"
+      },
+      {
+        "package": "devalue",
+        "severity": "moderate",
+        "title": "Svelte devalue: DoS via malformed input",
+        "url": "https://github.com/advisories/GHSA-9rgm-9g3h-6x36",
+        "vulnerableVersions": "<5.9.1",
+        "patchedVersions": ">=5.9.2"
+      },
+      {
+        "package": "devalue",
+        "severity": "low",
+        "title": "Sveltejs devalue's `devalue.parse` and `devalue.unflatten` emit objects with `__proto__` own properties",
+        "url": "https://github.com/advisories/GHSA-mwv9-gp5h-frr4",
+        "vulnerableVersions": ">=4.0.0 <5.6.4",
+        "patchedVersions": ">=5.6.4"
+      },
+      {
+        "package": "diff",
+        "severity": "low",
+        "title": "jsdiff has a Denial of Service vulnerability in parsePatch and applyPatch",
+        "url": "https://github.com/advisories/GHSA-73rr-hh4g-fpgx",
+        "vulnerableVersions": ">=5.0.0 <5.2.2",
+        "patchedVersions": ">=5.2.2"
+      },
+      {
+        "package": "esbuild",
+        "severity": "moderate",
+        "title": "esbuild enables any website to send any requests to the development server and read the response",
+        "url": "https://github.com/advisories/GHSA-67mh-4wv8-2f99",
+        "vulnerableVersions": "<=0.24.2",
+        "patchedVersions": ">=0.25.0"
+      },
+      {
+        "package": "fast-uri",
+        "severity": "high",
+        "title": "fast-uri vulnerable to authority injection via an unvalidated port in serialize",
+        "url": "https://github.com/advisories/GHSA-qw65-cvwx-89v3",
+        "vulnerableVersions": ">=3.0.0 <3.1.7",
+        "patchedVersions": ">=3.1.7"
+      },
+      {
+        "package": "fast-uri",
+        "severity": "high",
+        "title": "fast-uri vulnerable to host confusion via backslash authority introducer",
+        "url": "https://github.com/advisories/GHSA-7p8r-x3mc-p8w7",
+        "vulnerableVersions": ">=3.0.0 <3.1.5",
+        "patchedVersions": ">=3.1.5"
+      },
+      {
+        "package": "fast-uri",
+        "severity": "high",
+        "title": "fast-uri vulnerable to host confusion via failed IDN canonicalization",
+        "url": "https://github.com/advisories/GHSA-4c8g-83qw-93j6",
+        "vulnerableVersions": ">=3.0.0 <3.1.3",
+        "patchedVersions": ">=3.1.3"
+      },
+      {
+        "package": "fast-uri",
+        "severity": "high",
+        "title": "fast-uri vulnerable to host confusion via literal backslash authority delimiter",
+        "url": "https://github.com/advisories/GHSA-v2hh-gcrm-f6hx",
+        "vulnerableVersions": ">=3.0.0 <=3.1.3",
+        "patchedVersions": ">=3.1.4"
+      },
+      {
+        "package": "fast-uri",
+        "severity": "high",
+        "title": "fast-uri vulnerable to host confusion via percent-encoded authority delimiters",
+        "url": "https://github.com/advisories/GHSA-v39h-62p7-jpjc",
+        "vulnerableVersions": ">=3.0.0 <=3.1.1",
+        "patchedVersions": ">=3.1.2"
+      },
+      {
+        "package": "fast-uri",
+        "severity": "high",
+        "title": "fast-uri vulnerable to host confusion via percent-encoded scheme normalization",
+        "url": "https://github.com/advisories/GHSA-jqff-g426-hqxp",
+        "vulnerableVersions": ">=3.0.0 <3.1.6",
+        "patchedVersions": ">=3.1.6"
+      },
+      {
+        "package": "fast-uri",
+        "severity": "low",
+        "title": "fast-uri vulnerable to improper path equivalence in relative reference normalization",
+        "url": "https://github.com/advisories/GHSA-xhq7-xmqj-769h",
+        "vulnerableVersions": ">=3.0.0 <3.1.9",
+        "patchedVersions": ">=3.1.9"
+      },
+      {
+        "package": "fast-uri",
+        "severity": "moderate",
+        "title": "fast-uri vulnerable to inconsistent host case normalization via percent-encoded octets",
+        "url": "https://github.com/advisories/GHSA-hrr3-gc8f-f4qj",
+        "vulnerableVersions": ">=3.0.0 <3.1.8",
+        "patchedVersions": ">=3.1.8"
+      },
+      {
+        "package": "fast-uri",
+        "severity": "high",
+        "title": "fast-uri vulnerable to path traversal via percent-encoded dot segments",
+        "url": "https://github.com/advisories/GHSA-q3j6-qgpj-74h6",
+        "vulnerableVersions": ">=3.0.0 <=3.1.0",
+        "patchedVersions": ">=3.1.1"
+      },
+      {
+        "package": "fast-uri",
+        "severity": "low",
+        "title": "fast-uri vulnerable to scheme injection via an unescaped first-segment colon in suffix references",
+        "url": "https://github.com/advisories/GHSA-333x-w4r6-6crp",
+        "vulnerableVersions": ">=3.0.0 <3.1.9",
+        "patchedVersions": ">=3.1.9"
+      },
+      {
+        "package": "fast-uri",
+        "severity": "high",
+        "title": "fast-uri vulnerable to server-side request forgery via malformed IPv6 normalization",
+        "url": "https://github.com/advisories/GHSA-f65p-4m7j-42xc",
+        "vulnerableVersions": ">=3.0.0 <3.1.6",
+        "patchedVersions": ">=3.1.6"
+      },
+      {
+        "package": "fast-uri",
+        "severity": "moderate",
+        "title": "fast-uri vulnerable to URI scheme spoofing via percent-encoded scheme decoding",
+        "url": "https://github.com/advisories/GHSA-w74x-v6f9-j3xg",
+        "vulnerableVersions": ">=3.0.0 <3.1.9",
+        "patchedVersions": ">=3.1.9"
+      },
+      {
+        "package": "fast-xml-parser",
+        "severity": "moderate",
+        "title": "Entity Expansion Limits Bypassed When Set to Zero Due to JavaScript Falsy Evaluation in fast-xml-parser",
+        "url": "https://github.com/advisories/GHSA-jp2q-39xq-3w4g",
+        "vulnerableVersions": ">=4.0.0-beta.3 <4.5.5",
+        "patchedVersions": ">=4.5.5"
+      },
+      {
+        "package": "fast-xml-parser",
+        "severity": "high",
+        "title": "fast-xml-parser affected by DoS through entity expansion in DOCTYPE (no expansion limit)",
+        "url": "https://github.com/advisories/GHSA-jmr7-xgp7-cmfj",
+        "vulnerableVersions": ">=4.1.3 <4.5.4",
+        "patchedVersions": ">=4.5.4"
+      },
+      {
+        "package": "fast-xml-parser",
+        "severity": "high",
+        "title": "fast-xml-parser affected by numeric entity expansion bypassing all entity expansion limits (incomplete fix for CVE-2026-26278)",
+        "url": "https://github.com/advisories/GHSA-8gc5-j5rx-235r",
+        "vulnerableVersions": ">=4.0.0-beta.3 <4.5.5",
+        "patchedVersions": ">=4.5.5"
+      },
+      {
+        "package": "fast-xml-parser",
+        "severity": "critical",
+        "title": "fast-xml-parser has an entity encoding bypass via regex injection in DOCTYPE entity names",
+        "url": "https://github.com/advisories/GHSA-m7jm-9gc2-mpf2",
+        "vulnerableVersions": ">=4.1.3 <4.5.4",
+        "patchedVersions": ">=4.5.4"
+      },
+      {
+        "package": "fast-xml-parser",
+        "severity": "low",
+        "title": "fast-xml-parser has stack overflow in XMLBuilder with preserveOrder",
+        "url": "https://github.com/advisories/GHSA-fj3w-jwp8-x2g3",
+        "vulnerableVersions": ">=4.0.0-beta.0 <4.5.4",
+        "patchedVersions": ">=4.5.4"
+      },
+      {
+        "package": "fast-xml-parser",
+        "severity": "moderate",
+        "title": "fast-xml-parser XMLBuilder: XML Comment and CDATA Injection via Unescaped Delimiters",
+        "url": "https://github.com/advisories/GHSA-gh4j-gqv2-49f6",
+        "vulnerableVersions": "<5.7.0",
+        "patchedVersions": ">=5.7.0"
+      },
+      {
+        "package": "flatted",
+        "severity": "high",
+        "title": "flatted vulnerable to unbounded recursion DoS in parse() revive phase",
+        "url": "https://github.com/advisories/GHSA-25h7-pfq9-p65f",
+        "vulnerableVersions": "<3.4.0",
+        "patchedVersions": ">=3.4.0"
+      },
+      {
+        "package": "flatted",
+        "severity": "high",
+        "title": "Prototype Pollution via parse() in NodeJS flatted",
+        "url": "https://github.com/advisories/GHSA-rf6f-7fwh-wjgh",
+        "vulnerableVersions": "<=3.4.1",
+        "patchedVersions": ">=3.4.2"
+      },
+      {
+        "package": "glob",
+        "severity": "high",
+        "title": "glob CLI: Command injection via -c/--cmd executes matches with shell:true",
+        "url": "https://github.com/advisories/GHSA-5j98-mcp5-4vw2",
+        "vulnerableVersions": ">=10.2.0 <10.5.0",
+        "patchedVersions": ">=10.5.0"
+      },
+      {
+        "package": "glob",
+        "severity": "moderate",
+        "title": "Glob: AbortSignal cancellation bypass allows post-timeout filesystem traversal",
+        "url": "https://github.com/advisories/GHSA-3g3m-2fjr-6pw4",
+        "vulnerableVersions": ">=9.0.0 <=14.0.1",
+        "patchedVersions": ">=14.0.2"
+      },
+      {
+        "package": "h3",
+        "severity": "moderate",
+        "title": "h3 has a Path Traversal via Percent-Encoded Dot Segments in serveStatic Allows Arbitrary File Read",
+        "url": "https://github.com/advisories/GHSA-wr4h-v87w-p3r7",
+        "vulnerableVersions": "<1.15.6",
+        "patchedVersions": ">=1.15.6"
+      },
+      {
+        "package": "h3",
+        "severity": "high",
+        "title": "h3 has a Server-Sent Events Injection via Unsanitized Newlines in Event Stream Fields",
+        "url": "https://github.com/advisories/GHSA-22cc-p3c6-wpvm",
+        "vulnerableVersions": "<1.15.6",
+        "patchedVersions": ">=1.15.6"
+      },
+      {
+        "package": "h3",
+        "severity": "high",
+        "title": "h3 v1 has Request Smuggling (TE.TE) issue",
+        "url": "https://github.com/advisories/GHSA-mp2g-9vg9-f4cg",
+        "vulnerableVersions": "<=1.15.4",
+        "patchedVersions": ">=1.15.5"
+      },
+      {
+        "package": "h3",
+        "severity": "moderate",
+        "title": "h3: Double Decoding in `serveStatic` Bypasses `resolveDotSegments` Path Traversal Protection via `%252e%252e`",
+        "url": "https://github.com/advisories/GHSA-72gr-qfp7-vwhw",
+        "vulnerableVersions": "<=1.15.8",
+        "patchedVersions": ">=1.15.9"
+      },
+      {
+        "package": "h3",
+        "severity": "moderate",
+        "title": "h3: SSE Event Injection via Unsanitized Carriage Return (`\\r`) in EventStream Data and Comment Fields (Bypass of CVE Fix)",
+        "url": "https://github.com/advisories/GHSA-4hxc-9384-m385",
+        "vulnerableVersions": "<1.15.9",
+        "patchedVersions": ">=1.15.9"
+      },
+      {
+        "package": "immutable",
+        "severity": "high",
+        "title": "Immutable is vulnerable to Prototype Pollution",
+        "url": "https://github.com/advisories/GHSA-wf6x-7x77-mvgw",
+        "vulnerableVersions": ">=5.0.0 <5.1.5",
+        "patchedVersions": ">=5.1.5"
+      },
+      {
+        "package": "immutable",
+        "severity": "high",
+        "title": "Immutable: Hash-collision algorithmic complexity denial of service in Immutable.Map/Set",
+        "url": "https://github.com/advisories/GHSA-xvcm-6775-5m9r",
+        "vulnerableVersions": ">=5.0.0-beta.1 <5.1.8",
+        "patchedVersions": ">=5.1.8"
+      },
+      {
+        "package": "immutable",
+        "severity": "high",
+        "title": "Immutable.js `List` 32-bit trie overflow → unrecoverable DoS",
+        "url": "https://github.com/advisories/GHSA-v56q-mh7h-f735",
+        "vulnerableVersions": ">=5.0.0-beta.1 <5.1.8",
+        "patchedVersions": ">=5.1.8"
+      },
+      {
+        "package": "joi",
+        "severity": "moderate",
+        "title": "joi has an uncaught RangeError on deeply nested input through recursive `link()` schemas",
+        "url": "https://github.com/advisories/GHSA-q7cg-457f-vx79",
+        "vulnerableVersions": "<17.13.4",
+        "patchedVersions": ">=17.13.4"
+      },
+      {
+        "package": "joi",
+        "severity": "moderate",
+        "title": "joi messages compilation allows prototype replacement through __proto__ error codes",
+        "url": "https://github.com/advisories/GHSA-wr44-6hxh-3jwq",
+        "vulnerableVersions": "<17.13.8",
+        "patchedVersions": ">=17.13.8"
+      },
+      {
+        "package": "joi",
+        "severity": "low",
+        "title": "joi: object().rename() with a template target can set the validated object's prototype",
+        "url": "https://github.com/advisories/GHSA-gg4h-3hg2-grpc",
+        "vulnerableVersions": ">=16.0.0 <17.13.5",
+        "patchedVersions": ">=17.13.5"
+      },
+      {
+        "package": "joi",
+        "severity": "low",
+        "title": "joi: Prototype pollution via a `__proto__` language key in custom messages",
+        "url": "https://github.com/advisories/GHSA-6w3j-5fw6-r9vr",
+        "vulnerableVersions": ">=17.2.0 <17.13.6",
+        "patchedVersions": ">=17.13.6"
+      },
+      {
+        "package": "joi",
+        "severity": "high",
+        "title": "joi: Quadratic regular-expression backtracking in `Joi.string().isoDate()`",
+        "url": "https://github.com/advisories/GHSA-6h2x-m376-mqjq",
+        "vulnerableVersions": ">=17.2.0 <17.13.7",
+        "patchedVersions": ">=17.13.7"
+      },
+      {
+        "package": "joi",
+        "severity": "high",
+        "title": "joi: quadratic-time split in `string().email({ multiple: true })` allows denial of service",
+        "url": "https://github.com/advisories/GHSA-4528-x5fx-h6hg",
+        "vulnerableVersions": ">=17.1.1 <17.13.9",
+        "patchedVersions": ">=17.13.9"
+      },
+      {
+        "package": "js-yaml",
+        "severity": "moderate",
+        "title": "js-yaml has prototype pollution in merge (<<)",
+        "url": "https://github.com/advisories/GHSA-mh29-5h37-fv8m",
+        "vulnerableVersions": "<3.14.2",
+        "patchedVersions": ">=3.14.2"
+      },
+      {
+        "package": "js-yaml",
+        "severity": "moderate",
+        "title": "js-yaml has prototype pollution in merge (<<)",
+        "url": "https://github.com/advisories/GHSA-mh29-5h37-fv8m",
+        "vulnerableVersions": ">=4.0.0 <4.1.1",
+        "patchedVersions": ">=4.1.1"
+      },
+      {
+        "package": "js-yaml",
+        "severity": "high",
+        "title": "js-yaml: maxTotalMergeKeys does not limit CPU use for empty merge sources",
+        "url": "https://github.com/advisories/GHSA-2883-xcg3-v3hh",
+        "vulnerableVersions": ">=3.0.0 <3.15.2",
+        "patchedVersions": ">=3.15.2"
+      },
+      {
+        "package": "js-yaml",
+        "severity": "high",
+        "title": "js-yaml: maxTotalMergeKeys does not limit CPU use for empty merge sources",
+        "url": "https://github.com/advisories/GHSA-2883-xcg3-v3hh",
+        "vulnerableVersions": ">=4.0.0 <4.3.2",
+        "patchedVersions": ">=4.3.2"
+      },
+      {
+        "package": "js-yaml",
+        "severity": "high",
+        "title": "JS-YAML: Quadratic CPU consumption in !!omap resolution (3.x and 4.x) — CVE-2026-59870 fix not backported",
+        "url": "https://github.com/advisories/GHSA-5p4m-2wfm-xmqj",
+        "vulnerableVersions": ">=3.0.0 <3.15.1",
+        "patchedVersions": ">=3.15.1"
+      },
+      {
+        "package": "js-yaml",
+        "severity": "high",
+        "title": "JS-YAML: Quadratic CPU consumption in !!omap resolution (3.x and 4.x) — CVE-2026-59870 fix not backported",
+        "url": "https://github.com/advisories/GHSA-5p4m-2wfm-xmqj",
+        "vulnerableVersions": ">=4.0.0 <4.3.1",
+        "patchedVersions": ">=4.3.1"
+      },
+      {
+        "package": "js-yaml",
+        "severity": "moderate",
+        "title": "JS-YAML: Quadratic-complexity DoS in merge key handling via repeated aliases",
+        "url": "https://github.com/advisories/GHSA-h67p-54hq-rp68",
+        "vulnerableVersions": "<3.15.0",
+        "patchedVersions": ">=3.15.0"
+      },
+      {
+        "package": "js-yaml",
+        "severity": "moderate",
+        "title": "JS-YAML: Quadratic-complexity DoS in merge key handling via repeated aliases",
+        "url": "https://github.com/advisories/GHSA-h67p-54hq-rp68",
+        "vulnerableVersions": ">=4.0.0 <=4.1.1",
+        "patchedVersions": ">=4.2.0"
+      },
+      {
+        "package": "js-yaml",
+        "severity": "high",
+        "title": "js-yaml: YAML merge-key chains can force quadratic CPU consumption",
+        "url": "https://github.com/advisories/GHSA-52cp-r559-cp3m",
+        "vulnerableVersions": ">=4.0.0 <4.3.0",
+        "patchedVersions": ">=4.3.0"
+      },
+      {
+        "package": "js-yaml",
+        "severity": "high",
+        "title": "js-yaml: YAML merge-key chains can force quadratic CPU consumption",
+        "url": "https://github.com/advisories/GHSA-52cp-r559-cp3m",
+        "vulnerableVersions": ">=3.0.0 <3.15.0",
+        "patchedVersions": ">=3.15.0"
+      },
+      {
+        "package": "lodash",
+        "severity": "moderate",
+        "title": "Lodash has Prototype Pollution Vulnerability in `_.unset` and `_.omit` functions",
+        "url": "https://github.com/advisories/GHSA-xxjr-mmjv-4gpg",
+        "vulnerableVersions": ">=4.0.0 <=4.17.22",
+        "patchedVersions": ">=4.17.23"
+      },
+      {
+        "package": "lodash",
+        "severity": "high",
+        "title": "lodash vulnerable to Code Injection via `_.template` imports key names",
+        "url": "https://github.com/advisories/GHSA-r5fr-rjxr-66jc",
+        "vulnerableVersions": ">=4.0.0 <=4.17.23",
+        "patchedVersions": ">=4.18.0"
+      },
+      {
+        "package": "lodash",
+        "severity": "moderate",
+        "title": "lodash vulnerable to Prototype Pollution via array path bypass in `_.unset` and `_.omit`",
+        "url": "https://github.com/advisories/GHSA-f23m-r3pf-42rh",
+        "vulnerableVersions": "<=4.17.23",
+        "patchedVersions": ">=4.18.0"
+      },
+      {
+        "package": "mdast-util-to-hast",
+        "severity": "moderate",
+        "title": "mdast-util-to-hast has unsanitized class attribute",
+        "url": "https://github.com/advisories/GHSA-4fh9-h7wg-q85m",
+        "vulnerableVersions": ">=13.0.0 <13.2.1",
+        "patchedVersions": ">=13.2.1"
+      },
+      {
+        "package": "minimatch",
+        "severity": "high",
+        "title": "minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern",
+        "url": "https://github.com/advisories/GHSA-3ppc-4f35-3m26",
+        "vulnerableVersions": "<3.1.3",
+        "patchedVersions": ">=3.1.3"
+      },
+      {
+        "package": "minimatch",
+        "severity": "high",
+        "title": "minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern",
+        "url": "https://github.com/advisories/GHSA-3ppc-4f35-3m26",
+        "vulnerableVersions": ">=9.0.0 <9.0.6",
+        "patchedVersions": ">=9.0.6"
+      },
+      {
+        "package": "minimatch",
+        "severity": "moderate",
+        "title": "minimatch has potential denial of service via globparts amplification",
+        "url": "https://github.com/advisories/GHSA-g3hv-75wg-m249",
+        "vulnerableVersions": "<11.0.1",
+        "patchedVersions": ">=11.0.1"
+      },
+      {
+        "package": "minimatch",
+        "severity": "high",
+        "title": "minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments",
+        "url": "https://github.com/advisories/GHSA-7r86-cg39-jmmj",
+        "vulnerableVersions": "<3.1.3",
+        "patchedVersions": ">=3.1.3"
+      },
+      {
+        "package": "minimatch",
+        "severity": "high",
+        "title": "minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments",
+        "url": "https://github.com/advisories/GHSA-7r86-cg39-jmmj",
+        "vulnerableVersions": ">=9.0.0 <9.0.7",
+        "patchedVersions": ">=9.0.7"
+      },
+      {
+        "package": "minimatch",
+        "severity": "high",
+        "title": "minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions",
+        "url": "https://github.com/advisories/GHSA-23c5-xmqv-rm74",
+        "vulnerableVersions": "<3.1.4",
+        "patchedVersions": ">=3.1.4"
+      },
+      {
+        "package": "minimatch",
+        "severity": "high",
+        "title": "minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions",
+        "url": "https://github.com/advisories/GHSA-23c5-xmqv-rm74",
+        "vulnerableVersions": ">=9.0.0 <9.0.7",
+        "patchedVersions": ">=9.0.7"
+      },
+      {
+        "package": "nanoid",
+        "severity": "high",
+        "title": "nanoid: custom generators can loop indefinitely when size is zero",
+        "url": "https://github.com/advisories/GHSA-2v37-7h3g-55p8",
+        "vulnerableVersions": "<3.3.18",
+        "patchedVersions": ">=3.3.18"
+      },
+      {
+        "package": "nanoid",
+        "severity": "high",
+        "title": "nanoid: Integer Overflow or Wraparound",
+        "url": "https://github.com/advisories/GHSA-xwg4-73v4-xw9w",
+        "vulnerableVersions": "<3.3.12",
+        "patchedVersions": ">=3.3.12"
+      },
+      {
+        "package": "nanoid",
+        "severity": "high",
+        "title": "nanoid: non-secure generators can loop indefinitely with negative size",
+        "url": "https://github.com/advisories/GHSA-28wg-ghj8-5hjv",
+        "vulnerableVersions": "<3.3.16",
+        "patchedVersions": ">=3.3.16"
+      },
+      {
+        "package": "picomatch",
+        "severity": "high",
+        "title": "Picomatch has a ReDoS vulnerability via extglob quantifiers",
+        "url": "https://github.com/advisories/GHSA-c2c7-rcm5-vvqj",
+        "vulnerableVersions": "<2.3.2",
+        "patchedVersions": ">=2.3.2"
+      },
+      {
+        "package": "picomatch",
+        "severity": "high",
+        "title": "Picomatch has a ReDoS vulnerability via extglob quantifiers",
+        "url": "https://github.com/advisories/GHSA-c2c7-rcm5-vvqj",
+        "vulnerableVersions": ">=4.0.0 <4.0.4",
+        "patchedVersions": ">=4.0.4"
+      },
+      {
+        "package": "picomatch",
+        "severity": "moderate",
+        "title": "Picomatch: Method Injection in POSIX Character Classes causes incorrect Glob Matching",
+        "url": "https://github.com/advisories/GHSA-3v7f-55p6-f55p",
+        "vulnerableVersions": "<2.3.2",
+        "patchedVersions": ">=2.3.2"
+      },
+      {
+        "package": "picomatch",
+        "severity": "moderate",
+        "title": "Picomatch: Method Injection in POSIX Character Classes causes incorrect Glob Matching",
+        "url": "https://github.com/advisories/GHSA-3v7f-55p6-f55p",
+        "vulnerableVersions": ">=4.0.0 <4.0.4",
+        "patchedVersions": ">=4.0.4"
+      },
+      {
+        "package": "postcss",
+        "severity": "moderate",
+        "title": "PostCSS has XSS via Unescaped </style> in its CSS Stringify Output",
+        "url": "https://github.com/advisories/GHSA-qx2v-qp2m-jg93",
+        "vulnerableVersions": "<8.5.10",
+        "patchedVersions": ">=8.5.10"
+      },
+      {
+        "package": "postcss",
+        "severity": "high",
+        "title": "PostCSS: Arbitrary file read and information disclosure via attacker-controlled sourceMappingURL in CSS comments",
+        "url": "https://github.com/advisories/GHSA-6g55-p6wh-862q",
+        "vulnerableVersions": "<=8.5.11",
+        "patchedVersions": ">=8.5.12"
+      },
+      {
+        "package": "postcss",
+        "severity": "moderate",
+        "title": "PostCSS: incomplete fix of GHSA-6g55-p6wh-862q — attacker-controlled sourceMappingURL reads arbitrary .map files when `from` is unset",
+        "url": "https://github.com/advisories/GHSA-fxqj-rqcc-2cmp",
+        "vulnerableVersions": "<=8.5.22",
+        "patchedVersions": ">=8.5.23"
+      },
+      {
+        "package": "postcss",
+        "severity": "high",
+        "title": "PostCSS: Path Traversal in Previous Source Map Auto-Loading (sourceMappingURL) leads to Arbitrary .map File Disclosure",
+        "url": "https://github.com/advisories/GHSA-r28c-9q8g-f849",
+        "vulnerableVersions": "<=8.5.17",
+        "patchedVersions": ">=8.5.18"
+      },
+      {
+        "package": "postcss-selector-parser",
+        "severity": "low",
+        "title": "postcss-selector-parser allows denial of service through uncontrolled AST recursion",
+        "url": "https://github.com/advisories/GHSA-w9m9-85wc-3x92",
+        "vulnerableVersions": ">=6.1.0 <6.1.3",
+        "patchedVersions": ">=6.1.3"
+      },
+      {
+        "package": "postcss-selector-parser",
+        "severity": "moderate",
+        "title": "PostCSS: Quadratic complexity in flat selector parsing allows CPU exhaustion",
+        "url": "https://github.com/advisories/GHSA-rj75-hqrm-r3gf",
+        "vulnerableVersions": "<6.1.5",
+        "patchedVersions": ">=6.1.5"
+      },
+      {
+        "package": "prismjs",
+        "severity": "moderate",
+        "title": "PrismJS DOM Clobbering vulnerability",
+        "url": "https://github.com/advisories/GHSA-x7hr-w5r2-h6wg",
+        "vulnerableVersions": "<1.30.0",
+        "patchedVersions": ">=1.30.0"
+      },
+      {
+        "package": "rollup",
+        "severity": "high",
+        "title": "Rollup 4 has Arbitrary File Write via Path Traversal",
+        "url": "https://github.com/advisories/GHSA-mw96-cpmx-2vgc",
+        "vulnerableVersions": ">=4.0.0 <4.59.0",
+        "patchedVersions": ">=4.59.0"
+      },
+      {
+        "package": "sharp",
+        "severity": "high",
+        "title": "sharp : Vulnerability in librsvg dependency CVE-2026-96889",
+        "url": "https://github.com/advisories/GHSA-wq5f-xc86-pv6w",
+        "vulnerableVersions": "<0.35.5",
+        "patchedVersions": ">=0.35.5"
+      },
+      {
+        "package": "sharp",
+        "severity": "high",
+        "title": "sharp inherited vulnerabilities in libvips: CVE-2026-33327, CVE-2026-33328, CVE-2026-35590, CVE-2026-35591",
+        "url": "https://github.com/advisories/GHSA-f88m-g3jw-g9cj",
+        "vulnerableVersions": "<0.35.0",
+        "patchedVersions": ">=0.35.0"
+      },
+      {
+        "package": "sharp",
+        "severity": "high",
+        "title": "sharp: Vulnerabilities in libheif: GHSA-g89c-p67h-r497 and GHSA-2jg2-4ch7-h545",
+        "url": "https://github.com/advisories/GHSA-rgj7-g3m4-5g8c",
+        "vulnerableVersions": "<0.35.4",
+        "patchedVersions": ">=0.35.4"
+      },
+      {
+        "package": "source-map-js",
+        "severity": "high",
+        "title": "source-map-js allows event-loop denial of service through indexed source-map section offsets",
+        "url": "https://github.com/advisories/GHSA-68fv-2mgg-jv7q",
+        "vulnerableVersions": ">=1.0.0 <1.2.2",
+        "patchedVersions": ">=1.2.2"
+      },
+      {
+        "package": "swiper",
+        "severity": "critical",
+        "title": "Prototype pollution in swiper",
+        "url": "https://github.com/advisories/GHSA-hmx5-qpq5-p643",
+        "vulnerableVersions": ">=6.5.1 <12.1.2",
+        "patchedVersions": ">=12.1.2"
+      },
+      {
+        "package": "vite",
+        "severity": "high",
+        "title": "launch-editor: `fs.existsSync()` existence check can be bypassed on Windows",
+        "url": "https://github.com/advisories/GHSA-587h-7wmj-h5pm",
+        "vulnerableVersions": "<=6.4.3",
+        "patchedVersions": ">=6.4.4"
+      },
+      {
+        "package": "vite",
+        "severity": "moderate",
+        "title": "launch-editor: Editor CLI flag misinterpretation causing arbitrary command execution for some editors",
+        "url": "https://github.com/advisories/GHSA-r825-w8mm-5pxw",
+        "vulnerableVersions": "<=6.4.3",
+        "patchedVersions": ">=6.4.4"
+      },
+      {
+        "package": "vite",
+        "severity": "moderate",
+        "title": "launch-editor: escapeCmdArgs() omits % escaping on Windows",
+        "url": "https://github.com/advisories/GHSA-698v-4r3x-3vcv",
+        "vulnerableVersions": "<=6.4.3",
+        "patchedVersions": ">=6.4.4"
+      },
+      {
+        "package": "vite",
+        "severity": "moderate",
+        "title": "launch-editor: NTLMv2 hash disclosure via UNC path handling on Windows",
+        "url": "https://github.com/advisories/GHSA-v6wh-96g9-6wx3",
+        "vulnerableVersions": "<=6.4.2",
+        "patchedVersions": ">=6.4.3"
+      },
+      {
+        "package": "vite",
+        "severity": "moderate",
+        "title": "vite allows server.fs.deny bypass via backslash on Windows",
+        "url": "https://github.com/advisories/GHSA-93m4-6634-74q7",
+        "vulnerableVersions": ">=6.0.0 <=6.4.0",
+        "patchedVersions": ">=6.4.1"
+      },
+      {
+        "package": "vite",
+        "severity": "moderate",
+        "title": "Vite allows server.fs.deny to be bypassed with .svg or relative paths",
+        "url": "https://github.com/advisories/GHSA-xcj6-pq6g-qj4x",
+        "vulnerableVersions": ">=6.1.0 <6.1.4",
+        "patchedVersions": ">=6.1.4"
+      },
+      {
+        "package": "vite",
+        "severity": "moderate",
+        "title": "Vite bypasses server.fs.deny when using ?raw??",
+        "url": "https://github.com/advisories/GHSA-x574-m823-4x7w",
+        "vulnerableVersions": ">=6.1.0 <6.1.2",
+        "patchedVersions": ">=6.1.2"
+      },
+      {
+        "package": "vite",
+        "severity": "moderate",
+        "title": "Vite has a `server.fs.deny` bypassed for `inline` and `raw` with `?import` query",
+        "url": "https://github.com/advisories/GHSA-4r4m-qw57-chr8",
+        "vulnerableVersions": ">=6.1.0 <6.1.3",
+        "patchedVersions": ">=6.1.3"
+      },
+      {
+        "package": "vite",
+        "severity": "moderate",
+        "title": "Vite has an `server.fs.deny` bypass with an invalid `request-target`",
+        "url": "https://github.com/advisories/GHSA-356w-63v5-8wf4",
+        "vulnerableVersions": ">=6.1.0 <6.1.5",
+        "patchedVersions": ">=6.1.5"
+      },
+      {
+        "package": "vite",
+        "severity": "low",
+        "title": "Vite middleware may serve files starting with the same name with the public directory",
+        "url": "https://github.com/advisories/GHSA-g4jq-h2w9-997c",
+        "vulnerableVersions": ">=6.0.0 <=6.3.5",
+        "patchedVersions": ">=6.3.6"
+      },
+      {
+        "package": "vite",
+        "severity": "high",
+        "title": "Vite Vulnerable to Arbitrary File Read via Vite Dev Server WebSocket",
+        "url": "https://github.com/advisories/GHSA-p9ff-h696-f583",
+        "vulnerableVersions": ">=6.0.0 <=6.4.1",
+        "patchedVersions": ">=6.4.2"
+      },
+      {
+        "package": "vite",
+        "severity": "moderate",
+        "title": "Vite Vulnerable to Path Traversal in Optimized Deps `.map` Handling",
+        "url": "https://github.com/advisories/GHSA-4w7w-66w2-5vf9",
+        "vulnerableVersions": "<=6.4.1",
+        "patchedVersions": ">=6.4.2"
+      },
+      {
+        "package": "vite",
+        "severity": "moderate",
+        "title": "vite: `server.fs.deny` bypass on Windows alternate paths",
+        "url": "https://github.com/advisories/GHSA-fx2h-pf6j-xcff",
+        "vulnerableVersions": "<=6.4.2",
+        "patchedVersions": ">=6.4.3"
+      },
+      {
+        "package": "vite",
+        "severity": "low",
+        "title": "Vite: Cross origin script execution through Vite custom middleware",
+        "url": "https://github.com/advisories/GHSA-9jrq-w75r-8gcw",
+        "vulnerableVersions": "<=6.4.3",
+        "patchedVersions": ">=6.4.4"
+      },
+      {
+        "package": "vite",
+        "severity": "moderate",
+        "title": "Vite: Files outside `server.fs.allow` could be served when project paths match system paths on non-Windows machine",
+        "url": "https://github.com/advisories/GHSA-rq7h-c2jc-7f22",
+        "vulnerableVersions": "<=6.4.3",
+        "patchedVersions": ">=6.4.4"
+      },
+      {
+        "package": "vite",
+        "severity": "low",
+        "title": "Vite's `server.fs` settings were not applied to HTML files",
+        "url": "https://github.com/advisories/GHSA-jqfw-vq24-v9c3",
+        "vulnerableVersions": ">=6.0.0 <=6.3.5",
+        "patchedVersions": ">=6.3.6"
+      },
+      {
+        "package": "vite",
+        "severity": "moderate",
+        "title": "Vite's server.fs.deny bypassed with /. for files under project root",
+        "url": "https://github.com/advisories/GHSA-859w-5945-r5v3",
+        "vulnerableVersions": ">=6.0.0 <=6.1.5",
+        "patchedVersions": ">=6.1.6"
+      },
+      {
+        "package": "yaml",
+        "severity": "moderate",
+        "title": "yaml is vulnerable to Stack Overflow via deeply nested YAML collections",
+        "url": "https://github.com/advisories/GHSA-48c2-rrv3-qjmp",
+        "vulnerableVersions": ">=2.0.0 <2.8.3",
+        "patchedVersions": ">=2.8.3"
+      },
+      {
+        "package": "zod",
+        "severity": "high",
+        "title": "Zod can exhaust memory while validating oversized constrained collections",
+        "url": "https://github.com/advisories/GHSA-mrhx-c7xc-m3w5",
+        "vulnerableVersions": "<4.6.6",
+        "patchedVersions": ">=4.6.6"
+      }
+    ]
+  },
+  "remediated": {
+    "counts": {
+      "info": 0,
+      "low": 1,
+      "moderate": 2,
+      "high": 0,
+      "critical": 0,
+      "total": 3
+    },
+    "advisories": [
+      {
+        "package": "deepmerge",
+        "severity": "low",
+        "title": "deepmerge mergeObject() allows prototype poisoning of returned objects",
+        "url": "https://github.com/advisories/GHSA-gcqx-w48m-w2h4",
+        "vulnerableVersions": ">=4.2.0 <=4.3.1",
+        "patchedVersions": "<0.0.0"
+      },
+      {
+        "package": "minimatch",
+        "severity": "moderate",
+        "title": "minimatch has potential denial of service via globparts amplification",
+        "url": "https://github.com/advisories/GHSA-g3hv-75wg-m249",
+        "vulnerableVersions": "<11.0.1",
+        "patchedVersions": ">=11.0.1"
+      },
+      {
+        "package": "postcss-selector-parser",
+        "severity": "moderate",
+        "title": "PostCSS: Quadratic complexity in flat selector parsing allows CPU exhaustion",
+        "url": "https://github.com/advisories/GHSA-rj75-hqrm-r3gf",
+        "vulnerableVersions": "<6.1.5",
+        "patchedVersions": ">=6.1.5"
+      }
+    ]
+  },
+  "delta": {
+    "info": 0,
+    "low": -22,
+    "moderate": -66,
+    "high": -70,
+    "critical": -3,
+    "total": -156
+  }
+}
