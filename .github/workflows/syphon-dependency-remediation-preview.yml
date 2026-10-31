@@ -1,0 +1,73 @@
+name: SYPHON dependency remediation preview
+
+on:
+  push:
+    branches:
+      - syphon/dependency-remediation-preview
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: syphon-dependency-preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    name: Resolve patched dependency set and verify application compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout exact remediation-preview commit
+        uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.8.1
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install baseline locked dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Upgrade vulnerable framework and direct dependency paths
+        run: >-
+          pnpm up --latest
+          astro
+          @astrojs/check
+          @astrojs/mdx
+          @astrojs/react
+          @astrojs/rss
+          @astrojs/sitemap
+          @astrojs/tailwind
+          sharp
+          swiper
+      - name: Resolve updated lockfile
+        run: pnpm install --no-frozen-lockfile
+      - name: Capture resolved dependency versions
+        run: pnpm list --depth 0 > dependency-versions.txt
+      - name: Capture complete dependency audit
+        run: pnpm audit --json > dependency-audit.json || true
+      - name: Run SYPHON contract and security tests
+        run: pnpm test:syphon
+      - name: Run Astro type and content checks
+        run: pnpm check
+      - name: Build production static assets
+        run: pnpm build
+      - name: Preserve remediation preview evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: syphon-dependency-remediation-preview
+          if-no-files-found: warn
+          retention-days: 14
+          path: |
+            package.json
+            pnpm-lock.yaml
+            dependency-versions.txt
+            dependency-audit.json
+            dist/
