@@ -44,6 +44,8 @@ jobs:
           @astrojs/tailwind
           sharp
           swiper
+      - name: Preserve legacy remark plugin pipeline on Astro 7
+        run: pnpm add @astrojs/markdown-remark@latest
       - name: Resolve updated lockfile
         run: pnpm install --no-frozen-lockfile
       - name: Capture resolved dependency versions
