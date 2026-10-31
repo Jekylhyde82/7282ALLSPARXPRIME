@@ -78,6 +78,8 @@ jobs:
           # Preserve the repository's Tailwind v3 configuration. The Astro
           # integration invokes the v3 PostCSS plugin and is not a Tailwind v4 migration.
           pnpm pkg set 'devDependencies.tailwindcss=3.4.17'
+          # Retain the app's tested React/Framer Motion and content-tool API lines.
+          pnpm pkg set 'dependencies.framer-motion=12.4.7' 'dependencies.react=18.3.1' 'dependencies.react-dom=18.3.1' 'dependencies.astro-auto-import=0.4.4' 'dependencies.astro-font=0.1.81' 'dependencies.html-to-text=9.0.5' 'dependencies.marked=15.0.5'
           pnpm install --no-frozen-lockfile
 
       - name: Apply recorded Astro compatibility correction
