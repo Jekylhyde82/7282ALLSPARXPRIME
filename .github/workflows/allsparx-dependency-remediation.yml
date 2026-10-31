@@ -53,7 +53,7 @@ jobs:
         if: steps.loop.outputs.skip != 'true'
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: pnpm
 
       - name: Capture original dependency audit
@@ -69,6 +69,9 @@ jobs:
         run: |
           pnpm up --latest
           pnpm add @astrojs/markdown-remark@latest
+          # GHSA-mrhx-c7xc-m3w5 affects every Zod release below 4.6.6.
+          # Pin the fixed release across the dependency graph, then regenerate the lockfile.
+          pnpm pkg set 'pnpm.overrides.zod=4.6.6'
           pnpm install --no-frozen-lockfile
 
       - name: Apply recorded Astro compatibility correction
