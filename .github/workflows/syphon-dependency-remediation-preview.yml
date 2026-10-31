@@ -31,6 +31,8 @@ jobs:
           cache: pnpm
       - name: Install baseline locked dependencies
         run: pnpm install --frozen-lockfile
+      - name: Capture baseline vulnerability ledger
+        run: pnpm audit --json > baseline-dependency-audit.json || true
       - name: Upgrade vulnerable framework and direct dependency paths
         run: >-
           pnpm up --latest
@@ -48,6 +50,8 @@ jobs:
         run: pnpm add @astrojs/markdown-remark@latest
       - name: Resolve updated lockfile
         run: pnpm install --no-frozen-lockfile
+      - name: Apply syntax-only compatibility correction exposed by Astro 7
+        run: sed -i '/^  >$/d' src/pages/index.astro
       - name: Capture resolved dependency versions
         run: pnpm list --depth 0 > dependency-versions.txt
       - name: Capture complete dependency audit
@@ -68,6 +72,8 @@ jobs:
           path: |
             package.json
             pnpm-lock.yaml
+            src/pages/index.astro
+            baseline-dependency-audit.json
             dependency-versions.txt
             dependency-audit.json
             dist/
