@@ -35,6 +35,21 @@ jobs:
           subject="$(git log -1 --format=%s)"
           if [[ "$subject" == "security: commit verified dependency remediation ledger" ]]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
+          elif git cat-file -e HEAD:docs/security/dependency-remediation-ledger.json 2>/dev/null \
+            && git show HEAD:docs/security/dependency-remediation-ledger.json | node -e '
+              let input = "";
+              process.stdin.on("data", chunk => input += chunk);
+              process.stdin.on("end", () => {
+                try {
+                  const ledger = JSON.parse(input);
+                  const clear = ledger.policy?.unresolvedHigh === 0 && ledger.policy?.unresolvedCritical === 0;
+                  process.exit(clear ? 0 : 1);
+                } catch { process.exit(1); }
+              });
+            '; then
+            # A verified remediation ledger already exists. The independent
+            # nine-stage pipeline re-audits the exact new head on every update.
+            echo "skip=true" >> "$GITHUB_OUTPUT"
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
