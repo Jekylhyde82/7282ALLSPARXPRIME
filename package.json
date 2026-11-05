@@ -14,7 +14,7 @@
     "clean:pagefind": "rm -rf public/pagefind",
     "check": "astro check",
     "format": "prettier -w ./src",
-    "test:syphon": "node --test tests/syphon-runtime.test.mjs tests/syphon-provider-routing.test.mjs"
+    "test:syphon": "node --test tests/syphon-auth.test.mjs tests/syphon-runtime.test.mjs tests/syphon-provider-routing.test.mjs tests/syphon-gateway.test.mjs"
   },
   "dependencies": {
     "@astrojs/check": "0.9.4",

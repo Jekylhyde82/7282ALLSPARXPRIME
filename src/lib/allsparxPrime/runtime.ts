@@ -89,9 +89,13 @@ async function readBoundedJson(response: Response): Promise<unknown> {
 export async function runAllsparxPrimeTask(
   prompt: string,
   gatewayEndpoint: string,
-  providerPreference: ProviderPreference = "auto",
+  providerPreference: ProviderPreference,
+  accessToken: string,
+  catalogTitles: string[] = [],
+  refreshAccessToken?: () => Promise<string | null>,
 ): Promise<AssistantTaskResult> {
   const normalizedPrompt = prompt.trim();
+  if (!accessToken) throw new Error("Sign in before starting an ALLSPARX PRIME task.");
   if (!normalizedPrompt) throw new Error("Enter a request before starting an ALLSPARX PRIME task.");
   if (normalizedPrompt.length > 500) throw new Error("Requests must be 500 characters or fewer.");
   let endpointUrl: URL;
@@ -109,17 +113,29 @@ export async function runAllsparxPrimeTask(
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 30_000);
   try {
-    const response = await fetch(endpointUrl.toString(), {
-      method: "POST", redirect: "error",
-      headers: { "Content-Type": "application/json", "X-ALLSPARX-Request-ID": requestId },
-      signal: controller.signal,
-      body: JSON.stringify({
-        prompt: normalizedPrompt,
-        task: "startup-deal-recommendation",
-        provider: providerPreference,
-        contractVersion: 1,
-      }),
+    const requestBody = JSON.stringify({
+      prompt: normalizedPrompt,
+      task: "startup-deal-recommendation",
+      provider: providerPreference,
+      contractVersion: 1,
+      catalog: catalogTitles.slice(0, 200).filter((title) => typeof title === "string").map((title) => title.slice(0, 160)),
     });
+    const send = (token: string) => fetch(endpointUrl.toString(), {
+      method: "POST", redirect: "error",
+      headers: { "Content-Type": "application/json", "X-ALLSPARX-Request-ID": requestId, Authorization: `Bearer ${token}` },
+      signal: controller.signal,
+      body: requestBody,
+    });
+    let response = await send(accessToken);
+    // A signing-key rotation can leave an otherwise-valid session holding an
+    // access token signed by the previously used key. Refresh once on 401 so
+    // the gateway can validate the newly issued asymmetric token.
+    if (response.status === 401 && refreshAccessToken) {
+      const refreshedToken = await refreshAccessToken();
+      if (refreshedToken && refreshedToken !== accessToken) {
+        response = await send(refreshedToken);
+      }
+    }
     if (!response.ok) throw new Error("The ALLSPARX gateway could not complete this request.");
     const body: unknown = await readBoundedJson(response);
     if (!isAssistantApiResponse(body)) throw new Error("The ALLSPARX gateway returned an invalid response format.");

@@ -1,6 +1,17 @@
 name = "cloudcredits-io"
+main = "src/worker.mjs"
 compatibility_date = "2025-08-22"
 
 [assets]
 directory = "./dist"
+binding = "ASSETS"
 html_handling = "drop-trailing-slash"
+run_worker_first = ["/api/*"]
+
+[[durable_objects.bindings]]
+name = "USER_RATE_LIMITER_DO"
+class_name = "UserRateLimiter"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["UserRateLimiter"]
