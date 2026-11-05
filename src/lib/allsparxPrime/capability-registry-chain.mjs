@@ -47,11 +47,11 @@ function assertRecordShape(record) {
   if (typeof record.record_id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(record.record_id)) throw new TypeError("Registry record_id must be a UUID v4.");
   if (!Number.isSafeInteger(record.sequence) || record.sequence < 1) throw new TypeError("Registry sequence must be a positive safe integer.");
   if (typeof record.capability_id !== "string" || record.capability_id.length < 3 || record.capability_id.length > 160) throw new TypeError("Invalid capability_id.");
-  if (typeof record.capability_version !== "string" || !/^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?$/.test(record.capability_version)) throw new TypeError("Invalid capability semantic version.");
+  if (typeof record.capability_version !== "string" || !/^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?$/.test(record.capability_version)) throw new TypeError("Invalid capability semantic version.");
   if (!DIGEST_PATTERN.test(record.package_digest)) throw new TypeError("Invalid package digest.");
   if (!EVENT_TYPES.has(record.event_type)) throw new TypeError("Unsupported registry event type.");
   if (typeof record.occurred_at !== "string" ||
-      !/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$/.test(record.occurred_at) ||
+      !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(record.occurred_at) ||
       !Number.isFinite(Date.parse(record.occurred_at))) throw new TypeError("Invalid registry event timestamp.");
 
   assertOnlyKeys(record.actor, ACTOR_KEYS, "Registry actor");
