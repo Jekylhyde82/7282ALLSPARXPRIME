@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://allsparx.prime/schemas/capability-registry-record.schema.json",
+  "title": "ALLSPARX PRIME Capability Registry Record",
+  "description": "Append-only registry event. Records describe lifecycle decisions and must not be interpreted as executable instructions.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "record_version",
+    "record_id",
+    "sequence",
+    "capability_id",
+    "capability_version",
+    "package_digest",
+    "event_type",
+    "occurred_at",
+    "actor",
+    "decision",
+    "policy_version",
+    "previous_record_digest",
+    "record_digest"
+  ],
+  "properties": {
+    "record_version": {
+      "const": "1.0.0"
+    },
+    "record_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "capability_id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 160
+    },
+    "capability_version": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "package_digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "event_type": {
+      "enum": [
+        "discovered",
+        "provenance-recorded",
+        "license-reviewed",
+        "extracted",
+        "packaged",
+        "validated",
+        "approved",
+        "rejected",
+        "published",
+        "installed",
+        "disabled",
+        "upgraded",
+        "rolled-back",
+        "revoked",
+        "retired"
+      ]
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "id"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "human",
+            "service",
+            "system"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "identity_provider": {
+          "type": "string",
+          "maxLength": 200
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "outcome",
+        "reason_code"
+      ],
+      "properties": {
+        "outcome": {
+          "enum": [
+            "accepted",
+            "denied",
+            "recorded",
+            "failed",
+            "pending"
+          ]
+        },
+        "reason_code": {
+          "type": "string",
+          "pattern": "^[A-Z0-9_]{2,80}$"
+        },
+        "approval_reference": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "details_digest": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      }
+    },
+    "policy_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "previous_record_digest": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "record_digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "external_checkpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "reference",
+        "signature"
+      ],
+      "properties": {
+        "provider": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "reference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "signature": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        }
+      }
+    }
+  }
+}

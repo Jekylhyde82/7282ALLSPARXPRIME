@@ -1,0 +1,16 @@
+{
+  "record_version": "1.0.0",
+  "repository_id": "allsparx-prime-application",
+  "repository_url": "https://github.com/Jekylhyde82/7282ALLSPARXPRIME",
+  "relationship": "upstream",
+  "integration_status": "unknown",
+  "source": {
+    "commit": "0000000000000000000000000000000000000000"
+  },
+  "target": {
+    "repository_id": "allsparx-prime-application"
+  },
+  "capabilities": [],
+  "evidence": [],
+  "notes": "Illustrative schema example only. Replace placeholder commit and status with verified repository evidence before treating this as a factual inventory entry."
+}
