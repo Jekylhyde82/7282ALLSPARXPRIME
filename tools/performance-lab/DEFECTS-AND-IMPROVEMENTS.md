@@ -1,8 +1,8 @@
 # Performance Lab — Defects, Limitations and Improvement Register
 
 **Benchmark:** GENESIS-PERFORMANCE-LAB-001  
-**Register reviewed against:** `b1ebf0313bc3c95422b68048c2653fdaf5cfc9e6`  
-**Latest verified Performance Lab CI at review:** run [42836193833](https://github.com/Jekylhyde82/7282ALLSPARXPRIME/actions/runs/42836193833), 24 tests passed, 0 failed.  
+**Register reviewed against:** `2d90bf2e7d2e0d47d19b6aef25a00659c9bc4626` (pre-update candidate; this commit adds protocol documentation only)  
+**Latest previously verified Performance Lab CI:** run [42837644914](https://github.com/Jekylhyde82/7282ALLSPARXPRIME/actions/runs/42837644914), 24 tests passed, 0 failed on candidate `2d90bf2e7d2e0d47d19b6aef25a00659c9bc4626`. New documentation changes require fresh current-head CI.  
 **Operational status:** NOT OPERATIONAL — authentic trials and independent release evidence remain outstanding.
 
 This register distinguishes defects in the implemented toolchain from deliberate boundaries of the manually operated experimental protocol. A code-level fix does not close an experimental or governance gate.
@@ -21,7 +21,7 @@ This register distinguishes defects in the implemented toolchain from deliberate
 | PL-008 | Medium | Case-specific adversarial checks are stored as structured reviewer outcomes; the runner checks presence/status but does not independently judge the semantic correctness of reviewer findings. | **OPEN — EXTERNAL REVIEW CONTROL** | Keep the separate blinded adversarial reviewer and human review of critical findings. Define evidence-based acceptance criteria and independently audit reviewer outputs; never equate a PASS field with proof that a response passed. |
 | PL-009 | Medium | Repetition summaries report per-case mean/min/max across up to three eligible pairs, but do not estimate uncertainty or assessor agreement. | **OPEN — REPORTING LIMITATION** | After authentic trials, report the small sample size and dispersion transparently. Add inferential statistics only if assumptions and sample size justify them; do not imply that three repetitions establish broad generalisation. |
 | PL-010 | Low | GitHub Actions use major-version action tags (for example, `actions/checkout@v4` and `actions/setup-node@v4`) rather than reviewed immutable commit SHAs. Current logs also emit Node.js 20 deprecation warnings for those actions. | **OPEN** | Review action provenance and compatibility, pin actions to verified full commit SHAs, and define a controlled update process. Do not blindly copy unverified hashes. |
-| PL-011 | Low | The README evidence-manifest verification example contained duplicated signer ID/role arguments. | **RESOLVED IN CURRENT BRANCH** | Corrected the command to match the runner's six-argument CLI contract. Verify the documentation correction on the resulting branch head and retain the CI result. |
+| PL-011 | Low | The README evidence-manifest verification example contained duplicated signer ID/role arguments. | **RESOLVED IN CURRENT BRANCH** | Corrected the command to match the runner's six-argument CLI contract. Verify the documentation correction on the resulting branch head and retain the CI result. |\n| PL-012 | High | The runbook specified eight 0–5 scoring dimensions but did not define sufficiently anchored, dimension-specific scoring criteria. | **OPEN — APPROVAL GATE** | Added proposed `SCORING-RUBRIC.md` with common and dimension-specific anchors, critical-failure rules, and calibration-plan requirements. At least two qualified human reviewers must approve and sign the exact rubric hash and numerical calibration thresholds before evaluator calibration or experimental scoring. |\n| PL-013 | High | The operator matrix did not contain a dedicated machine-auditable confirmation that Unpersonalized Temporary Chat was selected, nor separate prompt/instruction hashes. | **PARTIALLY RESOLVED — DOCUMENTATION/MATRIX CONTROL** | Protocol 1.4 adds `unpersonalized_confirmed`, canonical prompt SHA-256 and architecture-instruction SHA-256 columns, and requires TRUE for validity. The current runner does not validate this operator CSV; an independent operator/release reviewer must enforce it. Consider future schema/runner integration only after protocol review. |
 
 ## Verified implementation and test evidence
 
@@ -35,7 +35,7 @@ This register distinguishes defects in the implemented toolchain from deliberate
 ## Improvement backlog
 
 1. Complete the 30 authentic trials using the registered Unpersonalized Temporary Chat protocol.
-2. Establish and preserve the held-out, human-adjudicated calibration reference set for both separate AI evaluators before scoring experimental responses.
+2. Obtain independent human approval of the anchored scoring rubric and pre-registered numerical calibration thresholds; establish and preserve the held-out, human-adjudicated calibration reference set for both separate AI evaluators before scoring experimental responses.
 3. Independently verify assessor/reviewer identity, blinding, evaluator configuration and signed evidence provenance.
 4. Cross-check every run-record evidence reference against the signed manifest and retained artifact bytes.
 5. Add RFC 3339 date-time validation with semantic negative tests.
@@ -43,7 +43,7 @@ This register distinguishes defects in the implemented toolchain from deliberate
 7. Improve adversarial-review auditability without treating machine-readable PASS fields as semantic proof.
 8. Report descriptive uncertainty honestly; avoid unjustified inference from three repetitions.
 9. Pin GitHub Actions to reviewed immutable SHAs and address Node.js runtime deprecation warnings.
-10. Obtain independent release approval against the exact final candidate revision.
+10. Obtain independent release approval against the exact final candidate revision.\n11. Enforce protocol 1.4 matrix isolation and provenance columns during execution and manifest review.
 
 ## Acceptance policy
 
