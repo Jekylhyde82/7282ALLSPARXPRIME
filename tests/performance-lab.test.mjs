@@ -72,6 +72,7 @@ test("duplicate condition within a repetition is rejected from clean pairing",()
   const duplicate=record("baseline","same-scorer","P01",1);
   const result=buildComparison([b,a,duplicate]);
   assert.ok(result.issues.some(x=>x.includes("P01: duplicate baseline record for repetition 1")));
+  assert.equal(result.pairs.length,0,"duplicate records must never produce a comparative delta");
 });
 
 test("report keeps operational status on HOLD",()=>{
@@ -122,6 +123,7 @@ test("paired comparisons reject prompt or model subject drift",()=>{
   const result=buildComparison([b,a]);
   assert.ok(result.issues.some(x=>x.includes("paired prompts differ")));
   assert.ok(result.issues.some(x=>x.includes("paired model subjects differ")));
+  assert.equal(result.pairs.length,0,"mismatched prompts or model subjects must never produce a comparative delta");
 });
 test("recording rejects a prompt that differs from the canonical case",()=>{
   const trial={case_id:"P01",condition:"baseline",subject:"GPT-6",prompt:"not the canonical prompt",response:"response",scores:Object.fromEntries(dims.map(d=>[d,3])),evidence:[{kind:"test",reference:"test://evidence"}],assessor:{assessor_id:"scorer",blinded_condition:true,independent:true},adversarial_review:{reviewer_id:"critic",blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"Reviewed."},{check_id:"AC02",outcome:"PASS",finding:"Reviewed."}]}};
