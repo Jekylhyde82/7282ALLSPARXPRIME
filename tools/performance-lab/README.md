@@ -32,7 +32,7 @@ Eight dimensions, each scored 0–5: accuracy, reasoning, evidence, calibration,
 3. Randomize response labels before scoring. Assessors must not know the condition.
 4. Use different independent assessors for baseline and assisted responses, or have multiple assessors score both under a documented blinded protocol. The current report flags identical assessor IDs for paired records.
 5. Record evidence references and critical failures. A score without rationale/evidence is not sufficient for operational approval.
-6. Submit ten records: five cases × two conditions.
+6. Submit **30 records**: five cases × two conditions × three repetitions. Repetition numbers 1, 2, and 3 must be present for every case-condition combination. The comparison runner pairs by case and repetition and reports each paired delta plus per-case mean and min/max across the three repetitions; it never substitutes a single overall average for case-level results.
 
 ## Record format
 
@@ -43,6 +43,7 @@ Example trial-input skeleton (scores are placeholders, not results):
 ```json
 {
   "case_id": "P01",
+  "repetition": 1,
   "condition": "baseline",
   "subject": "GPT-6",
   "prompt": "Paste the exact benchmark prompt.",
@@ -71,7 +72,7 @@ Example trial-input skeleton (scores are placeholders, not results):
 }
 ```
 
-The example is a format illustration only. Do not submit it as a completed trial. Each case's required adversarial check IDs are defined in `cases.json`; all must be assessed. Use `FAIL` when a defect is found and preserve the finding. Do not mark an unchecked item as `PASS`.
+The `repetition` field must be 1, 2, or 3. The example is a format illustration only. Do not submit it as a completed trial. Each case's required adversarial check IDs are defined in `cases.json`; all must be assessed. Use `FAIL` when a defect is found and preserve the finding. Do not mark an unchecked item as `PASS`.
 
 ## Commands
 
@@ -99,8 +100,8 @@ Record every detected defect and corrective action in the report/evidence packag
 Pull requests and pushes touching this toolset run Node tests and schema checks. CI success establishes only that the toolset's automated checks passed on that revision.
 
 **Operational status remains HOLD** until all are true:
-- all ten trial records validate;
-- five baseline/assisted pairs use identical prompts and controlled conditions;
+- all 30 trial records validate (five cases × two conditions × three repetitions);
+- all 15 baseline/assisted pairs (five cases × three repetitions) use identical prompts and controlled conditions;
 - independent blinded scoring is evidenced;
 - raw outputs and evidence references are retained and independently checked;
 - adversarial findings and remediation are reviewed;
