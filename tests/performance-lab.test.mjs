@@ -209,9 +209,10 @@ test("signed evidence manifest verifies revision, trusted key, and artifact byte
     artifacts:[{path:"trial-001.txt",kind:"raw-trial-output",sha256:sha256(fs.readFileSync(path.join(evidenceRoot,"trial-001.txt")))}]
   };
   const manifest=signEvidenceManifest(payload,privateKey.export({type:"pkcs8",format:"pem"}));
-  const verify=(m=manifest,key=publicPem,revision=payload.revision)=>verifyEvidenceManifest(m,{publicKeyPem:key,evidenceRoot,expectedRevision:revision});
+  const verify=(m=manifest,key=publicPem,revision=payload.revision,signerId=payload.signer.signer_id,signerRole=payload.signer.role)=>verifyEvidenceManifest(m,{publicKeyPem:key,evidenceRoot,expectedRevision:revision,expectedSignerId:signerId,expectedSignerRole:signerRole});
   assert.deepEqual(verify(),[]);
   assert.ok(verify(manifest,publicPem,"b".repeat(40)).some(x=>x.includes("revision")));
+  assert.ok(verify(manifest,publicPem,payload.revision,"unexpected-signer").some(x=>x.includes("signer ID")));
   const wrong=crypto.generateKeyPairSync("ed25519").publicKey.export({type:"spki",format:"pem"});
   assert.ok(verify(manifest,wrong).some(x=>x.includes("fingerprint")));
   fs.writeFileSync(path.join(evidenceRoot,"trial-001.txt"),"tampered artifact");
@@ -233,7 +234,7 @@ test("signed evidence manifest rejects path traversal and signature tampering",(
     artifacts:[{path:"../outside.txt",kind:"raw-trial-output",sha256:sha256("outside")}]
   };
   const manifest=signEvidenceManifest(payload,privateKey.export({type:"pkcs8",format:"pem"}));
-  assert.ok(verifyEvidenceManifest(manifest,{publicKeyPem:publicPem,evidenceRoot,expectedRevision:payload.revision}).some(x=>x.includes("traverse")));
+  assert.ok(verifyEvidenceManifest(manifest,{publicKeyPem:publicPem,evidenceRoot,expectedRevision:payload.revision,expectedSignerId:payload.signer.signer_id,expectedSignerRole:payload.signer.role}).some(x=>x.includes("traverse")));
   const tampered={...manifest,signer:{...manifest.signer,signer_id:"forged"}};
   assert.ok(verifyEvidenceManifest(tampered,{publicKeyPem:publicPem,evidenceRoot,expectedRevision:payload.revision}).some(x=>x.includes("signature is invalid")));
   fs.rmSync(temp,{recursive:true,force:true});
