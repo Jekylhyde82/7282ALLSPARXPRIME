@@ -305,3 +305,31 @@ test("calibration plan requires frozen thresholds, distinct evaluators and two i
   assert.ok(validateCalibrationPlan({...plan,experimental_output_accessed:true}).length>0);
   assert.ok(validateCalibrationPlan({...plan,reviewer_approvals:[reviewer("human-A"),reviewer("human-A")]}).some(error=>error.includes("unique")));
 });
+
+test("trial matrix rejects hashes that do not match the frozen canonical prompt or architecture instruction",()=>{
+  const matrix=fs.readFileSync(new URL("../tools/performance-lab/evidence/trial-matrix.csv",import.meta.url),"utf8");
+  const lines=matrix.trimEnd().split("\n");
+  const values=lines[1].split(",");
+  values[6]="CAPTURED"; values[7]="GPT-6"; values[8]="Unpersonalized Temporary Chat";
+  values[9]="context"; values[10]="2026-11-11T00:00:00Z"; values[11]="default"; values[12]="none";
+  values[13]="a".repeat(64); values[14]="capture"; values[17]="TRUE";
+  values[18]="f".repeat(64);
+  lines[1]=values.join(",");
+  const errors=validateTrialMatrix(lines.join("\n")+"\n");
+  assert.ok(errors.some(error=>error.includes("does not match the registered case prompt")));
+  const assistedIndex=lines.findIndex(line=>line.includes(",P01,1,architecture_assisted,"));
+  const assisted=lines[assistedIndex].split(",");
+  assisted[6]="CAPTURED"; assisted[7]="GPT-6"; assisted[8]="Unpersonalized Temporary Chat";
+  assisted[9]="context"; assisted[10]="2026-11-11T00:00:00Z"; assisted[11]="default"; assisted[12]="none";
+  assisted[13]="a".repeat(64); assisted[14]="capture"; assisted[17]="TRUE";
+  assisted[18]=sha256(cases.cases.find(item=>item.id==="P01").prompt);
+  assisted[19]="f".repeat(64);
+  lines[assistedIndex]=assisted.join(",");
+  assert.ok(validateTrialMatrix(lines.join("\n")+"\n").some(error=>error.includes("does not match the frozen architecture instruction")));
+});
+
+test("CSV parser rejects malformed quoting",()=>{
+  assert.ok(validateTrialMatrix('a"b,c\n').some(error=>error.includes("quote inside an unquoted field")));
+  assert.ok(validateTrialMatrix('"a"x,b\n').some(error=>error.includes("characters after a closing quote")));
+  assert.ok(validateTrialMatrix('"a,b\n').some(error=>error.includes("unterminated quoted field")));
+});
