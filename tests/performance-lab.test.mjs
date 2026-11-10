@@ -13,7 +13,7 @@ function record(condition, assessorId, caseId="P01") {
     case_id:caseId,condition,subject:"GPT-6",prompt_sha256:sha256("identical prompt"),
     response:"Recorded trial response.",scores:Object.fromEntries(dims.map(d=>[d,3])),
     critical_failures:[],evidence:[],assessor:{assessor_id:assessorId,blinded_condition:true,independent:true},
-    adversarial_review:{reviewer_id:"critic-" + assessorId,blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"No unsupported claim found."}]},
+    adversarial_review:{reviewer_id:"critic-" + assessorId,blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"No unsupported claim found."},{check_id:"AC02",outcome:"PASS",finding:"Uncertainty was stated."}]},
     limitations:[],verification_status:"NOT_VERIFIED",created_at:"2026-11-10T00:00:00.000Z"
   };
 }
@@ -44,7 +44,7 @@ test("report keeps operational status on HOLD",()=>{
 });
 
 test("automated record creation hashes the exact prompt and appends atomically",()=>{
-  const trial={case_id:"P01",condition:"baseline",subject:"GPT-6",prompt:"Exact controlled prompt",response:"Captured response",scores:Object.fromEntries(dims.map(d=>[d,3])),assessor:{assessor_id:"reviewer",blinded_condition:true,independent:true},adversarial_review:{reviewer_id:"independent-critic",blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"No critical defect."}]}};
+  const trial={case_id:"P01",condition:"baseline",subject:"GPT-6",prompt:"Exact controlled prompt",response:"Captured response",scores:Object.fromEntries(dims.map(d=>[d,3])),assessor:{assessor_id:"reviewer",blinded_condition:true,independent:true},adversarial_review:{reviewer_id:"independent-critic",blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"No critical defect."},{check_id:"AC02",outcome:"PASS",finding:"Second control reviewed."}]}};
   const record=createRunRecord(trial);
   assert.equal(record.prompt_sha256,sha256(trial.prompt));
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),"genesis-lab-"));
@@ -62,4 +62,12 @@ test("adversarial failures are surfaced and missing independent critic blocks re
   a.adversarial_review.reviewer_id=a.assessor.assessor_id;
   const blocked=buildComparison([b,a]);
   assert.ok(blocked.issues.some(x=>x.includes("must be distinct from scorer")));
+});
+
+test("missing required adversarial check blocks comparison readiness",()=>{
+  const b=record("baseline","score-A");
+  const a=record("architecture_assisted","score-A");
+  a.adversarial_review.checks=a.adversarial_review.checks.filter(x=>x.check_id!=="AC02");
+  const result=buildComparison([b,a]);
+  assert.ok(result.issues.some(x=>x.includes("required adversarial check AC02 missing")));
 });
