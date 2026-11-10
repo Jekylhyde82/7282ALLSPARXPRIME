@@ -23,7 +23,7 @@ Prompts and case-specific adversarial checks are in `cases.json`.
 
 ## Scoring
 
-Eight dimensions, each scored 0–5: accuracy, reasoning, evidence, calibration, capability, reliability, safety, synergy. A low score or critical failure must not be hidden by an aggregate. Assessors must record their rationale and supporting evidence outside this initial runner; the run record retains score, evidence references, critical failures and assessor attestations.
+Eight dimensions, each scored 0–5: accuracy, reasoning, evidence, calibration, capability, reliability, safety, synergy. A low score or critical failure must not be hidden by an aggregate. Assessors must record their rationale and supporting evidence in the external evidence package; the current run record retains scores, evidence references, critical failures and basic assessor attestations. Evaluator calibration, rationale capture and signed identity are not yet programmatically enforced by the runner.
 
 ## Trial protocol
 
@@ -31,7 +31,8 @@ Eight dimensions, each scored 0–5: accuracy, reasoning, evidence, calibration,
 2. Capture raw responses verbatim. Hash the exact prompt with SHA-256 and place the digest in `prompt_sha256`; also record the raw-response SHA-256 in the trial matrix.
 3. Randomize response labels before scoring. Assessors must not know the condition.
 4. Use the same independent blinded scorer for both conditions in each pair to reduce inter-rater confounding. A separate independent adversarial reviewer must assess every response and must not be the scorer.
-5. Record evidence references and critical failures. A score without rationale/evidence is not sufficient for operational approval.
+5. Record evidence references and critical failures, and preserve full scoring rationales in the external evidence package. A score without rationale/evidence is not sufficient for operational approval.
+6. Calibrate the AI scorer and separate AI adversarial reviewer against a held-out human-adjudicated reference set before scoring any experimental output. Follow the evaluator independence, calibration, and human-adjudication controls in [the execution runbook](TRIAL-EXECUTION.md).
 6. Follow [the controlled trial execution runbook](TRIAL-EXECUTION.md) and the operator-only [30-trial execution matrix](evidence/trial-matrix.csv). Keep the condition map away from scorers. Submit **30 records**: five cases × two conditions × three repetitions. Repetition numbers 1, 2, and 3 must be present for every case-condition combination. The comparison runner pairs by case and repetition and reports each paired delta plus per-case mean and min/max across the three repetitions; it never substitutes a single overall average for case-level results.
 
 ## Record format
@@ -82,7 +83,7 @@ node tools/performance-lab/runner.mjs report path/to/records.json reports/compar
 node --test tests/performance-lab.test.mjs
 ```
 
-The comparison engine is fail-closed: a pair produces no comparative delta unless both records have matching canonical-prompt hashes and model subjects, non-empty evidence references with SHA-256 digests, an independent blinded scorer, the same scorer for both conditions, and a separate independent blinded adversarial reviewer with every required check assessed. Duplicate records, missing evidence, incomplete reviews, scorer/reviewer conflicts, recorded critical failures, and failed adversarial checks invalidate that pair. Findings remain visible in the report issues; they are not converted into clean averages.
+The comparison engine is fail-closed for fields represented in its current run-record schema: a pair produces no comparative delta unless both records have matching canonical-prompt hashes and model subjects, non-empty evidence references with SHA-256 digests, an independent blinded scorer, the same scorer for both conditions, and a separate independent blinded adversarial reviewer with every required check assessed. Evaluator calibration and signed identity are external release gates, not yet machine-enforced by the runner. Duplicate records, missing evidence, incomplete reviews, scorer/reviewer conflicts, recorded critical failures, and failed adversarial checks invalidate that pair. Findings remain visible in the report issues; they are not converted into clean averages.
 
 Evidence hashes are integrity identifiers, not proof of authenticity. The runner does not retrieve evidence bytes, validate a hash against an external artifact, authenticate reviewer identity, or verify reviewer signatures. Those controls require an external evidence custodian/release reviewer and signed evidence manifest.
 
