@@ -20,6 +20,17 @@ function record(condition, assessorId, caseId="P01", repetition=1) {
 }
 
 test("valid record passes the declared schema subset",()=>assert.deepEqual(validateRunRecord(record("baseline","A"),schema),[]));
+test("Draft 2020-12 vocabulary is evaluated by the standards-compliant validator",()=>{
+  const draftSchema={$schema:"https://json-schema.org/draft/2020-12/schema",type:"array",minItems:2,prefixItems:[{type:"string"},{type:"integer"}],items:false};
+  assert.deepEqual(validateSchema(["case",2],draftSchema),[]);
+  assert.ok(validateSchema(["case"],draftSchema).length>0);
+  assert.ok(validateSchema(["case",2,3],draftSchema).length>0);
+});
+
+test("repetition index is constrained to one through three",()=>{
+  assert.ok(validateRunRecord({...record("baseline","A"),repetition:4},schema).length>0);
+});
+
 test("invalid score and unknown property are rejected",()=>{
   const bad={...record("baseline","A"),unexpected:true,scores:{...record("baseline","A").scores,accuracy:6}};
   const errors=validateSchema(bad,schema);
