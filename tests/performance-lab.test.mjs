@@ -97,6 +97,7 @@ test("adversarial failures are surfaced and missing independent critic blocks re
   const result=buildComparison([b,a]);
   assert.equal(result.pairs.length,0,"failed adversarial checks must not produce a certifiable comparison delta");
   assert.ok(result.issues.some(x=>x.includes("Unsupported factual assertion")));
+  assert.match(renderReport([b,a]),/Unsupported factual assertion/,"the report must retain rejected critical findings");
   a.adversarial_review.reviewer_id=a.assessor.assessor_id;
   const blocked=buildComparison([b,a]);
   assert.ok(blocked.issues.some(x=>x.includes("distinct from scorer")));
