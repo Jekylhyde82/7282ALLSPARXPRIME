@@ -246,13 +246,23 @@ test("trial matrix validates its complete randomized plan and rejects missing is
   assert.deepEqual(validateTrialMatrix(matrix),[]);
   const lines=matrix.trimEnd().split("\n");
   const values=lines[1].split(",");
+  values[6]="CAPTURED";
+  values[7]="GPT-6";
+  values[8]="Unpersonalized Temporary Chat";
+  values[9]="test-context";
+  values[10]="2026-11-11T00:00:00.000Z";
+  values[11]="default";
+  values[12]="none";
+  values[13]="a".repeat(64);
+  values[14]="test-capture";
   values[17]="FALSE";
+  values[18]="b".repeat(64);
   lines[1]=values.join(",");
-  const errors=validateTrialMatrix(lines.join("\n")+"\\n");
+  const errors=validateTrialMatrix(lines.join("\n")+"\n");
   assert.ok(errors.some(error=>error.includes("Unpersonalized confirmation must be TRUE")));
 });
 
-test("trial matrix rejects duplicate trial identifiers and mismatched paired prompt hashes",()=>{
+test("trial matrix rejects duplicate trial identifiers",()=>{
   const matrix=fs.readFileSync(new URL("../tools/performance-lab/evidence/trial-matrix.csv",import.meta.url),"utf8");
   const lines=matrix.trimEnd().split("\n");
   const baseline=lines.findIndex(line=>line.includes(",P01,1,baseline,"));
@@ -260,6 +270,6 @@ test("trial matrix rejects duplicate trial identifiers and mismatched paired pro
   const b=lines[baseline].split(","), a=lines[assisted].split(",");
   a[1]=b[1]; a[18]="f".repeat(64);
   lines[assisted]=a.join(",");
-  const errors=validateTrialMatrix(lines.join("\n")+"\\n");
+  const errors=validateTrialMatrix(lines.join("\n")+"\n");
   assert.ok(errors.some(error=>error.includes("duplicate trial_id")));
 });
