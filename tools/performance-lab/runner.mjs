@@ -58,12 +58,14 @@ export function signEvidenceManifest(payload, privateKeyPem) {
   };
 }
 
-export function verifyEvidenceManifest(manifest, { publicKeyPem, evidenceRoot, expectedRevision }) {
+export function verifyEvidenceManifest(manifest, { publicKeyPem, evidenceRoot, expectedRevision, expectedSignerId, expectedSignerRole }) {
   const errors = [];
   const manifestSchema = loadJson(path.join(ROOT, "schema/evidence-manifest.schema.json"));
   errors.push(...validateSchema(manifest, manifestSchema));
   if (errors.length) return errors;
   if (manifest.revision !== expectedRevision) errors.push("manifest revision does not match the expected candidate revision");
+  if (expectedSignerId && manifest.signer.signer_id !== expectedSignerId) errors.push("manifest signer ID does not match the externally trusted signer identity");
+  if (expectedSignerRole && manifest.signer.role !== expectedSignerRole) errors.push("manifest signer role does not match the required role");
   let publicKey;
   try {
     publicKey = crypto.createPublicKey(publicKeyPem);
@@ -352,7 +354,7 @@ export function renderReport(records) {
 }
 
 function usage() {
-  console.log("Usage: node tools/performance-lab/runner.mjs record <trial.json> <ledger.json> | validate <ledger.json> | report <ledger.json> <output.md> | sign-manifest <payload.json> <private-key.pem> <output.json> | verify-manifest <manifest.json> <trusted-public-key.pem> <evidence-root> <expected-revision>");
+  console.log("Usage: node tools/performance-lab/runner.mjs record <trial.json> <ledger.json> | validate <ledger.json> | report <ledger.json> <output.md> | sign-manifest <payload.json> <private-key.pem> <output.json> | verify-manifest <manifest.json> <trusted-public-key.pem> <evidence-root> <expected-revision> <expected-signer-id> <expected-signer-role>");
 }
 
 if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
@@ -381,13 +383,15 @@ if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === imp
     if (manifestErrors.length) throw new Error(manifestErrors.join("\\n"));
     fs.writeFileSync(process.argv[5], JSON.stringify(signed, null, 2) + "\\n", { flag: "wx", mode: 0o600 });
     console.log("Signed evidence manifest written to " + process.argv[5]);
-  } else if (command === "verify-manifest" && input && output && process.argv[5] && process.argv[6]) {
+  } else if (command === "verify-manifest" && input && output && process.argv[5] && process.argv[6] && process.argv[7] && process.argv[8]) {
     const manifest = loadJson(input);
     const publicKeyPem = fs.readFileSync(output, "utf8");
     const errors = verifyEvidenceManifest(manifest, {
       publicKeyPem,
       evidenceRoot: process.argv[5],
-      expectedRevision: process.argv[6]
+      expectedRevision: process.argv[6],
+      expectedSignerId: process.argv[7],
+      expectedSignerRole: process.argv[8]
     });
     if (errors.length) {
       console.error(errors.join("\\n"));
