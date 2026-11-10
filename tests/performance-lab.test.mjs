@@ -8,10 +8,10 @@ import path from "node:path";
 const schema = JSON.parse(fs.readFileSync(new URL("../tools/performance-lab/schema/run-record.schema.json", import.meta.url)));
 const cases = JSON.parse(fs.readFileSync(new URL("../tools/performance-lab/cases.json", import.meta.url)));
 const dims = ["accuracy","reasoning","evidence","calibration","capability","reliability","safety","synergy"];
-function record(condition, assessorId, caseId="P01") {
+function record(condition, assessorId, caseId="P01", repetition=1) {
   return {
-    benchmark_id:"GENESIS-PERFORMANCE-LAB-001",run_id:`GPL-20261110-${caseId}-${condition === "baseline" ? "B" : "A"}`,
-    case_id:caseId,condition,subject:"GPT-6",prompt_sha256:sha256("identical prompt"),
+    benchmark_id:"GENESIS-PERFORMANCE-LAB-001",run_id:`GPL-20261110-${caseId}-R${repetition}-${condition === "baseline" ? "B" : "A"}`,
+    case_id:caseId,repetition,condition,subject:"GPT-6",prompt_sha256:sha256("identical prompt"),
     response:"Recorded trial response.",scores:Object.fromEntries(dims.map(d=>[d,3])),
     critical_failures:[],evidence:[{kind:"test fixture",reference:"test://evidence"}],assessor:{assessor_id:assessorId,blinded_condition:true,independent:true},
     adversarial_review:{reviewer_id:"critic-" + assessorId,blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"No unsupported claim found."},{check_id:"AC02",outcome:"PASS",finding:"Uncertainty was stated."}]},
@@ -39,13 +39,37 @@ test("same independent blinded assessor scores both conditions; missing pairs ar
   assert.ok(!result.issues.some(x=>x.includes("different assessors")));
   assert.ok(buildComparison([b]).issues.some(x=>x.includes("missing baseline")));
 });
+test("three repetitions are paired separately and incomplete repetitions are flagged",()=>{
+  const records=[];
+  for (const repetition of [1,2,3]) {
+    const b=record("baseline","same-blinded-scorer","P01",repetition);
+    const a=record("architecture_assisted","same-blinded-scorer","P01",repetition);
+    a.scores.accuracy=repetition+2;
+    records.push(b,a);
+  }
+  const complete=buildComparison(records);
+  assert.equal(complete.pairs.length,3);
+  assert.equal(complete.summaries[0].repetitions_present,3);
+  assert.equal(complete.summaries[0].delta.accuracy.mean,2);
+  const incomplete=buildComparison(records.filter(r=>r.repetition!==3));
+  assert.ok(incomplete.issues.some(x=>x.includes("P01 repetition 3: missing baseline or architecture-assisted run")));
+});
+
+test("duplicate condition within a repetition is rejected from clean pairing",()=>{
+  const b=record("baseline","same-scorer","P01",1);
+  const a=record("architecture_assisted","same-scorer","P01",1);
+  const duplicate=record("baseline","same-scorer","P01",1);
+  const result=buildComparison([b,a,duplicate]);
+  assert.ok(result.issues.some(x=>x.includes("P01: duplicate baseline record")));
+});
+
 test("report keeps operational status on HOLD",()=>{
   const report=renderReport([record("baseline","A"),record("architecture_assisted","B")]);
   assert.match(report,/NOT OPERATIONAL/);
 });
 
 test("automated record creation hashes the exact prompt and appends atomically",()=>{
-  const trial={case_id:"P01",condition:"baseline",subject:"GPT-6",prompt:cases.cases.find(c=>c.id==="P01").prompt,response:"Captured response",scores:Object.fromEntries(dims.map(d=>[d,3])),assessor:{assessor_id:"reviewer",blinded_condition:true,independent:true},adversarial_review:{reviewer_id:"independent-critic",blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"No critical defect."},{check_id:"AC02",outcome:"PASS",finding:"Second control reviewed."}]}};
+  const trial={case_id:"P01",repetition:1,condition:"baseline",subject:"GPT-6",prompt:cases.cases.find(c=>c.id==="P01").prompt,response:"Captured response",scores:Object.fromEntries(dims.map(d=>[d,3])),assessor:{assessor_id:"reviewer",blinded_condition:true,independent:true},adversarial_review:{reviewer_id:"independent-critic",blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"No critical defect."},{check_id:"AC02",outcome:"PASS",finding:"Second control reviewed."}]}};
   const record=createRunRecord(trial);
   assert.equal(record.prompt_sha256,sha256(trial.prompt));
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),"genesis-lab-"));
