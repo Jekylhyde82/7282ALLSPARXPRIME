@@ -70,7 +70,7 @@ export function createRunRecord(input) {
     assessor: input.assessor,
     adversarial_review: input.adversarial_review,
     limitations: input.limitations ?? [],
-    verification_status: input.verification_status ?? "NOT_VERIFIED",
+    verification_status: "NOT_VERIFIED",
     created_at: date
   };
   const errors = validateRunRecord(record);
@@ -114,6 +114,11 @@ export function buildComparison(records) {
     }
     const baseline = group.baseline;
     const assisted = group.architecture_assisted;
+    for (const record of [baseline, assisted]) {
+      if (!Array.isArray(record.evidence) || record.evidence.length === 0) {
+        issues.push(caseId + " " + record.condition + ": no supporting evidence references recorded");
+      }
+    }
     const baselineAssessor = baseline.assessor?.assessor_id;
     const assistedAssessor = assisted.assessor?.assessor_id;
     const independent = baseline.assessor?.independent === true && assisted.assessor?.independent === true;
