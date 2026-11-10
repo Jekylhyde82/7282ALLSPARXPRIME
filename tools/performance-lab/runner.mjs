@@ -67,6 +67,7 @@ export function createRunRecord(input) {
     critical_failures: input.critical_failures ?? [],
     evidence: input.evidence ?? [],
     assessor: input.assessor,
+    adversarial_review: input.adversarial_review,
     limitations: input.limitations ?? [],
     verification_status: input.verification_status ?? "NOT_VERIFIED",
     created_at: date
@@ -118,6 +119,18 @@ export function buildComparison(records) {
     const blinded = baseline.assessor?.blinded_condition === true && assisted.assessor?.blinded_condition === true;
     if (!independent) issues.push(caseId + ": assessor independence not attested");
     if (!blinded) issues.push(caseId + ": blinded scoring not attested");
+    for (const record of [baseline, assisted]) {
+      const review = record.adversarial_review;
+      if (!review || review.independent !== true || review.blinded_condition !== true) {
+        issues.push(caseId + " " + record.condition + ": independent blinded adversarial review missing");
+      }
+      if (review && review.reviewer_id === record.assessor?.assessor_id) {
+        issues.push(caseId + " " + record.condition + ": adversarial reviewer must be distinct from scorer");
+      }
+      for (const check of review?.checks ?? []) {
+        if (check.outcome === "NOT_ASSESSED") issues.push(caseId + " " + record.condition + ": adversarial check " + check.check_id + " not assessed");
+      }
+    }
     if (baselineAssessor && assistedAssessor && baselineAssessor !== assistedAssessor) {
       issues.push(caseId + ": different assessors scored paired conditions; same blinded independent assessor should score both to reduce inter-rater confounding");
     }
@@ -130,7 +143,9 @@ export function buildComparison(records) {
       delta,
       critical_failures: [
         ...baseline.critical_failures.map(x => "baseline: " + x),
-        ...assisted.critical_failures.map(x => "assisted: " + x)
+        ...assisted.critical_failures.map(x => "assisted: " + x),
+        ...(baseline.adversarial_review?.checks ?? []).filter(x => x.outcome === "FAIL").map(x => "baseline adversarial " + x.check_id + ": " + x.finding),
+        ...(assisted.adversarial_review?.checks ?? []).filter(x => x.outcome === "FAIL").map(x => "assisted adversarial " + x.check_id + ": " + x.finding)
       ]
     });
   }
