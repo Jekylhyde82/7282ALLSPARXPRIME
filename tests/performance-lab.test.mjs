@@ -244,22 +244,22 @@ test("signed evidence manifest rejects path traversal and signature tampering",(
 test("trial matrix validates its complete randomized plan and rejects missing isolation confirmation",()=>{
   const matrix=fs.readFileSync(new URL("../tools/performance-lab/evidence/trial-matrix.csv",import.meta.url),"utf8");
   assert.deepEqual(validateTrialMatrix(matrix),[]);
-  const lines=matrix.trimEnd().split("\\n");
+  const lines=matrix.trimEnd().split("\n");
   const values=lines[1].split(",");
   values[17]="FALSE";
   lines[1]=values.join(",");
-  const errors=validateTrialMatrix(lines.join("\\n")+"\\n");
+  const errors=validateTrialMatrix(lines.join("\n")+"\\n");
   assert.ok(errors.some(error=>error.includes("Unpersonalized confirmation must be TRUE")));
 });
 
 test("trial matrix rejects duplicate trial identifiers and mismatched paired prompt hashes",()=>{
   const matrix=fs.readFileSync(new URL("../tools/performance-lab/evidence/trial-matrix.csv",import.meta.url),"utf8");
-  const lines=matrix.trimEnd().split("\\n");
+  const lines=matrix.trimEnd().split("\n");
   const baseline=lines.findIndex(line=>line.includes(",P01,1,baseline,"));
   const assisted=lines.findIndex(line=>line.includes(",P01,1,architecture_assisted,"));
   const b=lines[baseline].split(","), a=lines[assisted].split(",");
   a[1]=b[1]; a[18]="f".repeat(64);
   lines[assisted]=a.join(",");
-  const errors=validateTrialMatrix(lines.join("\\n")+"\\n");
+  const errors=validateTrialMatrix(lines.join("\n")+"\\n");
   assert.ok(errors.some(error=>error.includes("duplicate trial_id")));
 });
