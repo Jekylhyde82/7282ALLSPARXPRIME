@@ -1,7 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { validateSchema, validateRunRecord, buildComparison, renderReport, sha256, createRunRecord, appendRunRecord } from "../tools/performance-lab/runner.mjs";
-import fs from "node:fs";\nimport os from "node:os";\nimport path from "node:path";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 
 const schema = JSON.parse(fs.readFileSync(new URL("../tools/performance-lab/schema/run-record.schema.json", import.meta.url)));
 const dims = ["accuracy","reasoning","evidence","calibration","capability","reliability","safety","synergy"];
@@ -29,10 +31,10 @@ test("pair comparison calculates per-dimension deltas",()=>{
   assert.equal(result.pairs[0].delta.accuracy,2);
   assert.ok(result.issues.every(x=>x.includes("missing baseline or architecture-assisted run")));
 });
-test("missing pair and same assessor are flagged",()=>{
-  const b=record("baseline","same");
-  const result=buildComparison([b,record("architecture_assisted","same")]);
-  assert.ok(result.issues.some(x=>x.includes("same assessor")));
+test("same independent blinded assessor scores both conditions; missing pairs are flagged",()=>{
+  const b=record("baseline","reviewer-independent");
+  const result=buildComparison([b,record("architecture_assisted","reviewer-independent")]);
+  assert.ok(!result.issues.some(x=>x.includes("different assessors")));
   assert.ok(buildComparison([b]).issues.some(x=>x.includes("missing baseline")));
 });
 test("report keeps operational status on HOLD",()=>{
