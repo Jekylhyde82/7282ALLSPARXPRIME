@@ -71,6 +71,10 @@ export function verifyEvidenceManifest(manifest, { publicKeyPem, evidenceRoot, e
     errors.push("trusted public key cannot be parsed");
     return errors;
   }
+  if (publicKey.asymmetricKeyType !== "ed25519") {
+    errors.push("trusted public key must use Ed25519");
+    return errors;
+  }
   const publicDer = publicKey.export({ type: "spki", format: "der" });
   const fingerprint = sha256(publicDer);
   if (fingerprint !== manifest.signature.public_key_sha256) errors.push("manifest signing key fingerprint does not match the externally supplied trusted public key");
