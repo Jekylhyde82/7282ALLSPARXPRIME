@@ -81,7 +81,7 @@ Before scoring experimental outputs, calibrate both AI evaluators on a held-out 
 
 ## Scoring
 
-Use the versioned [SCORING-RUBRIC.md](SCORING-RUBRIC.md) for all eight dimensions. The common ordinal anchors and dimension-specific definitions are mandatory; retain a rationale and supporting response evidence for every score. Record critical failures separately; they cannot be offset by high scores elsewhere. The exact rubric hash must be frozen before calibration and included in the evidence manifest. The rubric is proposed pending approval by at least two qualified human reviewers. Numerical calibration acceptance thresholds must be approved and signed before either evaluator sees experimental outputs; do not invent or tune thresholds after seeing trial results. No experimental scoring may begin until this calibration gate passes.
+Use the versioned [SCORING-RUBRIC.md](SCORING-RUBRIC.md) for all eight dimensions. The common ordinal anchors and dimension-specific definitions are mandatory; retain a rationale and supporting response evidence for every score. Record critical failures separately; they cannot be offset by high scores elsewhere. The exact rubric hash must be frozen before calibration and included in the evidence manifest. The rubric is proposed pending approval by at least two qualified human reviewers. Complete [CALIBRATION-PLAN-TEMPLATE.md](CALIBRATION-PLAN-TEMPLATE.md); numerical calibration acceptance thresholds must be approved and signed before either evaluator sees experimental outputs. Do not invent or tune thresholds after seeing trial results. No experimental scoring may begin until this calibration gate passes.
 
 ## Completion gate
 
