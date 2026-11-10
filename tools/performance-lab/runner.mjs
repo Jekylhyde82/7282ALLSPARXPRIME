@@ -474,7 +474,11 @@ function usage() {
 
 if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
   const [command, input, output] = process.argv.slice(2);
-  if (command === "validate-matrix" && input) {\n    const errors = validateTrialMatrix(fs.readFileSync(input, "utf8"));\n    if (errors.length) { console.error(errors.join("\\n")); process.exitCode = 1; }\n    else console.log("Validated all 30 planned trial rows; capture gates are enforced for any started trial.");\n  } else if (command === "record" && input && output) {
+  if (command === "validate-matrix" && input) {
+    const errors = validateTrialMatrix(fs.readFileSync(input, "utf8"));
+    if (errors.length) { console.error(errors.join("\n")); process.exitCode = 1; }
+    else console.log("Validated all 30 planned trial rows; capture gates are enforced for any started trial.");
+  } else if (command === "record" && input && output) {
     const payload = loadJson(input);
     const record = createRunRecord(payload);
     const count = appendRunRecord(record, output);
