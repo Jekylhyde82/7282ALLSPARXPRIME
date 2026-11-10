@@ -7,6 +7,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const SCHEMA_PATH = path.join(ROOT, "schema/run-record.schema.json");
 const CASES_PATH = path.join(ROOT, "cases.json");
+const INSTRUCTION_PATH = path.join(ROOT, "ARCHITECTURE-INSTRUCTION.txt");
 const DIMENSIONS = ["accuracy","reasoning","evidence","calibration","capability","reliability","safety","synergy"];
 
 function loadJson(file) {
@@ -171,20 +172,26 @@ const MATRIX_COLUMNS = [
 
 export function parseCsv(text) {
   const rows = [];
-  let row = [], field = "", quoted = false;
+  let row = [], field = "", quoted = false, afterQuote = false;
   for (let i = 0; i < text.length; i++) {
     const char = text[i];
     if (quoted) {
       if (char === '"' && text[i + 1] === '"') { field += '"'; i++; }
-      else if (char === '"') quoted = false;
+      else if (char === '"') { quoted = false; afterQuote = true; }
       else field += char;
+    } else if (afterQuote) {
+      if (char === ",") { row.push(field); field = ""; afterQuote = false; }
+      else if (char === "\n") { row.push(field); if (row.some(value => value !== "")) rows.push(row); row = []; field = ""; afterQuote = false; }
+      else if (char === "\r" && text[i + 1] === "\n") { row.push(field); if (row.some(value => value !== "")) rows.push(row); row = []; field = ""; afterQuote = false; i++; }
+      else throw new Error("CSV contains characters after a closing quote.");
     } else if (char === '"' && field.length === 0) quoted = true;
+    else if (char === '"') throw new Error("CSV contains a quote inside an unquoted field.");
     else if (char === ",") { row.push(field); field = ""; }
     else if (char === "\n") { row.push(field.replace(/\r$/, "")); if (row.some(value => value !== "")) rows.push(row); row = []; field = ""; }
     else field += char;
   }
   if (quoted) throw new Error("CSV contains an unterminated quoted field.");
-  if (field.length || row.length) { row.push(field.replace(/\r$/, "")); if (row.some(value => value !== "")) rows.push(row); }
+  if (afterQuote || field.length || row.length) { row.push(field.replace(/\r$/, "")); if (row.some(value => value !== "")) rows.push(row); }
   return rows;
 }
 
@@ -196,6 +203,7 @@ export function validateTrialMatrix(csvText) {
   if (!rows.length) return ["trial matrix is empty"];
   if (JSON.stringify(rows[0]) !== JSON.stringify(MATRIX_COLUMNS)) return ["trial matrix header does not match the required 20-column protocol 1.5 format"];
   if (rows.length !== 31) errors.push("trial matrix must contain exactly 30 trial rows");
+  const casePrompts = new Map(loadJson(CASES_PATH).cases.map(item => [item.id, item.prompt]));
   const seenTrialIds = new Set(), seenBlindLabels = new Set(), combinations = new Set();
   const records = [];
   for (let i = 1; i < rows.length; i++) {
@@ -209,7 +217,7 @@ export function validateTrialMatrix(csvText) {
     if (seenTrialIds.has(row.trial_id)) errors.push("row " + line + ": duplicate trial_id " + row.trial_id);
     if (seenBlindLabels.has(row.blind_label)) errors.push("row " + line + ": duplicate blind_label " + row.blind_label);
     seenTrialIds.add(row.trial_id); seenBlindLabels.add(row.blind_label);
-    if (!["P01","P02","P03","P04","P05"].includes(row.case_id)) errors.push("row " + line + ": invalid case_id");
+    if (!casePrompts.has(row.case_id)) errors.push("row " + line + ": invalid case_id");
     if (!["1","2","3"].includes(row.repetition)) errors.push("row " + line + ": repetition must be 1, 2, or 3");
     if (!["baseline","architecture_assisted"].includes(row.condition)) errors.push("row " + line + ": invalid condition");
     if (!["NOT_RUN","CAPTURED","ASSESSED"].includes(row.status)) errors.push("row " + line + ": invalid status");
@@ -230,8 +238,10 @@ export function validateTrialMatrix(csvText) {
     if (!row.tools_used) errors.push("row " + line + ": captured trial must explicitly record tools_used (use none when unused)");
     if (!row.capture_reference) errors.push("row " + line + ": captured trial requires capture_reference");
     if (row.unpersonalized_confirmed !== "TRUE") errors.push("row " + line + ": Unpersonalized confirmation must be TRUE");
-    for (const key of ["raw_response_sha256","canonical_prompt_sha256"]) if (!/^[a-f0-9]{64}$/.test(row[key])) errors.push("row " + line + ": " + key + " must be a SHA-256 digest");
-    if (row.condition === "architecture_assisted" && !/^[a-f0-9]{64}$/.test(row.architecture_instruction_sha256)) errors.push("row " + line + ": assisted trial requires architecture_instruction_sha256");
+    if (!/^[a-f0-9]{64}$/.test(row.raw_response_sha256)) errors.push("row " + line + ": raw_response_sha256 must be a SHA-256 digest");
+    const canonicalPromptHash = sha256(casePrompts.get(row.case_id) ?? "");
+    if (row.canonical_prompt_sha256 !== canonicalPromptHash) errors.push("row " + line + ": canonical_prompt_sha256 does not match the registered case prompt");
+    if (row.condition === "architecture_assisted" && row.architecture_instruction_sha256 !== sha256(fs.readFileSync(INSTRUCTION_PATH, "utf8"))) errors.push("row " + line + ": architecture_instruction_sha256 does not match the frozen architecture instruction");
     if (row.condition === "baseline" && row.architecture_instruction_sha256) errors.push("row " + line + ": baseline trial must not contain architecture_instruction_sha256");
     if (row.status === "CAPTURED" && (row.scorer_id || row.adversarial_reviewer_id)) errors.push("row " + line + ": CAPTURED trial must not contain assessor identities before blinded assessment");
     if (row.status === "ASSESSED" && (!row.scorer_id || !row.adversarial_reviewer_id || row.scorer_id === row.adversarial_reviewer_id)) errors.push("row " + line + ": assessed trial requires distinct scorer and adversarial reviewer IDs");
@@ -254,7 +264,6 @@ export function validateTrialMatrix(csvText) {
   }
   return errors;
 }
-
 export function createRunRecord(input) {
   if (!input || typeof input !== "object" || Array.isArray(input)) throw new Error("Trial input must be a JSON object.");
   if (typeof input.response !== "string" || !input.response.length) throw new Error("Trial input requires the complete verbatim response.");
@@ -265,10 +274,10 @@ export function createRunRecord(input) {
   if (!input.trial_execution || input.trial_execution.unpersonalized_confirmed !== true) throw new Error("Trial execution must explicitly confirm an Unpersonalized Temporary Chat.");
   if (input.trial_execution.context_type !== "Unpersonalized Temporary Chat") throw new Error("Trial execution context must be an Unpersonalized Temporary Chat.");
   if (input.trial_execution.model_label !== input.subject) throw new Error("Trial execution model label must match the run-record subject.");
-  if (!input.trial_execution.context_reference || !input.trial_execution.captured_at || Number.isNaN(Date.parse(input.trial_execution.captured_at))) throw new Error("Trial execution requires a context reference and valid capture timestamp.");
+  if (!input.trial_execution.context_reference || !isRfc3339Timestamp(input.trial_execution.captured_at)) throw new Error("Trial execution requires a context reference and valid capture timestamp.");
   if (!input.trial_execution.settings || !input.trial_execution.tools_used || !input.trial_execution.capture_reference) throw new Error("Trial execution requires settings, tools-used and capture-reference metadata.");
   if (input.trial_execution.canonical_prompt_sha256 !== sha256(input.prompt)) throw new Error("Trial execution canonical prompt hash does not match the exact canonical prompt.");
-  if (input.condition === "architecture_assisted" && !/^[a-f0-9]{64}$/.test(input.trial_execution.architecture_instruction_sha256 ?? "")) throw new Error("Architecture-assisted trials require the architecture instruction SHA-256.");
+  if (input.condition === "architecture_assisted" && input.trial_execution.architecture_instruction_sha256 !== sha256(fs.readFileSync(INSTRUCTION_PATH, "utf8"))) throw new Error("Architecture-assisted trials require the SHA-256 of the frozen architecture instruction.");
   if (input.condition === "baseline" && input.trial_execution.architecture_instruction_sha256 != null) throw new Error("Baseline trials must not contain an architecture instruction hash.");
   const date = new Date().toISOString();
   const runId = "GPL-" + date.replace(/[-:.TZ]/g, "").slice(0, 14) + "-" + (input.case_id ?? "XX") + "-" + (input.condition ?? "unknown") + "-" + crypto.randomUUID().slice(0, 8);
