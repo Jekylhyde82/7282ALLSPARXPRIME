@@ -287,6 +287,7 @@ test("RFC 3339 timestamps reject impossible dates and malformed offsets",()=>{
 });
 
 test("calibration plan requires frozen thresholds, distinct evaluators and two independent human approvals",()=>{
+  // These are fixture-only values to exercise schema validation, not recommended operational thresholds.
   const evaluator=(id)=>({evaluator_id:id,provider:"provider",model:"model",version:"1",instruction_sha256:"a".repeat(64),configuration_reference:"evidence://evaluator"});
   const reviewer=(id)=>({reviewer_id:id,qualification_basis:"Independent qualified reviewer",independent:true,decision:"APPROVE",approved_at:"2026-11-11T00:00:00Z",signed_statement_reference:"evidence://approval-"+id,signing_key_sha256:"b".repeat(64)});
   const plan={
