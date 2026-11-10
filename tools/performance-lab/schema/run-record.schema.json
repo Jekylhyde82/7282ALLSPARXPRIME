@@ -21,7 +21,8 @@
     "verification_status",
     "created_at",
     "adversarial_review",
-    "assessment"
+    "assessment",
+    "trial_execution"
   ],
   "properties": {
     "benchmark_id": {
@@ -391,6 +392,55 @@
           }
         }
       }
+    },
+    "trial_execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trial_id",
+        "blind_label",
+        "unpersonalized_confirmed",
+        "context_reference",
+        "captured_at",
+        "canonical_prompt_sha256",
+        "raw_response_sha256"
+      ],
+      "properties": {
+        "trial_id": {
+          "type": "string",
+          "pattern": "^TRIAL-[0-9]{3}$"
+        },
+        "blind_label": {
+          "type": "string",
+          "pattern": "^BLIND-[0-9]{3}$"
+        },
+        "unpersonalized_confirmed": {
+          "const": true
+        },
+        "context_reference": {
+          "type": "string",
+          "minLength": 1
+        },
+        "captured_at": {
+          "type": "string",
+          "minLength": 20
+        },
+        "canonical_prompt_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "raw_response_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "architecture_instruction_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
     }
   }
-}
+}\n
