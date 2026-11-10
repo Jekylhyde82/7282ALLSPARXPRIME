@@ -18,7 +18,8 @@
     "assessor",
     "limitations",
     "verification_status",
-    "created_at"
+    "created_at",
+    "adversarial_review"
   ],
   "properties": {
     "benchmark_id": {
@@ -180,6 +181,57 @@
     "created_at": {
       "type": "string",
       "minLength": 20
+    },
+    "adversarial_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reviewer_id",
+        "blinded_condition",
+        "independent",
+        "checks"
+      ],
+      "properties": {
+        "reviewer_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "blinded_condition": {
+          "type": "boolean"
+        },
+        "independent": {
+          "type": "boolean"
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "check_id",
+              "outcome",
+              "finding"
+            ],
+            "properties": {
+              "check_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "PASS",
+                  "FAIL",
+                  "NOT_ASSESSED"
+                ]
+              },
+              "finding": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
