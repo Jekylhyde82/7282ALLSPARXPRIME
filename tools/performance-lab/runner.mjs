@@ -5,6 +5,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const SCHEMA_PATH = path.join(ROOT, "schema/run-record.schema.json");
+const CASES_PATH = path.join(ROOT, "cases.json");
 const DIMENSIONS = ["accuracy","reasoning","evidence","calibration","capability","reliability","safety","synergy"];
 
 function loadJson(file) {
@@ -127,6 +128,12 @@ export function buildComparison(records) {
       if (review && review.reviewer_id === record.assessor?.assessor_id) {
         issues.push(caseId + " " + record.condition + ": adversarial reviewer must be distinct from scorer");
       }
+      const expectedChecks = (loadJson(CASES_PATH).cases.find(c => c.id === caseId)?.adversarial_checks ?? []).map(x => x.check_id);
+      const observedChecks = (review?.checks ?? []).map(x => x.check_id);
+      for (const expected of expectedChecks) {
+        if (!observedChecks.includes(expected)) issues.push(caseId + " " + record.condition + ": required adversarial check " + expected + " missing");
+      }
+      if (new Set(observedChecks).size !== observedChecks.length) issues.push(caseId + " " + record.condition + ": duplicate adversarial check IDs");
       for (const check of review?.checks ?? []) {
         if (check.outcome === "NOT_ASSESSED") issues.push(caseId + " " + record.condition + ": adversarial check " + check.check_id + " not assessed");
       }
