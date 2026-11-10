@@ -90,7 +90,10 @@ export function buildComparison(records) {
     const key = record.case_id + ":" + record.repetition;
     if (!grouped.has(key)) grouped.set(key, {});
     const group = grouped.get(key);
-    if (group[record.condition]) issues.push(record.case_id + ": duplicate " + record.condition + " record for repetition " + record.repetition);
+    if (group[record.condition]) {
+      issues.push(record.case_id + ": duplicate " + record.condition + " record for repetition " + record.repetition);
+      group.invalid = true;
+    }
     group[record.condition] = record;
   }
   for (const caseId of ["P01","P02","P03","P04","P05"]) {
@@ -100,10 +103,18 @@ export function buildComparison(records) {
       issues.push(caseId + " repetition " + repetition + ": missing baseline or architecture-assisted run");
       continue;
     }
+    if (group.invalid) continue;
     const baseline = group.baseline;
     const assisted = group.architecture_assisted;
-    if (baseline.prompt_sha256 !== assisted.prompt_sha256) issues.push(caseId + ": paired prompts differ; comparison is invalid");
-    if (baseline.subject !== assisted.subject) issues.push(caseId + ": paired model subjects differ; comparison is invalid");
+    let invalidPair = false;
+    if (baseline.prompt_sha256 !== assisted.prompt_sha256) {
+      issues.push(caseId + ": paired prompts differ; comparison is invalid");
+      invalidPair = true;
+    }
+    if (baseline.subject !== assisted.subject) {
+      issues.push(caseId + ": paired model subjects differ; comparison is invalid");
+      invalidPair = true;
+    }
     for (const record of [baseline, assisted]) {
       if (!Array.isArray(record.evidence) || record.evidence.length === 0) {
         issues.push(caseId + " " + record.condition + ": no supporting evidence references recorded");
@@ -135,7 +146,9 @@ export function buildComparison(records) {
     }
     if (baselineAssessor && assistedAssessor && baselineAssessor !== assistedAssessor) {
       issues.push(caseId + ": different assessors scored paired conditions; same blinded independent assessor should score both to reduce inter-rater confounding");
+      invalidPair = true;
     }
+    if (invalidPair) continue;
     const delta = {};
     for (const dimension of DIMENSIONS) delta[dimension] = assisted.scores[dimension] - baseline.scores[dimension];
     pairs.push({
