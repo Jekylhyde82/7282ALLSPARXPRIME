@@ -13,6 +13,7 @@ function record(condition, assessorId, caseId="P01") {
     case_id:caseId,condition,subject:"GPT-6",prompt_sha256:sha256("identical prompt"),
     response:"Recorded trial response.",scores:Object.fromEntries(dims.map(d=>[d,3])),
     critical_failures:[],evidence:[],assessor:{assessor_id:assessorId,blinded_condition:true,independent:true},
+    adversarial_review:{reviewer_id:"critic-" + assessorId,blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"No unsupported claim found."}]},
     limitations:[],verification_status:"NOT_VERIFIED",created_at:"2026-11-10T00:00:00.000Z"
   };
 }
@@ -43,7 +44,7 @@ test("report keeps operational status on HOLD",()=>{
 });
 
 test("automated record creation hashes the exact prompt and appends atomically",()=>{
-  const trial={case_id:"P01",condition:"baseline",subject:"GPT-6",prompt:"Exact controlled prompt",response:"Captured response",scores:Object.fromEntries(dims.map(d=>[d,3])),assessor:{assessor_id:"reviewer",blinded_condition:true,independent:true}};
+  const trial={case_id:"P01",condition:"baseline",subject:"GPT-6",prompt:"Exact controlled prompt",response:"Captured response",scores:Object.fromEntries(dims.map(d=>[d,3])),assessor:{assessor_id:"reviewer",blinded_condition:true,independent:true},adversarial_review:{reviewer_id:"independent-critic",blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"No critical defect."}]}};
   const record=createRunRecord(trial);
   assert.equal(record.prompt_sha256,sha256(trial.prompt));
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),"genesis-lab-"));
@@ -51,4 +52,14 @@ test("automated record creation hashes the exact prompt and appends atomically",
   assert.equal(appendRunRecord(record,ledger),1);
   assert.equal(JSON.parse(fs.readFileSync(ledger,"utf8")).length,1);
   fs.rmSync(dir,{recursive:true,force:true});
+});
+
+test("adversarial failures are surfaced and missing independent critic blocks readiness",()=>{
+  const b=record("baseline","score-A"),a=record("architecture_assisted","score-A");
+  a.adversarial_review.checks[0]={check_id:"AC01",outcome:"FAIL",finding:"Unsupported factual assertion."};
+  const result=buildComparison([b,a]);
+  assert.ok(result.pairs[0].critical_failures.some(x=>x.includes("Unsupported factual assertion")));
+  a.adversarial_review.reviewer_id=a.assessor.assessor_id;
+  const blocked=buildComparison([b,a]);
+  assert.ok(blocked.issues.some(x=>x.includes("must be distinct from scorer")));
 });
