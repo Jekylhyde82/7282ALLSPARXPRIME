@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { validateSchema, validateRunRecord, buildComparison, renderReport, sha256, createRunRecord, appendRunRecord, verifyEvidenceManifest, canonicalize, signEvidenceManifest, validateTrialMatrix } from "../tools/performance-lab/runner.mjs";
+import { validateSchema, validateRunRecord, buildComparison, renderReport, sha256, createRunRecord, appendRunRecord, verifyEvidenceManifest, canonicalize, signEvidenceManifest, validateTrialMatrix, isRfc3339Timestamp } from "../tools/performance-lab/runner.mjs";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -272,4 +272,14 @@ test("trial matrix rejects duplicate trial identifiers",()=>{
   lines[assisted]=a.join(",");
   const errors=validateTrialMatrix(lines.join("\n")+"\n");
   assert.ok(errors.some(error=>error.includes("duplicate trial_id")));
+});
+
+test("RFC 3339 timestamps reject impossible dates and malformed offsets",()=>{
+  assert.equal(isRfc3339Timestamp("2026-11-10T00:00:00.000Z"),true);
+  assert.equal(isRfc3339Timestamp("2026-11-10T10:00:00+10:00"),true);
+  assert.equal(isRfc3339Timestamp("2026-02-30T00:00:00Z"),false);
+  assert.equal(isRfc3339Timestamp("2026-11-10 00:00:00Z"),false);
+  assert.equal(isRfc3339Timestamp("2026-11-10T25:00:00Z"),false);
+  const invalid={...record("baseline","A"),created_at:"2026-02-30T00:00:00Z"};
+  assert.ok(validateRunRecord(invalid,schema).some(error=>error.includes("valid RFC 3339 timestamp")));
 });
