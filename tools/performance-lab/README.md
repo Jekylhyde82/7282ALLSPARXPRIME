@@ -127,7 +127,7 @@ Commands:
 node tools/performance-lab/runner.mjs sign-manifest payload.json /secure/path/custodian-private-key.pem evidence-manifest.json
 
 # Verify signature, key fingerprint, revision binding, and evidence bytes
-node tools/performance-lab/runner.mjs verify-manifest evidence-manifest.json /secure/path/trusted-custodian-public-key.pem evidence/ <candidate-commit-sha> <trusted-signer-id> evidence-custodian <trusted-signer-id> evidence-custodian
+node tools/performance-lab/runner.mjs verify-manifest evidence-manifest.json /secure/path/trusted-custodian-public-key.pem evidence/ <candidate-commit-sha> <trusted-signer-id> evidence-custodian
 ```
 
 The manifest signs a deterministic canonical JSON representation of every manifest field except `signature`. Artifact paths must be relative to the evidence root and cannot escape it. Signature verification proves possession of a private key, not the real-world identity of its holder. The verifier enforces the expected signer ID and role supplied by the independent trust record; it cannot create that trust record.
