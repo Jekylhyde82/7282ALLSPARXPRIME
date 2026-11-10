@@ -111,7 +111,8 @@ The `repetition` field must be 1, 2, or 3. The example is a format illustration 
 ## Commands
 
 ```bash
-node tools/performance-lab/runner.mjs record path/to/trial-input.json path/to/records.json\nnode tools/performance-lab/runner.mjs validate path/to/records.json
+node tools/performance-lab/runner.mjs record path/to/trial-input.json path/to/records.json
+node tools/performance-lab/runner.mjs validate path/to/records.json
 node tools/performance-lab/runner.mjs report path/to/records.json reports/comparison.md
 node --test tests/performance-lab.test.mjs
 ```
