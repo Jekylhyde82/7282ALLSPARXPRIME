@@ -1,7 +1,7 @@
 # Experimental Trial Execution Runbook
 
 **Benchmark:** GENESIS-PERFORMANCE-LAB-001  
-**Protocol version:** 1.4  
+**Protocol version:** 1.5  
 **Required trials:** 30 (5 cases × 2 conditions × 3 repetitions)  
 **Status:** PRE-REGISTERED — ALL TRIALS NOT RUN
 
@@ -25,7 +25,7 @@ This is a prompt/context intervention benchmark. It does not test model-weight c
 7. Keep tools disabled or unused for both conditions. The five canonical prompts are designed to be answerable without external research. If a tool is used in one condition, the paired trial is invalid unless the same tool and information are made available to both.
 8. Do not change model, available settings, output constraints, or task prompt between paired trials.
 9. Capture the full response verbatim. Do not edit, summarize, or remove mistakes.
-10. Record the trial ID, blind label, case, repetition, condition, exact model label, context type, explicit `unpersonalized_confirmed=TRUE`, a non-sensitive context reference, capture timestamp, available settings, tools used, canonical prompt SHA-256, architecture-instruction SHA-256 for assisted trials, and raw-response SHA-256 in the matrix. A blank or FALSE isolation confirmation invalidates the trial; do not count it among the 30. Preserve each raw response as an immutable artifact. Add its evidence reference and matching SHA-256 digest to the run record. If the UI exposes no context ID, use a unique operator-generated context reference; never place account secrets in the matrix.
+10. Record the trial ID, blind label, case, repetition, condition, exact model label, context type, explicit `unpersonalized_confirmed=TRUE`, a non-sensitive context reference, capture timestamp, available settings, tools used, canonical prompt SHA-256, architecture-instruction SHA-256 for assisted trials, and raw-response SHA-256 in the matrix. Run `node tools/performance-lab/runner.mjs validate-matrix tools/performance-lab/evidence/trial-matrix.csv` after each matrix update; any reported error blocks the trial or pair. A blank or FALSE isolation confirmation invalidates the trial; do not count it among the 30. Preserve each raw response as an immutable artifact. Add its evidence reference and matching SHA-256 digest to the run record. If the UI exposes no context ID, use a unique operator-generated context reference; never place account secrets in the matrix.
 11. Keep the execution map private from scorers and adversarial reviewers. Give assessors only blind labels and raw responses.
 12. Complete three repetitions for every case-condition combination. Do not replace failed or poor outputs; record failures and repeat only under a documented protocol.
 
@@ -76,7 +76,7 @@ Before scoring experimental outputs, calibrate both AI evaluators on a held-out 
 - The AI scorer and AI adversarial reviewer must not be the same model instance, agent, provider account, or shared conversation. Record known common dependencies.
 - A human adjudicator must review every critical failure, every disagreement that could change a pair's eligibility or comparative conclusion, and any suspected evaluator bias. Preserve the original AI outputs; adjudication supplements rather than overwrites them.
 - Assessor identity, blinding, evaluator configuration, and evidence provenance must be independently checked; self-attestation alone is not authentication.
-- Every comparison pair is fail-closed for missing evidence references or SHA-256 digests, incomplete scorer/reviewer attestations, scorer/reviewer conflicts, missing or duplicate adversarial checks, any NOT_ASSESSED check, critical/adversarial failures, missing evaluator calibration PASS evidence, missing calibration references/hashes, evaluator identity mismatches, and missing per-dimension rationales. These checks are enforced by the current run-record schema and comparison runner. The runner validates the supplied calibration metadata and digest format; it does not independently validate the referenced calibration artifact bytes or prove evaluator quality.
+- Every comparison pair is fail-closed for missing evidence references or SHA-256 digests, incomplete scorer/reviewer attestations, scorer/reviewer conflicts, missing or duplicate adversarial checks, any NOT_ASSESSED check, critical/adversarial failures, missing evaluator calibration PASS evidence, missing calibration references/hashes, evaluator identity mismatches, and missing per-dimension rationales. These checks are enforced by the current run-record schema and comparison runner. The runner validates the supplied calibration metadata and digest format; the run-record schema now requires trial execution metadata, the runner recomputes the raw-response hash, and `validate-matrix` enforces the operator CSV isolation/provenance gate; it does not independently validate the referenced calibration artifact bytes or prove evaluator quality.
 - A SHA-256 digest establishes a content fingerprint only when checked against the retained artifact. It does not authenticate who captured, scored, or reviewed that artifact. Retain independently signed reviewer statements and an evidence manifest outside the run-record self-attestations.
 
 ## Scoring
