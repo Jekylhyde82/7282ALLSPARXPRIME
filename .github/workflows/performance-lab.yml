@@ -36,3 +36,5 @@ jobs:
         run: node --test tests/performance-lab.test.mjs
       - name: Validate benchmark case definitions
         run: node -e "const c=require('./tools/performance-lab/cases.json'); if(c.cases.length!==5 || new Set(c.cases.map(x=>x.id)).size!==5) process.exit(1); console.log('Five unique benchmark cases validated.')"
+      - name: Validate 30-row trial matrix and isolation gates
+        run: node tools/performance-lab/runner.mjs validate-matrix tools/performance-lab/evidence/trial-matrix.csv
