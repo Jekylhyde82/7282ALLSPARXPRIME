@@ -48,7 +48,7 @@ This register distinguishes defects in the implemented toolchain from deliberate
 10. Obtain independent release approval against the exact final candidate revision.
 11. Enforce protocol 1.4 matrix isolation and provenance columns during execution and manifest review.
 
-## Acceptance policy
+| PL-014 | Critical | Operator-matrix isolation and capture provenance were documented but not enforced by the runner; run records did not bind trial IDs/context confirmation to response bytes. | **IMPLEMENTED — CURRENT-HEAD CI REQUIRED** | Added strict 20-column CSV validation for all 30 planned rows, unique trial/blind IDs, exact pair coverage, capture-state metadata, Unpersonalized confirmation, prompt/instruction/response hashes, and assessor separation for assessed rows. Run records now require trial_execution metadata and recompute the raw-response SHA-256. The comparison engine rejects missing/invalid trial provenance. Independent operator confirmation and identity authentication remain external. |\n\n## Acceptance policy
 
 No item is silently closed. Every code-level resolution requires a commit reference and successful tests on the exact revision. Every experimental/governance resolution requires its own inspectable evidence and independent review. Do not mark an issue resolved solely because documentation says it is resolved.
 
