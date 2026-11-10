@@ -53,6 +53,11 @@ Example trial-input skeleton (scores are placeholders, not results):
     "trial_id": "TRIAL-001",
     "blind_label": "BLIND-001",
     "unpersonalized_confirmed": true,
+    "context_type": "Unpersonalized Temporary Chat",
+    "model_label": "GPT-6",
+    "settings": "Record the actual visible settings",
+    "tools_used": "none",
+    "capture_reference": "REPLACE_WITH_CAPTURE_ARTIFACT_REFERENCE",
     "context_reference": "operator-generated-context-reference",
     "captured_at": "2026-11-11T00:00:00.000Z",
     "canonical_prompt_sha256": "REPLACE_WITH_CANONICAL_PROMPT_SHA256"
