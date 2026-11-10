@@ -23,7 +23,7 @@ Prompts and case-specific adversarial checks are in `cases.json`.
 
 ## Scoring
 
-Eight dimensions are scored 0–5 using the anchored [SCORING-RUBRIC.md](SCORING-RUBRIC.md): accuracy, reasoning, evidence, calibration, capability, reliability, safety, and synergy. A low score or critical failure must not be hidden by an aggregate. Assessors must record a rationale and supporting response evidence for every dimension. The rubric is proposed pending approval by two qualified human reviewers. Calibration acceptance thresholds must be signed and frozen before evaluators see experimental outputs; no trial scoring may begin until calibration passes.
+Eight dimensions are scored 0–5 using the anchored [SCORING-RUBRIC.md](SCORING-RUBRIC.md): accuracy, reasoning, evidence, calibration, capability, reliability, safety, and synergy. A low score or critical failure must not be hidden by an aggregate. Assessors must record a rationale and supporting response evidence for every dimension. The rubric is proposed pending approval by two qualified human reviewers. Complete [CALIBRATION-PLAN-TEMPLATE.md](CALIBRATION-PLAN-TEMPLATE.md), sign and freeze all acceptance thresholds before evaluators see experimental outputs; no trial scoring may begin until calibration passes.
 
 ## Trial protocol
 
