@@ -69,6 +69,39 @@ Example trial-input skeleton (scores are placeholders, not results):
       {"check_id": "AC02", "outcome": "PASS", "finding": "Explain the evidence for this finding."}
     ]
   },
+  "assessment": {
+      "protocol_version": "1.0",
+      "scorer": {
+          "evaluator_id": "independent-scorer-A",
+          "provider": "REPLACE",
+          "model": "REPLACE",
+          "version": "REPLACE",
+          "instruction_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "calibration_status": "PASS",
+          "calibration_reference": "REPLACE_WITH_CALIBRATION_ARTIFACT",
+          "calibration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "adversarial_reviewer": {
+          "evaluator_id": "independent-critic-A",
+          "provider": "REPLACE",
+          "model": "REPLACE",
+          "version": "REPLACE",
+          "instruction_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "calibration_status": "PASS",
+          "calibration_reference": "REPLACE_WITH_CALIBRATION_ARTIFACT",
+          "calibration_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+      },
+      "rationales": {
+          "accuracy": "PLACEHOLDER: explain the evidence supporting the accuracy score.",
+          "reasoning": "PLACEHOLDER: explain the evidence supporting the reasoning score.",
+          "evidence": "PLACEHOLDER: explain the evidence supporting the evidence score.",
+          "calibration": "PLACEHOLDER: explain the evidence supporting the calibration score.",
+          "capability": "PLACEHOLDER: explain the evidence supporting the capability score.",
+          "reliability": "PLACEHOLDER: explain the evidence supporting the reliability score.",
+          "safety": "PLACEHOLDER: explain the evidence supporting the safety score.",
+          "synergy": "PLACEHOLDER: explain the evidence supporting the synergy score."
+      }
+  },
   "limitations": []
 }
 ```
