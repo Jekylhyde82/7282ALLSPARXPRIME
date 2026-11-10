@@ -47,13 +47,36 @@ The operator-only execution order is recorded in `evidence/trial-matrix.csv`. Th
 
 ## Independent scoring and adversarial review
 
-- A scorer who did not design or execute the architecture intervention must score all blind-labelled responses without seeing condition labels.
-- Use the same blinded scorer for paired responses to reduce inter-rater confounding.
-- A separate adversarial reviewer must assess both required case-specific adversarial checks for every response.
-- The reviewer must not be the scorer and must not see condition labels.
+### Assessment model
+
+Use a hybrid assessment system. Human assessors are not required to score every response, but human governance is required to establish the calibration set, resolve material disputes, review critical failures, and approve the final evidence package.
+
+- **AI scorer:** A separately operated evaluator scores all blind-labelled responses against the eight-dimension rubric. It must not be the GPT-6 subject instance, the architecture-assisted subject conversation, or an evaluator embedded in the system under test.
+- **AI adversarial reviewer:** A second, separately operated evaluator checks both required case-specific adversarial checks for every response. It must not be the scorer and must independently assess critical failures.
+- **Human governance reviewers:** At least two qualified human reviewers establish/adjudicate the calibration reference set. A human reviewer examines every critical failure, every material scorer/reviewer disagreement, and the final revision-bound evidence manifest before release approval.
+- Prefer different model providers and model families for scorer and adversarial reviewer. If that is unavailable, use distinct model versions and independently configured evaluator environments, document the shared dependencies, and treat independence as reduced rather than assumed.
+- Freeze evaluator model/version, system instructions, rubric, sampling settings, tool policy, and scoring schema before unblinding. Record these in the evidence manifest. Evaluators must have no access to the execution map, condition labels, subject conversation history, memory, or one another's conclusions.
+- Give both evaluators the same raw response, canonical case definition, and scoring criteria. Do not provide condition labels, trial order, or paired-condition identities. Randomize blind-label presentation order independently for each evaluator.
+- The same scorer should score both members of a pair to reduce inter-rater confounding. The separate adversarial reviewer independently reviews both members.
 - Record rationale for every dimension and each adversarial check. A numeric score without rationale is insufficient.
-- Assessor identity, blinding, and evidence provenance must be independently checked; self-attestation alone is not authentication.
-- Every comparison pair is fail-closed: missing evidence references or SHA-256 digests, incomplete scorer/reviewer attestations, scorer/reviewer conflicts, missing adversarial checks, any NOT_ASSESSED check, or any critical/adversarial failure prevents that pair from producing a comparative delta.
+
+### Evaluator calibration and independence gate
+
+Before scoring experimental outputs, calibrate both AI evaluators on a held-out reference set that is separate from the 30 experimental trials.
+
+1. At least two qualified human reviewers independently score the calibration responses and adjudicate disagreements to create the reference labels. Preserve both original ratings and the adjudication record.
+2. Include ordinary examples, borderline examples, seeded reasoning/evidence defects, and known critical/adversarial failures. Keep the answer key hidden from the AI evaluators.
+3. Pre-register the calibration set, rubric, acceptance thresholds, and evaluator versions before examining experimental results. Do not tune evaluators against the 30 trial outputs.
+4. Report per-dimension agreement, quadratic-weighted kappa for ordinal scores where calculable, critical-failure sensitivity, false-positive rate, and disagreement examples. Do not rely on one aggregate agreement number.
+5. If either evaluator misses a seeded critical failure, fails the pre-registered agreement threshold, or shows material condition-related scoring bias, calibration fails. Correct the evaluator protocol and repeat calibration on a fresh held-out set before any experimental scoring.
+6. The calibration report and its evidence must be independently reviewed and signed. Passing calibration supports use of the evaluator; it does not prove that its judgments are infallible.
+
+### Adjudication and fail-closed rules
+
+- The AI scorer and AI adversarial reviewer must not be the same model instance, agent, provider account, or shared conversation. Record known common dependencies.
+- A human adjudicator must review every critical failure, every disagreement that could change a pair's eligibility or comparative conclusion, and any suspected evaluator bias. Preserve the original AI outputs; adjudication supplements rather than overwrites them.
+- Assessor identity, blinding, evaluator configuration, and evidence provenance must be independently checked; self-attestation alone is not authentication.
+- Every comparison pair is fail-closed: missing evidence references or SHA-256 digests, incomplete scorer/reviewer attestations, scorer/reviewer conflicts, failed evaluator calibration, missing adversarial checks, any NOT_ASSESSED check, or any critical/adversarial failure prevents that pair from producing a comparative delta.
 - A SHA-256 digest establishes a content fingerprint only when checked against the retained artifact. It does not authenticate who captured, scored, or reviewed that artifact. Retain independently signed reviewer statements and an evidence manifest outside the run-record self-attestations.
 
 ## Scoring
