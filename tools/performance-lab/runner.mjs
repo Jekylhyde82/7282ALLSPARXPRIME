@@ -180,7 +180,7 @@ export function validateTrialMatrix(csvText) {
     if (!["P01","P02","P03","P04","P05"].includes(row.case_id)) errors.push("row " + line + ": invalid case_id");
     if (!["1","2","3"].includes(row.repetition)) errors.push("row " + line + ": repetition must be 1, 2, or 3");
     if (!["baseline","architecture_assisted"].includes(row.condition)) errors.push("row " + line + ": invalid condition");
-    if (!["NOT_RUN","CAPTURED","ASSESSED","VERIFIED"].includes(row.status)) errors.push("row " + line + ": invalid status");
+    if (!["NOT_RUN","CAPTURED","ASSESSED"].includes(row.status)) errors.push("row " + line + ": invalid status");
     const combo = row.case_id + ":" + row.repetition + ":" + row.condition;
     if (combinations.has(combo)) errors.push("row " + line + ": duplicate case/repetition/condition " + combo);
     combinations.add(combo);
@@ -201,7 +201,7 @@ export function validateTrialMatrix(csvText) {
     for (const key of ["raw_response_sha256","canonical_prompt_sha256"]) if (!/^[a-f0-9]{64}$/.test(row[key])) errors.push("row " + line + ": " + key + " must be a SHA-256 digest");
     if (row.condition === "architecture_assisted" && !/^[a-f0-9]{64}$/.test(row.architecture_instruction_sha256)) errors.push("row " + line + ": assisted trial requires architecture_instruction_sha256");
     if (row.condition === "baseline" && row.architecture_instruction_sha256) errors.push("row " + line + ": baseline trial must not contain architecture_instruction_sha256");
-    if (["ASSESSED","VERIFIED"].includes(row.status) && (!row.scorer_id || !row.adversarial_reviewer_id || row.scorer_id === row.adversarial_reviewer_id)) errors.push("row " + line + ": assessed trial requires distinct scorer and adversarial reviewer IDs");
+    if (row.status === "ASSESSED" && (!row.scorer_id || !row.adversarial_reviewer_id || row.scorer_id === row.adversarial_reviewer_id)) errors.push("row " + line + ": assessed trial requires distinct scorer and adversarial reviewer IDs");
   }
   for (const caseId of ["P01","P02","P03","P04","P05"]) for (const repetition of ["1","2","3"]) {
     for (const condition of ["baseline","architecture_assisted"]) {
@@ -229,6 +229,10 @@ export function createRunRecord(input) {
   if (!benchmarkCase) throw new Error("Unknown benchmark case: " + input.case_id);
   if (input.prompt !== benchmarkCase.prompt) throw new Error("Prompt must exactly match the canonical benchmark case prompt.");
   if (!input.trial_execution || input.trial_execution.unpersonalized_confirmed !== true) throw new Error("Trial execution must explicitly confirm an Unpersonalized Temporary Chat.");
+  if (input.trial_execution.context_type !== "Unpersonalized Temporary Chat") throw new Error("Trial execution context must be an Unpersonalized Temporary Chat.");
+  if (input.trial_execution.model_label !== input.subject) throw new Error("Trial execution model label must match the run-record subject.");
+  if (!input.trial_execution.context_reference || !input.trial_execution.captured_at || Number.isNaN(Date.parse(input.trial_execution.captured_at))) throw new Error("Trial execution requires a context reference and valid capture timestamp.");
+  if (!input.trial_execution.settings || !input.trial_execution.tools_used || !input.trial_execution.capture_reference) throw new Error("Trial execution requires settings, tools-used and capture-reference metadata.");
   if (input.trial_execution.canonical_prompt_sha256 !== sha256(input.prompt)) throw new Error("Trial execution canonical prompt hash does not match the exact canonical prompt.");
   if (input.condition === "architecture_assisted" && !/^[a-f0-9]{64}$/.test(input.trial_execution.architecture_instruction_sha256 ?? "")) throw new Error("Architecture-assisted trials require the architecture instruction SHA-256.");
   if (input.condition === "baseline" && input.trial_execution.architecture_instruction_sha256 != null) throw new Error("Baseline trials must not contain an architecture instruction hash.");
@@ -307,7 +311,12 @@ export function buildComparison(records) {
     }
     if (!baseline.trial_execution || !assisted.trial_execution ||
         baseline.trial_execution.unpersonalized_confirmed !== true || assisted.trial_execution.unpersonalized_confirmed !== true ||
+        baseline.trial_execution.context_type !== "Unpersonalized Temporary Chat" || assisted.trial_execution.context_type !== "Unpersonalized Temporary Chat" ||
+        baseline.trial_execution.model_label !== baseline.subject || assisted.trial_execution.model_label !== assisted.subject ||
         !baseline.trial_execution.context_reference || !assisted.trial_execution.context_reference ||
+        !baseline.trial_execution.settings || !assisted.trial_execution.settings ||
+        !baseline.trial_execution.tools_used || !assisted.trial_execution.tools_used ||
+        !baseline.trial_execution.capture_reference || !assisted.trial_execution.capture_reference ||
         baseline.trial_execution.canonical_prompt_sha256 !== baseline.prompt_sha256 ||
         assisted.trial_execution.canonical_prompt_sha256 !== assisted.prompt_sha256 ||
         baseline.trial_execution.raw_response_sha256 !== sha256(baseline.response) ||
