@@ -93,4 +93,4 @@ Sign with `node tools/performance-lab/runner.mjs sign-manifest payload.json /sec
 
 **Remaining limitation:** the runner verifies manifest structure, signature, revision binding, trusted-key fingerprint, and listed artifact hashes, but it does not establish that a trusted key belongs to a named human. That identity-to-key trust decision remains an external governance control.
 
-**Current result:** no model trials have been executed and no performance improvement or regression is claimed. Protocol 1.4 adds explicit matrix evidence for Unpersonalized isolation, canonical prompt provenance and architecture-instruction provenance. The rubric and calibration plan require independent human approval before scoring.
+**Current result:** no model trials have been executed and no performance improvement or regression is claimed. Protocol 1.5 adds machine-enforced matrix evidence for Unpersonalized isolation, canonical prompt provenance and architecture-instruction provenance. The rubric and calibration plan require independent human approval before scoring.
