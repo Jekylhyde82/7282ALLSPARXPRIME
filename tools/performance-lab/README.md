@@ -118,7 +118,7 @@ node --test tests/performance-lab.test.mjs
 
 The comparison engine is fail-closed for fields represented in its run-record schema: both records must have matching canonical-prompt hashes and model subjects, evidence references with SHA-256 digests, calibrated scorer and adversarial-reviewer metadata, matching evaluator attestations, rationales for all eight dimensions, the same blinded scorer for both conditions, and a distinct blinded adversarial reviewer with every required check assessed. Duplicate records, missing evidence, incomplete reviews, calibration gaps, evaluator identity mismatches, scorer/reviewer conflicts, recorded critical failures, and failed adversarial checks invalidate that pair. Findings remain visible in the report issues; they are not converted into clean averages.
 
-Evidence hashes are integrity identifiers, not proof of authenticity. The signed evidence manifest schema is `schema/evidence-manifest.schema.json`. The runner can sign a manifest with an Ed25519 private key held by the evidence custodian and verify its signature using an independently provisioned trusted public key. Verification checks the expected candidate revision, trusted-key fingerprint, artifact path containment, and SHA-256 of every listed artifact. The trusted public key must be obtained out of band; a manifest cannot establish its own trust anchor. The independent reviewer must separately verify that the trusted key is legitimately bound to the named custodian and that key custody is sound.
+Evidence hashes are integrity identifiers, not proof of authenticity. The signed evidence manifest schema is `schema/evidence-manifest.schema.json`. The runner can sign a manifest with an Ed25519 private key held by the evidence custodian and verify its signature using an independently provisioned trusted public key. Verification checks the expected candidate revision, trusted-key fingerprint, artifact path containment, and SHA-256 of every listed artifact. The trusted public key, expected signer ID, and required signer role must be obtained from an out-of-band trust record; the verifier checks all three against the signed manifest. A manifest cannot establish its own trust anchor. The independent reviewer must separately verify that the trusted key is legitimately bound to the named custodian and that key custody is sound.
 
 Commands:
 
@@ -127,10 +127,10 @@ Commands:
 node tools/performance-lab/runner.mjs sign-manifest payload.json /secure/path/custodian-private-key.pem evidence-manifest.json
 
 # Verify signature, key fingerprint, revision binding, and evidence bytes
-node tools/performance-lab/runner.mjs verify-manifest evidence-manifest.json /secure/path/trusted-custodian-public-key.pem evidence/ <candidate-commit-sha>
+node tools/performance-lab/runner.mjs verify-manifest evidence-manifest.json /secure/path/trusted-custodian-public-key.pem evidence/ <candidate-commit-sha> <trusted-signer-id> evidence-custodian <trusted-signer-id> evidence-custodian
 ```
 
-The manifest signs a deterministic canonical JSON representation of every manifest field except `signature`. Artifact paths must be relative to the evidence root and cannot escape it. Signature verification proves possession of a private key, not the real-world identity of its holder.
+The manifest signs a deterministic canonical JSON representation of every manifest field except `signature`. Artifact paths must be relative to the evidence root and cannot escape it. Signature verification proves possession of a private key, not the real-world identity of its holder. The verifier enforces the expected signer ID and role supplied by the independent trust record; it cannot create that trust record.
 
 The report displays per-dimension deltas only for eligible pairs and lists missing pairs and evidence/review integrity gaps. It does not calculate a single misleading average.
 
