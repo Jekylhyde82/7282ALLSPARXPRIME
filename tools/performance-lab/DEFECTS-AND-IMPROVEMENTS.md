@@ -1,8 +1,8 @@
 # Performance Lab — Defects, Limitations and Improvement Register
 
 **Benchmark:** GENESIS-PERFORMANCE-LAB-001  
-**Register reviewed against:** `2d90bf2e7d2e0d47d19b6aef25a00659c9bc4626` (pre-update candidate; this commit adds protocol documentation only)  
-**Latest previously verified Performance Lab CI:** run [42837644914](https://github.com/Jekylhyde82/7282ALLSPARXPRIME/actions/runs/42837644914), 24 tests passed, 0 failed on candidate `2d90bf2e7d2e0d47d19b6aef25a00659c9bc4626`. New documentation changes require fresh current-head CI.  
+**Register reviewed against:** `38101363f86720c920a2d4fe0e4d0cb048773d93`  
+**Current-head CI:** NOT VERIFIED. No workflow runs or combined status checks have been returned for the current candidate. Earlier CI results apply only to their exact historical commits.
 **Operational status:** NOT OPERATIONAL — authentic trials and independent release evidence remain outstanding.
 
 This register distinguishes defects in the implemented toolchain from deliberate boundaries of the manually operated experimental protocol. A code-level fix does not close an experimental or governance gate.
