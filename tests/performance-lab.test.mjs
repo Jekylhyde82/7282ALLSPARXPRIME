@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { validateSchema, validateRunRecord, buildComparison, renderReport, sha256, createRunRecord, appendRunRecord, verifyEvidenceManifest, canonicalize } from "../tools/performance-lab/runner.mjs";
+import { validateSchema, validateRunRecord, buildComparison, renderReport, sha256, createRunRecord, appendRunRecord, verifyEvidenceManifest, canonicalize, signEvidenceManifest } from "../tools/performance-lab/runner.mjs";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -208,8 +208,7 @@ test("signed evidence manifest verifies revision, trusted key, and artifact byte
     signer:{signer_id:"independent-evidence-custodian",role:"evidence-custodian"},
     artifacts:[{path:"trial-001.txt",kind:"raw-trial-output",sha256:sha256(fs.readFileSync(path.join(evidenceRoot,"trial-001.txt")))}]
   };
-  const signature=crypto.sign(null,Buffer.from(canonicalize(payload)),privateKey).toString("base64");
-  const manifest={...payload,signature:{algorithm:"Ed25519",public_key_sha256:sha256(publicDer),value:signature}};
+  const manifest=signEvidenceManifest(payload,privateKey.export({type:"pkcs8",format:"pem"}));
   const verify=(m=manifest,key=publicPem,revision=payload.revision)=>verifyEvidenceManifest(m,{publicKeyPem:key,evidenceRoot,expectedRevision:revision});
   assert.deepEqual(verify(),[]);
   assert.ok(verify(manifest,publicPem,"b".repeat(40)).some(x=>x.includes("revision")));
@@ -233,8 +232,7 @@ test("signed evidence manifest rejects path traversal and signature tampering",(
     signer:{signer_id:"custodian",role:"evidence-custodian"},
     artifacts:[{path:"../outside.txt",kind:"raw-trial-output",sha256:sha256("outside")}]
   };
-  const signature=crypto.sign(null,Buffer.from(canonicalize(payload)),privateKey).toString("base64");
-  const manifest={...payload,signature:{algorithm:"Ed25519",public_key_sha256:sha256(publicKey.export({type:"spki",format:"der"})),value:signature}};
+  const manifest=signEvidenceManifest(payload,privateKey.export({type:"pkcs8",format:"pem"}));
   assert.ok(verifyEvidenceManifest(manifest,{publicKeyPem:publicPem,evidenceRoot,expectedRevision:payload.revision}).some(x=>x.includes("traverse")));
   const tampered={...manifest,signer:{...manifest.signer,signer_id:"forged"}};
   assert.ok(verifyEvidenceManifest(tampered,{publicKeyPem:publicPem,evidenceRoot,expectedRevision:payload.revision}).some(x=>x.includes("signature is invalid")));
