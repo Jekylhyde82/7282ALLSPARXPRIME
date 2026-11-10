@@ -1,0 +1,33 @@
+name: Performance Lab Validation
+
+on:
+  pull_request:
+    paths:
+      - "tools/performance-lab/**"
+      - "tests/performance-lab.test.mjs"
+      - ".github/workflows/performance-lab.yml"
+  push:
+    branches:
+      - "engineering/performance-lab-foundation"
+    paths:
+      - "tools/performance-lab/**"
+      - "tests/performance-lab.test.mjs"
+      - ".github/workflows/performance-lab.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run Performance Lab tests
+        run: node --test tests/performance-lab.test.mjs
+      - name: Validate benchmark case definitions
+        run: node -e "const c=require('./tools/performance-lab/cases.json'); if(c.cases.length!==5 || new Set(c.cases.map(x=>x.id)).size!==5) process.exit(1); console.log('Five unique benchmark cases validated.')"
