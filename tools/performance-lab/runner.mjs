@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import Ajv2020 from "ajv/dist/2020.js";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
@@ -12,35 +13,17 @@ function loadJson(file) {
   return JSON.parse(fs.readFileSync(file, "utf8"));
 }
 
+const schemaValidatorCache = new WeakMap();
+
 export function validateSchema(value, schema, pointer = "$") {
-  const errors = [];
-  const fail = message => errors.push(pointer + ": " + message);
-  if (schema.const !== undefined && value !== schema.const) fail("must equal " + JSON.stringify(schema.const));
-  if (schema.enum && !schema.enum.includes(value)) fail("must be one of " + schema.enum.join(", "));
-  if (schema.type === "object") {
-    if (!value || typeof value !== "object" || Array.isArray(value)) return [pointer + ": must be an object"];
-    for (const key of schema.required ?? []) if (!(key in value)) errors.push(pointer + "." + key + ": is required");
-    for (const [key, child] of Object.entries(schema.properties ?? {})) {
-      if (key in value) errors.push(...validateSchema(value[key], child, pointer + "." + key));
-    }
-    if (schema.additionalProperties === false) {
-      for (const key of Object.keys(value)) if (!(key in (schema.properties ?? {}))) errors.push(pointer + "." + key + ": additional property is not allowed");
-    }
-  } else if (schema.type === "array") {
-    if (!Array.isArray(value)) return [pointer + ": must be an array"];
-    if (schema.items) value.forEach((item, i) => errors.push(...validateSchema(item, schema.items, pointer + "[" + i + "]")));
-  } else if (schema.type === "string") {
-    if (typeof value !== "string") return [pointer + ": must be a string"];
-    if (schema.minLength !== undefined && value.length < schema.minLength) fail("must contain at least " + schema.minLength + " characters");
-    if (schema.pattern && !(new RegExp(schema.pattern).test(value))) fail("must match pattern " + schema.pattern);
-  } else if (schema.type === "integer") {
-    if (!Number.isInteger(value)) return [pointer + ": must be an integer"];
-    if (schema.minimum !== undefined && value < schema.minimum) fail("must be >= " + schema.minimum);
-    if (schema.maximum !== undefined && value > schema.maximum) fail("must be <= " + schema.maximum);
-  } else if (schema.type === "boolean" && typeof value !== "boolean") {
-    fail("must be a boolean");
+  let validate = schemaValidatorCache.get(schema);
+  if (!validate) {
+    const ajv = new Ajv2020({ allErrors: true, strict: true });
+    validate = ajv.compile(schema);
+    schemaValidatorCache.set(schema, validate);
   }
-  return errors;
+  if (validate(value)) return [];
+  return (validate.errors ?? []).map(error => pointer + (error.instancePath || "") + ": " + error.message);
 }
 
 export function validateRunRecord(record, schema = loadJson(SCHEMA_PATH)) {
