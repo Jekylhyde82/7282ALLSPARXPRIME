@@ -12,7 +12,7 @@ function record(condition, assessorId, caseId="P01") {
     benchmark_id:"GENESIS-PERFORMANCE-LAB-001",run_id:`GPL-20261110-${caseId}-${condition === "baseline" ? "B" : "A"}`,
     case_id:caseId,condition,subject:"GPT-6",prompt_sha256:sha256("identical prompt"),
     response:"Recorded trial response.",scores:Object.fromEntries(dims.map(d=>[d,3])),
-    critical_failures:[],evidence:[],assessor:{assessor_id:assessorId,blinded_condition:true,independent:true},
+    critical_failures:[],evidence:[{kind:"test fixture",reference:"test://evidence"}],assessor:{assessor_id:assessorId,blinded_condition:true,independent:true},
     adversarial_review:{reviewer_id:"critic-" + assessorId,blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"No unsupported claim found."},{check_id:"AC02",outcome:"PASS",finding:"Uncertainty was stated."}]},
     limitations:[],verification_status:"NOT_VERIFIED",created_at:"2026-11-10T00:00:00.000Z"
   };
@@ -70,4 +70,9 @@ test("missing required adversarial check blocks comparison readiness",()=>{
   a.adversarial_review.checks=a.adversarial_review.checks.filter(x=>x.check_id!=="AC02");
   const result=buildComparison([b,a]);
   assert.ok(result.issues.some(x=>x.includes("required adversarial check AC02 missing")));
+});
+
+test("run records cannot self-promote verification status",()=>{
+  const trial={case_id:"P01",condition:"baseline",subject:"GPT-6",prompt:"Exact prompt",response:"Response",scores:Object.fromEntries(dims.map(d=>[d,3])),evidence:[{kind:"test",reference:"test://evidence"}],assessor:{assessor_id:"scorer",blinded_condition:true,independent:true},adversarial_review:{reviewer_id:"critic",blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"Reviewed."},{check_id:"AC02",outcome:"PASS",finding:"Reviewed."}]},verification_status:"INDEPENDENTLY_REVIEWED"};
+  assert.throws(()=>createRunRecord(trial),/must equal/);
 });
