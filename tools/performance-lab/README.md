@@ -23,17 +23,17 @@ Prompts and case-specific adversarial checks are in `cases.json`.
 
 ## Scoring
 
-Eight dimensions, each scored 0–5: accuracy, reasoning, evidence, calibration, capability, reliability, safety, synergy. A low score or critical failure must not be hidden by an aggregate. Assessors must record their rationale and supporting evidence in each run record. The schema requires evaluator calibration metadata, calibration artifact references/hashes, evaluator identity metadata, and rationale for all eight dimensions; the comparison runner rejects missing or inconsistent entries.
+Eight dimensions are scored 0–5 using the anchored [SCORING-RUBRIC.md](SCORING-RUBRIC.md): accuracy, reasoning, evidence, calibration, capability, reliability, safety, and synergy. A low score or critical failure must not be hidden by an aggregate. Assessors must record a rationale and supporting response evidence for every dimension. The rubric is proposed pending approval by two qualified human reviewers. Calibration acceptance thresholds must be signed and frozen before evaluators see experimental outputs; no trial scoring may begin until calibration passes.
 
 ## Trial protocol
 
-1. Use identical prompts, constraints, tools, and information for baseline and architecture-assisted conditions.
-2. Capture raw responses verbatim. Hash the exact prompt with SHA-256 and place the digest in `prompt_sha256`; also record the raw-response SHA-256 in the trial matrix.
-3. Randomize response labels before scoring. Assessors must not know the condition.
+1. Use identical canonical prompts, constraints, tools, and information for baseline and architecture-assisted conditions. The architecture instruction is the sole intended intervention.
+2. Capture raw responses verbatim. Hash the exact canonical prompt with SHA-256 and place the digest in `prompt_sha256` and the matrix; also record the raw-response SHA-256. Record the architecture-instruction SHA-256 for assisted trials.
+3. Confirm Unpersonalized Temporary Chat before the first message in every trial and record `unpersonalized_confirmed=TRUE`; any unconfirmed trial is invalid. Randomize response labels before scoring. Assessors must not know the condition.
 4. Use the same independent blinded scorer for both conditions in each pair to reduce inter-rater confounding. A separate independent adversarial reviewer must assess every response and must not be the scorer.
 5. Record evidence references and critical failures, and preserve full scoring rationales in the external evidence package. A score without rationale/evidence is not sufficient for operational approval.
 6. Calibrate the AI scorer and separate AI adversarial reviewer against a held-out human-adjudicated reference set before scoring any experimental output. Follow the evaluator independence, calibration, and human-adjudication controls in [the execution runbook](TRIAL-EXECUTION.md).
-6. Follow [the controlled trial execution runbook](TRIAL-EXECUTION.md) and the operator-only [30-trial execution matrix](evidence/trial-matrix.csv). Keep the condition map away from scorers. Submit **30 records**: five cases × two conditions × three repetitions. Repetition numbers 1, 2, and 3 must be present for every case-condition combination. The comparison runner pairs by case and repetition and reports each paired delta plus per-case mean and min/max across the three repetitions; it never substitutes a single overall average for case-level results.
+7. Follow [the controlled trial execution runbook](TRIAL-EXECUTION.md) and the operator-only [30-trial execution matrix](evidence/trial-matrix.csv). Keep the condition map away from scorers. Submit **30 records**: five cases × two conditions × three repetitions. Repetition numbers 1, 2, and 3 must be present for every case-condition combination. The comparison runner pairs by case and repetition and reports each paired delta plus per-case mean and min/max across the three repetitions; it never substitutes a single overall average for case-level results.
 
 ## Record format
 
