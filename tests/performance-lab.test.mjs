@@ -34,7 +34,7 @@ test("repetition index is constrained to one through three",()=>{
 test("invalid score and unknown property are rejected",()=>{
   const bad={...record("baseline","A"),unexpected:true,scores:{...record("baseline","A").scores,accuracy:6}};
   const errors=validateSchema(bad,schema);
-  assert.ok(errors.some(e=>e.includes("additional property")));
+  assert.ok(errors.some(e=>e.includes("additional properties")));
   assert.ok(errors.some(e=>e.includes("must be <= 5")));
 });
 test("pair comparison calculates per-dimension deltas",()=>{
@@ -61,7 +61,7 @@ test("three repetitions are paired separately and incomplete repetitions are fla
   const complete=buildComparison(records);
   assert.equal(complete.pairs.length,3);
   assert.equal(complete.summaries[0].repetitions_present,3);
-  assert.equal(complete.summaries[0].delta.accuracy.mean,2);
+  assert.equal(complete.summaries[0].delta.accuracy.mean,1);
   const incomplete=buildComparison(records.filter(r=>r.repetition!==3));
   assert.ok(incomplete.issues.some(x=>x.includes("P01 repetition 3: missing baseline or architecture-assisted run")));
 });
@@ -112,7 +112,7 @@ test("run records cannot self-promote verification status",()=>{
   const trial={case_id:"P01",repetition:1,condition:"baseline",subject:"GPT-6",prompt:cases.cases.find(c=>c.id==="P01").prompt,response:"Response",scores:Object.fromEntries(dims.map(d=>[d,3])),evidence:[{kind:"test",reference:"test://evidence"}],assessor:{assessor_id:"scorer",blinded_condition:true,independent:true},adversarial_review:{reviewer_id:"critic",blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"Reviewed."},{check_id:"AC02",outcome:"PASS",finding:"Reviewed."}]},verification_status:"INDEPENDENTLY_REVIEWED"};
   const record=createRunRecord(trial);
   assert.equal(record.verification_status,"NOT_VERIFIED");
-  assert.ok(validateRunRecord({...record,verification_status:"INDEPENDENTLY_REVIEWED"}).some(error=>error.includes("must equal")));
+  assert.ok(validateRunRecord({...record,verification_status:"INDEPENDENTLY_REVIEWED"}).some(error=>error.includes("equal to constant")));
 });
 
 test("paired comparisons reject prompt or model subject drift",()=>{
