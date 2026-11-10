@@ -107,7 +107,7 @@ export function buildComparison(records) {
     const key = record.case_id + ":" + record.repetition;
     if (!grouped.has(key)) grouped.set(key, {});
     const group = grouped.get(key);
-    if (group[record.condition]) issues.push(key + ": duplicate " + record.condition + " record");
+    if (group[record.condition]) issues.push(record.case_id + ": duplicate " + record.condition + " record for repetition " + record.repetition);
     group[record.condition] = record;
   }
   for (const caseId of ["P01","P02","P03","P04","P05"]) {
@@ -216,7 +216,7 @@ export function renderReport(records) {
   lines.push("", "## Evidence and independence gaps", "");
   lines.push(...(result.issues.length ? result.issues.map(x => "- " + x) : ["- Pair completeness, assessor independence and blinding are attested in supplied records; attestations still require external validation."]));
   lines.push("", "## Operational decision", "",
-    "NOT OPERATIONAL unless all five pairs are present, schema validation passes, independent assessors verify source evidence, adversarial checks are reviewed, CI passes, and a separate release reviewer signs the evidence package.", "");
+    "NOT OPERATIONAL unless all 15 pairs are present (five cases × three repetitions), schema validation passes, independent assessors verify source evidence, adversarial checks are reviewed, CI passes, and a separate release reviewer signs the evidence package.", "");
   return lines.join("\n");
 }
 
