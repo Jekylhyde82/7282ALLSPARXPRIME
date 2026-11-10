@@ -19,7 +19,7 @@ function record(condition, assessorId, caseId="P01", repetition=1) {
   };
 }
 
-test("valid record passes the declared schema subset",()=>assert.deepEqual(validateRunRecord(record("baseline","A"),schema),[]));
+test("valid record passes the Draft 2020-12 schema",()=>assert.deepEqual(validateRunRecord(record("baseline","A"),schema),[]));
 test("Draft 2020-12 vocabulary is evaluated by the standards-compliant validator",()=>{
   const draftSchema={$schema:"https://json-schema.org/draft/2020-12/schema",type:"array",minItems:2,prefixItems:[{type:"string"},{type:"integer"}],items:false};
   assert.deepEqual(validateSchema(["case",2],draftSchema),[]);
