@@ -38,6 +38,22 @@ export function isRfc3339Timestamp(value) {
   return Number.isFinite(Date.parse(value));
 }
 
+
+export function validateCalibrationPlan(plan, schema = loadJson(path.join(ROOT, "schema/calibration-plan.schema.json"))) {
+  const errors = validateSchema(plan, schema);
+  if (errors.length) return errors;
+  const scorerId = plan.evaluators.scorer.evaluator_id;
+  const reviewerId = plan.evaluators.adversarial_reviewer.evaluator_id;
+  if (scorerId === reviewerId) errors.push("scorer and adversarial reviewer must be distinct evaluator identities");
+  const reviewerIds = plan.reviewer_approvals.map(reviewer => reviewer.reviewer_id);
+  if (new Set(reviewerIds).size !== reviewerIds.length) errors.push("human reviewer approval identities must be unique");
+  if (!isRfc3339Timestamp(plan.frozen_at)) errors.push("calibration plan frozen_at must be a valid RFC 3339 timestamp");
+  for (const reviewer of plan.reviewer_approvals) {
+    if (!isRfc3339Timestamp(reviewer.approved_at)) errors.push("reviewer " + reviewer.reviewer_id + " approval timestamp must be valid RFC 3339");
+  }
+  return errors;
+}
+
 export function validateRunRecord(record, schema = loadJson(SCHEMA_PATH)) {
   const errors = validateSchema(record, schema);
   if (record && !isRfc3339Timestamp(record.created_at)) errors.push("$.created_at: must be a valid RFC 3339 timestamp");
@@ -496,12 +512,12 @@ export function renderReport(records) {
 }
 
 function usage() {
-  console.log("Usage: node tools/performance-lab/runner.mjs validate-matrix <trial-matrix.csv> | record <trial.json> <ledger.json> | validate <ledger.json> | report <ledger.json> <output.md> | sign-manifest <payload.json> <private-key.pem> <output.json> | verify-manifest <manifest.json> <trusted-public-key.pem> <evidence-root> <expected-revision> <expected-signer-id> <expected-signer-role>");
+  console.log("Usage: node tools/performance-lab/runner.mjs validate-matrix <trial-matrix.csv> | validate-calibration-plan <plan.json> | record <trial.json> <ledger.json> | validate <ledger.json> | report <ledger.json> <output.md> | sign-manifest <payload.json> <private-key.pem> <output.json> | verify-manifest <manifest.json> <trusted-public-key.pem> <evidence-root> <expected-revision> <expected-signer-id> <expected-signer-role>");
 }
 
 if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
   const [command, input, output] = process.argv.slice(2);
-  if (command === "validate-matrix" && input) {
+  if (command === "validate-calibration-plan" && input) {\n    const errors = validateCalibrationPlan(loadJson(input));\n    if (errors.length) { console.error(errors.join("\\n")); process.exitCode = 1; }\n    else console.log("Calibration plan schema, evaluator separation, reviewer approvals and timestamps validated. Human identity/key binding remains an independent governance check.");\n  } else if (command === "validate-matrix" && input) {
     const errors = validateTrialMatrix(fs.readFileSync(input, "utf8"));
     if (errors.length) { console.error(errors.join("\n")); process.exitCode = 1; }
     else console.log("Validated all 30 planned trial rows; capture gates are enforced for any started trial.");
