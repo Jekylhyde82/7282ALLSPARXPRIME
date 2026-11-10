@@ -212,6 +212,8 @@ test("signed evidence manifest verifies revision, trusted key, and artifact byte
   const manifest=signEvidenceManifest(payload,privateKey.export({type:"pkcs8",format:"pem"}));
   const verify=(m=manifest,key=publicPem,revision=payload.revision,signerId=payload.signer.signer_id,signerRole=payload.signer.role)=>verifyEvidenceManifest(m,{publicKeyPem:key,evidenceRoot,expectedRevision:revision,expectedSignerId:signerId,expectedSignerRole:signerRole});
   assert.deepEqual(verify(),[]);
+  const invalidDateManifest=signEvidenceManifest({...payload,created_at:"2026-02-30T00:00:00Z"},privateKey.export({type:"pkcs8",format:"pem"}));
+  assert.ok(verify(invalidDateManifest).some(x=>x.includes("valid RFC 3339 timestamp")));
   assert.ok(verify(manifest,publicPem,"b".repeat(40)).some(x=>x.includes("revision")));
   assert.ok(verify(manifest,publicPem,payload.revision,"unexpected-signer").some(x=>x.includes("signer ID")));
   const wrong=crypto.generateKeyPairSync("ed25519").publicKey.export({type:"spki",format:"pem"});
