@@ -115,33 +115,54 @@ export function buildComparison(records) {
       issues.push(caseId + ": paired model subjects differ; comparison is invalid");
       invalidPair = true;
     }
+    const expectedChecks = (loadJson(CASES_PATH).cases.find(c => c.id === caseId)?.adversarial_checks ?? []).map(x => x.check_id);
     for (const record of [baseline, assisted]) {
-      if (!Array.isArray(record.evidence) || record.evidence.length === 0) {
-        issues.push(caseId + " " + record.condition + ": no supporting evidence references recorded");
+      if (!Array.isArray(record.evidence) || record.evidence.length === 0 ||
+          record.evidence.some(item => !item.reference || !/^[a-f0-9]{64}$/.test(item.sha256 ?? ""))) {
+        issues.push(caseId + " " + record.condition + ": supporting evidence reference and SHA-256 are required");
+        invalidPair = true;
+      }
+      if (Array.isArray(record.critical_failures) && record.critical_failures.length > 0) {
+        issues.push(caseId + " " + record.condition + ": critical failure recorded: " + record.critical_failures.join("; "));
+        invalidPair = true;
       }
     }
     const baselineAssessor = baseline.assessor?.assessor_id;
     const assistedAssessor = assisted.assessor?.assessor_id;
-    const independent = baseline.assessor?.independent === true && assisted.assessor?.independent === true;
-    const blinded = baseline.assessor?.blinded_condition === true && assisted.assessor?.blinded_condition === true;
-    if (!independent) issues.push(caseId + ": assessor independence not attested");
-    if (!blinded) issues.push(caseId + ": blinded scoring not attested");
     for (const record of [baseline, assisted]) {
+      if (!record.assessor?.assessor_id || record.assessor.independent !== true || record.assessor.blinded_condition !== true) {
+        issues.push(caseId + " " + record.condition + ": authenticated independent blinded scorer evidence is missing or incomplete");
+        invalidPair = true;
+      }
       const review = record.adversarial_review;
-      if (!review || review.independent !== true || review.blinded_condition !== true) {
-        issues.push(caseId + " " + record.condition + ": independent blinded adversarial review missing");
+      if (!review || !review.reviewer_id || review.independent !== true || review.blinded_condition !== true) {
+        issues.push(caseId + " " + record.condition + ": independent blinded adversarial review missing or incomplete");
+        invalidPair = true;
       }
-      if (review && review.reviewer_id === record.assessor?.assessor_id) {
-        issues.push(caseId + " " + record.condition + ": adversarial reviewer must be distinct from scorer");
+      if (review && (!review.reviewer_id || review.reviewer_id === record.assessor?.assessor_id)) {
+        issues.push(caseId + " " + record.condition + ": adversarial reviewer must be identified and distinct from scorer");
+        invalidPair = true;
       }
-      const expectedChecks = (loadJson(CASES_PATH).cases.find(c => c.id === caseId)?.adversarial_checks ?? []).map(x => x.check_id);
       const observedChecks = (review?.checks ?? []).map(x => x.check_id);
       for (const expected of expectedChecks) {
-        if (!observedChecks.includes(expected)) issues.push(caseId + " " + record.condition + ": required adversarial check " + expected + " missing");
+        if (!observedChecks.includes(expected)) {
+          issues.push(caseId + " " + record.condition + ": required adversarial check " + expected + " missing");
+          invalidPair = true;
+        }
       }
-      if (new Set(observedChecks).size !== observedChecks.length) issues.push(caseId + " " + record.condition + ": duplicate adversarial check IDs");
+      if (new Set(observedChecks).size !== observedChecks.length) {
+        issues.push(caseId + " " + record.condition + ": duplicate adversarial check IDs");
+        invalidPair = true;
+      }
       for (const check of review?.checks ?? []) {
-        if (check.outcome === "NOT_ASSESSED") issues.push(caseId + " " + record.condition + ": adversarial check " + check.check_id + " not assessed");
+        if (check.outcome === "NOT_ASSESSED") {
+          issues.push(caseId + " " + record.condition + ": adversarial check " + check.check_id + " not assessed");
+          invalidPair = true;
+        }
+        if (check.outcome === "FAIL") {
+          issues.push(caseId + " " + record.condition + ": adversarial failure " + check.check_id + ": " + check.finding);
+          invalidPair = true;
+        }
       }
     }
     if (baselineAssessor && assistedAssessor && baselineAssessor !== assistedAssessor) {
