@@ -51,7 +51,46 @@ function loadJson(file) {
   return JSON.parse(fs.readFileSync(file, "utf8"));
 }
 
-export function buildComparison(records) {
+
+export function createRunRecord(input) {
+  if (!input || typeof input !== "object" || Array.isArray(input)) throw new Error("Trial input must be a JSON object.");
+  if (typeof input.prompt !== "string" || !input.prompt.trim()) throw new Error("Trial input requires the exact non-empty prompt.");
+  const date = new Date().toISOString();
+  const record = {
+    benchmark_id:"GENESIS-PERFORMANCE-LAB-001",
+    run_id:`GPL-${date.replace(/[-:.TZ]/g,"").slice(0,14)}-${input.case_id ?? "XX"}-${input.condition ?? "unknown"}-${crypto.randomUUID().slice(0,8)}`,
+    case_id:input.case_id,
+    condition:input.condition,
+    subject:input.subject,
+    prompt_sha256:sha256(input.prompt),
+    response:input.response,
+    scores:input.scores,
+    critical_failures:input.critical_failures ?? [],
+    evidence:input.evidence ?? [],
+    assessor:input.assessor,
+    limitations:input.limitations ?? [],
+    verification_status:input.verification_status ?? "NOT_VERIFIED",
+    created_at:date
+  };
+  const errors=validateRunRecord(record);
+  if(errors.length) throw new Error(errors.join("\\n"));
+  return record;
+}
+
+export function appendRunRecord(record, ledgerPath) {
+  const existing=fs.existsSync(ledgerPath) ? loadJson(ledgerPath) : [];
+  if(!Array.isArray(existing)) throw new Error("Existing run ledger must be a JSON array.");
+  const schema=loadJson(SCHEMA_PATH);
+  const errors=[...existing.flatMap((r,i)=>validateRunRecord(r,schema).map(e=>`existing[${i}] ${e}`)),...validateRunRecord(record,schema)];
+  if(errors.length) throw new Error(errors.join("\\n"));
+  const next=[...existing,record];
+  fs.mkdirSync(path.dirname(path.resolve(ledgerPath)),{recursive:true});
+  const temp=`${ledgerPath}.${process.pid}.tmp`;
+  fs.writeFileSync(temp,JSON.stringify(next,null,2)+"\\n",{flag:"wx"});
+  fs.renameSync(temp,ledgerPath);
+  return next.length;
+}
+\nexport function buildComparison(records) {
   const pairs = [];
   const issues = [];
   const grouped = new Map();
@@ -76,8 +115,8 @@ export function buildComparison(records) {
     const blinded = baseline.assessor?.blinded_condition === true && assisted.assessor?.blinded_condition === true;
     if (!independent) issues.push(`${caseId}: assessor independence not attested`);
     if (!blinded) issues.push(`${caseId}: blinded scoring not attested`);
-    if (baselineAssessor && assistedAssessor && baselineAssessor === assistedAssessor) {
-      issues.push(`${caseId}: same assessor scored both conditions; independent comparison not established`);
+    if (baselineAssessor && assistedAssessor && baselineAssessor !== assistedAssessor) {
+      issues.push(`${caseId}: different assessors scored the paired conditions; use the same independent blinded assessor to reduce inter-rater confounding`);
     }
     const delta = {};
     for (const dimension of DIMENSIONS) delta[dimension] = assisted.scores[dimension] - baseline.scores[dimension];
@@ -109,12 +148,12 @@ export function renderReport(records) {
 }
 
 function usage() {
-  console.log("Usage: node tools/performance-lab/runner.mjs <validate|report> <records.json> [output.md]");
+  console.log("Usage: node tools/performance-lab/runner.mjs <record <trial.json> <ledger.json> | validate <ledger.json> | report <ledger.json> <output.md>>");
 }
 
 if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
 const [command, input, output] = process.argv.slice(2);
-if (command === "validate" && input) {
+if (command === "record" && input && output) {\n  const payload=loadJson(input);\n  const record=createRunRecord(payload);\n  const count=appendRunRecord(record,output);\n  console.log(`Recorded ${record.run_id}; ledger contains ${count} record(s).`);\n} else if (command === "validate" && input) {
   const records = loadJson(input);
   if (!Array.isArray(records)) throw new Error("Input must be a JSON array of run records.");
   const schema = loadJson(SCHEMA_PATH);
