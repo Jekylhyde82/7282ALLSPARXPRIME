@@ -1,9 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { validateSchema, validateRunRecord, buildComparison, renderReport, sha256, createRunRecord, appendRunRecord } from "../tools/performance-lab/runner.mjs";
+import { validateSchema, validateRunRecord, buildComparison, renderReport, sha256, createRunRecord, appendRunRecord, verifyEvidenceManifest, canonicalize } from "../tools/performance-lab/runner.mjs";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import crypto from "node:crypto";
 
 const schema = JSON.parse(fs.readFileSync(new URL("../tools/performance-lab/schema/run-record.schema.json", import.meta.url)));
 const cases = JSON.parse(fs.readFileSync(new URL("../tools/performance-lab/cases.json", import.meta.url)));
@@ -188,4 +189,54 @@ test("run-record schema requires evaluator metadata and per-dimension rationales
   const invalid=record("baseline","score-A");
   delete invalid.assessment.rationales.safety;
   assert.ok(validateRunRecord(invalid,schema).some(error=>error.includes("safety")));
+});
+
+
+test("signed evidence manifest verifies revision, trusted key, and artifact bytes",()=>{
+  const temp=fs.mkdtempSync(path.join(os.tmpdir(),"genesis-manifest-"));
+  const evidenceRoot=path.join(temp,"evidence");
+  fs.mkdirSync(evidenceRoot);
+  fs.writeFileSync(path.join(evidenceRoot,"trial-001.txt"),"immutable raw trial artifact");
+  const {publicKey,privateKey}=crypto.generateKeyPairSync("ed25519");
+  const publicPem=publicKey.export({type:"spki",format:"pem"});
+  const publicDer=publicKey.export({type:"spki",format:"der"});
+  const payload={
+    schema_version:"1.0",
+    benchmark_id:"GENESIS-PERFORMANCE-LAB-001",
+    revision:"a".repeat(40),
+    created_at:"2026-11-10T00:00:00.000Z",
+    signer:{signer_id:"independent-evidence-custodian",role:"evidence-custodian"},
+    artifacts:[{path:"trial-001.txt",kind:"raw-trial-output",sha256:sha256(fs.readFileSync(path.join(evidenceRoot,"trial-001.txt")))}]
+  };
+  const signature=crypto.sign(null,Buffer.from(canonicalize(payload)),privateKey).toString("base64");
+  const manifest={...payload,signature:{algorithm:"Ed25519",public_key_sha256:sha256(publicDer),value:signature}};
+  const verify=(m=manifest,key=publicPem,revision=payload.revision)=>verifyEvidenceManifest(m,{publicKeyPem:key,evidenceRoot,expectedRevision:revision});
+  assert.deepEqual(verify(),[]);
+  assert.ok(verify(manifest,publicPem,"b".repeat(40)).some(x=>x.includes("revision")));
+  const wrong=crypto.generateKeyPairSync("ed25519").publicKey.export({type:"spki",format:"pem"});
+  assert.ok(verify(manifest,wrong).some(x=>x.includes("fingerprint")));
+  fs.writeFileSync(path.join(evidenceRoot,"trial-001.txt"),"tampered artifact");
+  assert.ok(verify().some(x=>x.includes("SHA-256 mismatch")));
+  fs.rmSync(temp,{recursive:true,force:true});
+});
+
+test("signed evidence manifest rejects path traversal and signature tampering",()=>{
+  const temp=fs.mkdtempSync(path.join(os.tmpdir(),"genesis-manifest-path-"));
+  const evidenceRoot=path.join(temp,"evidence");
+  fs.mkdirSync(evidenceRoot);
+  fs.writeFileSync(path.join(temp,"outside.txt"),"outside");
+  const {publicKey,privateKey}=crypto.generateKeyPairSync("ed25519");
+  const publicPem=publicKey.export({type:"spki",format:"pem"});
+  const payload={
+    schema_version:"1.0",benchmark_id:"GENESIS-PERFORMANCE-LAB-001",revision:"c".repeat(40),
+    created_at:"2026-11-10T00:00:00.000Z",
+    signer:{signer_id:"custodian",role:"evidence-custodian"},
+    artifacts:[{path:"../outside.txt",kind:"raw-trial-output",sha256:sha256("outside")}]
+  };
+  const signature=crypto.sign(null,Buffer.from(canonicalize(payload)),privateKey).toString("base64");
+  const manifest={...payload,signature:{algorithm:"Ed25519",public_key_sha256:sha256(publicKey.export({type:"spki",format:"der"})),value:signature}};
+  assert.ok(verifyEvidenceManifest(manifest,{publicKeyPem:publicPem,evidenceRoot,expectedRevision:payload.revision}).some(x=>x.includes("traverse")));
+  const tampered={...manifest,signer:{...manifest.signer,signer_id:"forged"}};
+  assert.ok(verifyEvidenceManifest(tampered,{publicKeyPem:publicPem,evidenceRoot,expectedRevision:payload.revision}).some(x=>x.includes("signature is invalid")));
+  fs.rmSync(temp,{recursive:true,force:true});
 });
