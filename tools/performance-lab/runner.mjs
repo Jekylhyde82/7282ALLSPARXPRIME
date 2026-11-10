@@ -78,6 +78,7 @@ export function verifyEvidenceManifest(manifest, { publicKeyPem, evidenceRoot, e
   const manifestSchema = loadJson(path.join(ROOT, "schema/evidence-manifest.schema.json"));
   errors.push(...validateSchema(manifest, manifestSchema));
   if (errors.length) return errors;
+  if (!isRfc3339Timestamp(manifest.created_at)) errors.push("manifest created_at must be a valid RFC 3339 timestamp");
   if (manifest.revision !== expectedRevision) errors.push("manifest revision does not match the expected candidate revision");
   if (expectedSignerId && manifest.signer.signer_id !== expectedSignerId) errors.push("manifest signer ID does not match the externally trusted signer identity");
   if (expectedSignerRole && manifest.signer.role !== expectedSignerRole) errors.push("manifest signer role does not match the required role");
