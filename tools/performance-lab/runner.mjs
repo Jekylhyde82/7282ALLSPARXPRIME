@@ -42,6 +42,22 @@ export function canonicalize(value) {
   return JSON.stringify(value);
 }
 
+export function signEvidenceManifest(payload, privateKeyPem) {
+  const privateKey = crypto.createPrivateKey(privateKeyPem);
+  if (privateKey.asymmetricKeyType !== "ed25519") throw new Error("Evidence manifest signing requires an Ed25519 private key.");
+  const publicKey = crypto.createPublicKey(privateKey);
+  const publicDer = publicKey.export({ type: "spki", format: "der" });
+  const signature = crypto.sign(null, Buffer.from(canonicalize(payload)), privateKey).toString("base64");
+  return {
+    ...payload,
+    signature: {
+      algorithm: "Ed25519",
+      public_key_sha256: sha256(publicDer),
+      value: signature
+    }
+  };
+}
+
 export function verifyEvidenceManifest(manifest, { publicKeyPem, evidenceRoot, expectedRevision }) {
   const errors = [];
   const manifestSchema = loadJson(path.join(ROOT, "schema/evidence-manifest.schema.json"));
@@ -332,7 +348,7 @@ export function renderReport(records) {
 }
 
 function usage() {
-  console.log("Usage: node tools/performance-lab/runner.mjs record <trial.json> <ledger.json> | validate <ledger.json> | report <ledger.json> <output.md> | verify-manifest <manifest.json> <trusted-public-key.pem> <evidence-root> <expected-revision>");
+  console.log("Usage: node tools/performance-lab/runner.mjs record <trial.json> <ledger.json> | validate <ledger.json> | report <ledger.json> <output.md> | sign-manifest <payload.json> <private-key.pem> <output.json> | verify-manifest <manifest.json> <trusted-public-key.pem> <evidence-root> <expected-revision>");
 }
 
 if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
@@ -353,6 +369,14 @@ if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === imp
     } else {
       console.log("Validated " + records.length + " run record(s) against the Performance Lab schema.");
     }
+  } else if (command === "sign-manifest" && input && output) {
+    const payload = loadJson(input);
+    const privateKeyPem = fs.readFileSync(output, "utf8");
+    const signed = signEvidenceManifest(payload, privateKeyPem);
+    const manifestErrors = validateSchema(signed, loadJson(path.join(ROOT, "schema/evidence-manifest.schema.json")));
+    if (manifestErrors.length) throw new Error(manifestErrors.join("\\n"));
+    fs.writeFileSync(process.argv[5], JSON.stringify(signed, null, 2) + "\\n", { flag: "wx", mode: 0o600 });
+    console.log("Signed evidence manifest written to " + process.argv[5]);
   } else if (command === "verify-manifest" && input && output && process.argv[5] && process.argv[6]) {
     const manifest = loadJson(input);
     const publicKeyPem = fs.readFileSync(output, "utf8");
