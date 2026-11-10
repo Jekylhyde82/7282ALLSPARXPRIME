@@ -23,7 +23,7 @@ Prompts and case-specific adversarial checks are in `cases.json`.
 
 ## Scoring
 
-Eight dimensions are scored 0–5 using the anchored [SCORING-RUBRIC.md](SCORING-RUBRIC.md): accuracy, reasoning, evidence, calibration, capability, reliability, safety, and synergy. A low score or critical failure must not be hidden by an aggregate. Assessors must record a rationale and supporting response evidence for every dimension. The rubric is proposed pending approval by two qualified human reviewers. Complete [CALIBRATION-PLAN-TEMPLATE.md](CALIBRATION-PLAN-TEMPLATE.md), sign and freeze all acceptance thresholds before evaluators see experimental outputs; no trial scoring may begin until calibration passes.
+Eight dimensions are scored 0–5 using the anchored [SCORING-RUBRIC.md](SCORING-RUBRIC.md): accuracy, reasoning, evidence, calibration, capability, reliability, safety, and synergy. A low score or critical failure must not be hidden by an aggregate. Assessors must record a rationale and supporting response evidence for every dimension. The rubric is proposed pending approval by two qualified human reviewers. Complete [CALIBRATION-PLAN-TEMPLATE.md](CALIBRATION-PLAN-TEMPLATE.md), validate the completed plan with `validate-calibration-plan`, and sign/freeze all acceptance thresholds before evaluators see experimental outputs; no trial scoring may begin until calibration passes.
 
 ## Trial protocol
 
@@ -124,7 +124,8 @@ Every run record must include `trial_execution` with the exact matrix `trial_id`
 ## Commands
 
 ```bash
-node tools/performance-lab/runner.mjs validate-matrix tools/performance-lab/evidence/trial-matrix.csv\nnode tools/performance-lab/runner.mjs record path/to/trial-input.json path/to/records.json
+node tools/performance-lab/runner.mjs validate-matrix tools/performance-lab/evidence/trial-matrix.csv
+node tools/performance-lab/runner.mjs validate-calibration-plan path/to/approved-calibration-plan.json\nnode tools/performance-lab/runner.mjs record path/to/trial-input.json path/to/records.json
 node tools/performance-lab/runner.mjs validate path/to/records.json
 node tools/performance-lab/runner.mjs report path/to/records.json reports/comparison.md
 node --test tests/performance-lab.test.mjs
