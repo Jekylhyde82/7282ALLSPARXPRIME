@@ -109,6 +109,7 @@ test("missing required adversarial check blocks comparison readiness",()=>{
   a.adversarial_review.checks=a.adversarial_review.checks.filter(x=>x.check_id!=="AC02");
   const result=buildComparison([b,a]);
   assert.ok(result.issues.some(x=>x.includes("required adversarial check AC02 missing")));
+  assert.equal(result.pairs.length,0,"incomplete adversarial coverage must not produce a comparative delta");
 });
 
 test("run records cannot self-promote verification status",()=>{
