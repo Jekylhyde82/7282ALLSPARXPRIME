@@ -5,7 +5,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-const schema = JSON.parse(fs.readFileSync(new URL("../tools/performance-lab/schema/run-record.schema.json", import.meta.url)));
+const schema = JSON.parse(fs.readFileSync(new URL("../tools/performance-lab/schema/run-record.schema.json", import.meta.url)));\nconst cases = JSON.parse(fs.readFileSync(new URL("../tools/performance-lab/cases.json", import.meta.url)));
 const dims = ["accuracy","reasoning","evidence","calibration","capability","reliability","safety","synergy"];
 function record(condition, assessorId, caseId="P01") {
   return {
@@ -44,7 +44,7 @@ test("report keeps operational status on HOLD",()=>{
 });
 
 test("automated record creation hashes the exact prompt and appends atomically",()=>{
-  const trial={case_id:"P01",condition:"baseline",subject:"GPT-6",prompt:"Exact controlled prompt",response:"Captured response",scores:Object.fromEntries(dims.map(d=>[d,3])),assessor:{assessor_id:"reviewer",blinded_condition:true,independent:true},adversarial_review:{reviewer_id:"independent-critic",blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"No critical defect."},{check_id:"AC02",outcome:"PASS",finding:"Second control reviewed."}]}};
+  const trial={case_id:"P01",condition:"baseline",subject:"GPT-6",prompt:cases.cases.find(c=>c.id==="P01").prompt,response:"Captured response",scores:Object.fromEntries(dims.map(d=>[d,3])),assessor:{assessor_id:"reviewer",blinded_condition:true,independent:true},adversarial_review:{reviewer_id:"independent-critic",blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"No critical defect."},{check_id:"AC02",outcome:"PASS",finding:"Second control reviewed."}]}};
   const record=createRunRecord(trial);
   assert.equal(record.prompt_sha256,sha256(trial.prompt));
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),"genesis-lab-"));
@@ -73,8 +73,21 @@ test("missing required adversarial check blocks comparison readiness",()=>{
 });
 
 test("run records cannot self-promote verification status",()=>{
-  const trial={case_id:"P01",condition:"baseline",subject:"GPT-6",prompt:"Exact prompt",response:"Response",scores:Object.fromEntries(dims.map(d=>[d,3])),evidence:[{kind:"test",reference:"test://evidence"}],assessor:{assessor_id:"scorer",blinded_condition:true,independent:true},adversarial_review:{reviewer_id:"critic",blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"Reviewed."},{check_id:"AC02",outcome:"PASS",finding:"Reviewed."}]},verification_status:"INDEPENDENTLY_REVIEWED"};
+  const trial={case_id:"P01",condition:"baseline",subject:"GPT-6",prompt:cases.cases.find(c=>c.id==="P01").prompt,response:"Response",scores:Object.fromEntries(dims.map(d=>[d,3])),evidence:[{kind:"test",reference:"test://evidence"}],assessor:{assessor_id:"scorer",blinded_condition:true,independent:true},adversarial_review:{reviewer_id:"critic",blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"Reviewed."},{check_id:"AC02",outcome:"PASS",finding:"Reviewed."}]},verification_status:"INDEPENDENTLY_REVIEWED"};
   const record=createRunRecord(trial);
   assert.equal(record.verification_status,"NOT_VERIFIED");
   assert.ok(validateRunRecord({...record,verification_status:"INDEPENDENTLY_REVIEWED"}).some(error=>error.includes("must equal")));
+});
+
+test("paired comparisons reject prompt or model subject drift",()=>{
+  const b=record("baseline","scorer"),a=record("architecture_assisted","scorer");
+  a.prompt_sha256=sha256("different prompt");
+  a.subject="different-model";
+  const result=buildComparison([b,a]);
+  assert.ok(result.issues.some(x=>x.includes("paired prompts differ")));
+  assert.ok(result.issues.some(x=>x.includes("paired model subjects differ")));
+});
+test("recording rejects a prompt that differs from the canonical case",()=>{
+  const trial={case_id:"P01",condition:"baseline",subject:"GPT-6",prompt:"not the canonical prompt",response:"response",scores:Object.fromEntries(dims.map(d=>[d,3])),evidence:[{kind:"test",reference:"test://evidence"}],assessor:{assessor_id:"scorer",blinded_condition:true,independent:true},adversarial_review:{reviewer_id:"critic",blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"Reviewed."},{check_id:"AC02",outcome:"PASS",finding:"Reviewed."}]}};
+  assert.throws(()=>createRunRecord(trial),/canonical benchmark case prompt/);
 });
