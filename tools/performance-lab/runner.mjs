@@ -56,6 +56,7 @@ export function createRunRecord(input) {
     evidence: input.evidence ?? [],
     assessor: input.assessor,
     adversarial_review: input.adversarial_review,
+    assessment: input.assessment,
     limitations: input.limitations ?? [],
     verification_status: "NOT_VERIFIED",
     created_at: date
@@ -117,6 +118,23 @@ export function buildComparison(records) {
     }
     const expectedChecks = (loadJson(CASES_PATH).cases.find(c => c.id === caseId)?.adversarial_checks ?? []).map(x => x.check_id);
     for (const record of [baseline, assisted]) {
+      const assessment = record.assessment;
+      const scorer = assessment?.scorer;
+      const reviewer = assessment?.adversarial_reviewer;
+      if (assessment?.protocol_version !== "1.0" ||
+          !scorer || scorer.calibration_status !== "PASS" || !scorer.calibration_reference ||
+          !/^[a-f0-9]{64}$/.test(scorer.calibration_sha256 ?? "") ||
+          !reviewer || reviewer.calibration_status !== "PASS" || !reviewer.calibration_reference ||
+          !/^[a-f0-9]{64}$/.test(reviewer.calibration_sha256 ?? "")) {
+        issues.push(caseId + " " + record.condition + ": calibrated scorer and adversarial-reviewer evidence is missing or invalid");
+        invalidPair = true;
+      }
+      if (scorer?.evaluator_id !== record.assessor?.assessor_id ||
+          reviewer?.evaluator_id !== record.adversarial_review?.reviewer_id ||
+          (scorer?.evaluator_id && reviewer?.evaluator_id && scorer.evaluator_id === reviewer.evaluator_id)) {
+        issues.push(caseId + " " + record.condition + ": evaluator metadata does not match distinct scorer/reviewer attestations");
+        invalidPair = true;
+      }
       if (!Array.isArray(record.evidence) || record.evidence.length === 0 ||
           record.evidence.some(item => !item.reference || !/^[a-f0-9]{64}$/.test(item.sha256 ?? ""))) {
         issues.push(caseId + " " + record.condition + ": supporting evidence reference and SHA-256 are required");
