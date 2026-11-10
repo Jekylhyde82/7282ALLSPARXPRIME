@@ -129,12 +129,109 @@ export function verifyEvidenceManifest(manifest, { publicKeyPem, evidenceRoot, e
   return errors;
 }
 
+
+const MATRIX_COLUMNS = [
+  "execution_order","trial_id","blind_label","case_id","repetition","condition","status",
+  "model_label","context_type","context_reference","captured_at","settings","tools_used",
+  "raw_response_sha256","capture_reference","scorer_id","adversarial_reviewer_id",
+  "unpersonalized_confirmed","canonical_prompt_sha256","architecture_instruction_sha256"
+];
+
+export function parseCsv(text) {
+  const rows = [];
+  let row = [], field = "", quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    if (quoted) {
+      if (char === '"' && text[i + 1] === '"') { field += '"'; i++; }
+      else if (char === '"') quoted = false;
+      else field += char;
+    } else if (char === '"' && field.length === 0) quoted = true;
+    else if (char === ",") { row.push(field); field = ""; }
+    else if (char === "\n") { row.push(field.replace(/\r$/, "")); if (row.some(value => value !== "")) rows.push(row); row = []; field = ""; }
+    else field += char;
+  }
+  if (quoted) throw new Error("CSV contains an unterminated quoted field.");
+  if (field.length || row.length) { row.push(field.replace(/\r$/, "")); if (row.some(value => value !== "")) rows.push(row); }
+  return rows;
+}
+
+export function validateTrialMatrix(csvText) {
+  const errors = [];
+  let rows;
+  try { rows = parseCsv(csvText); }
+  catch (error) { return [error.message]; }
+  if (!rows.length) return ["trial matrix is empty"];
+  if (JSON.stringify(rows[0]) !== JSON.stringify(MATRIX_COLUMNS)) return ["trial matrix header does not match the required 20-column protocol 1.4 format"];
+  if (rows.length !== 31) errors.push("trial matrix must contain exactly 30 trial rows");
+  const seenTrialIds = new Set(), seenBlindLabels = new Set(), combinations = new Set();
+  const records = [];
+  for (let i = 1; i < rows.length; i++) {
+    const line = i + 1, values = rows[i];
+    if (values.length !== MATRIX_COLUMNS.length) { errors.push("row " + line + " must contain exactly 20 columns"); continue; }
+    const row = Object.fromEntries(MATRIX_COLUMNS.map((key, index) => [key, values[index].trim()]));
+    records.push(row);
+    if (Number(row.execution_order) !== i) errors.push("row " + line + ": execution_order must be sequential starting at 1");
+    if (!/^TRIAL-[0-9]{3}$/.test(row.trial_id)) errors.push("row " + line + ": invalid trial_id");
+    if (!/^BLIND-[0-9]{3}$/.test(row.blind_label)) errors.push("row " + line + ": invalid blind_label");
+    if (seenTrialIds.has(row.trial_id)) errors.push("row " + line + ": duplicate trial_id " + row.trial_id);
+    if (seenBlindLabels.has(row.blind_label)) errors.push("row " + line + ": duplicate blind_label " + row.blind_label);
+    seenTrialIds.add(row.trial_id); seenBlindLabels.add(row.blind_label);
+    if (!["P01","P02","P03","P04","P05"].includes(row.case_id)) errors.push("row " + line + ": invalid case_id");
+    if (!["1","2","3"].includes(row.repetition)) errors.push("row " + line + ": repetition must be 1, 2, or 3");
+    if (!["baseline","architecture_assisted"].includes(row.condition)) errors.push("row " + line + ": invalid condition");
+    if (!["NOT_RUN","CAPTURED","ASSESSED","VERIFIED"].includes(row.status)) errors.push("row " + line + ": invalid status");
+    const combo = row.case_id + ":" + row.repetition + ":" + row.condition;
+    if (combinations.has(combo)) errors.push("row " + line + ": duplicate case/repetition/condition " + combo);
+    combinations.add(combo);
+    if (row.status === "NOT_RUN") {
+      const captureFields = ["model_label","context_type","context_reference","captured_at","settings","tools_used","raw_response_sha256","capture_reference","unpersonalized_confirmed","canonical_prompt_sha256","architecture_instruction_sha256"];
+      for (const key of captureFields) if (row[key]) errors.push("row " + line + ": NOT_RUN row must not contain capture field " + key);
+      if (row.scorer_id || row.adversarial_reviewer_id) errors.push("row " + line + ": NOT_RUN row must not contain assessor identities");
+      continue;
+    }
+    if (!row.model_label) errors.push("row " + line + ": captured trial requires model_label");
+    if (row.context_type !== "Unpersonalized Temporary Chat") errors.push("row " + line + ": context_type must be Unpersonalized Temporary Chat");
+    if (!row.context_reference) errors.push("row " + line + ": captured trial requires context_reference");
+    if (!row.captured_at || Number.isNaN(Date.parse(row.captured_at))) errors.push("row " + line + ": captured_at must be a valid timestamp");
+    if (!row.settings) errors.push("row " + line + ": captured trial requires settings metadata");
+    if (!row.tools_used) errors.push("row " + line + ": captured trial must explicitly record tools_used (use none when unused)");
+    if (!row.capture_reference) errors.push("row " + line + ": captured trial requires capture_reference");
+    if (row.unpersonalized_confirmed !== "TRUE") errors.push("row " + line + ": Unpersonalized confirmation must be TRUE");
+    for (const key of ["raw_response_sha256","canonical_prompt_sha256"]) if (!/^[a-f0-9]{64}$/.test(row[key])) errors.push("row " + line + ": " + key + " must be a SHA-256 digest");
+    if (row.condition === "architecture_assisted" && !/^[a-f0-9]{64}$/.test(row.architecture_instruction_sha256)) errors.push("row " + line + ": assisted trial requires architecture_instruction_sha256");
+    if (row.condition === "baseline" && row.architecture_instruction_sha256) errors.push("row " + line + ": baseline trial must not contain architecture_instruction_sha256");
+    if (["ASSESSED","VERIFIED"].includes(row.status) && (!row.scorer_id || !row.adversarial_reviewer_id || row.scorer_id === row.adversarial_reviewer_id)) errors.push("row " + line + ": assessed trial requires distinct scorer and adversarial reviewer IDs");
+  }
+  for (const caseId of ["P01","P02","P03","P04","P05"]) for (const repetition of ["1","2","3"]) {
+    for (const condition of ["baseline","architecture_assisted"]) {
+      if (!combinations.has(caseId + ":" + repetition + ":" + condition)) errors.push("missing planned trial " + caseId + " repetition " + repetition + " " + condition);
+    }
+  }
+  const paired = new Map();
+  for (const row of records.filter(row => row.status !== "NOT_RUN")) {
+    const key = row.case_id + ":" + row.repetition;
+    if (!paired.has(key)) paired.set(key, {});
+    paired.get(key)[row.condition] = row;
+  }
+  for (const [key, pair] of paired) {
+    if (pair.baseline && pair.architecture_assisted && pair.baseline.canonical_prompt_sha256 !== pair.architecture_assisted.canonical_prompt_sha256) {
+      errors.push(key + ": baseline and assisted canonical prompt hashes differ");
+    }
+  }
+  return errors;
+}
+
 export function createRunRecord(input) {
   if (!input || typeof input !== "object" || Array.isArray(input)) throw new Error("Trial input must be a JSON object.");
   if (typeof input.prompt !== "string" || !input.prompt.trim()) throw new Error("Trial input requires the exact non-empty prompt.");
   const benchmarkCase = loadJson(CASES_PATH).cases.find(c => c.id === input.case_id);
   if (!benchmarkCase) throw new Error("Unknown benchmark case: " + input.case_id);
   if (input.prompt !== benchmarkCase.prompt) throw new Error("Prompt must exactly match the canonical benchmark case prompt.");
+  if (!input.trial_execution || input.trial_execution.unpersonalized_confirmed !== true) throw new Error("Trial execution must explicitly confirm an Unpersonalized Temporary Chat.");
+  if (input.trial_execution.canonical_prompt_sha256 !== sha256(input.prompt)) throw new Error("Trial execution canonical prompt hash does not match the exact canonical prompt.");
+  if (input.condition === "architecture_assisted" && !/^[a-f0-9]{64}$/.test(input.trial_execution.architecture_instruction_sha256 ?? "")) throw new Error("Architecture-assisted trials require the architecture instruction SHA-256.");
+  if (input.condition === "baseline" && input.trial_execution.architecture_instruction_sha256 != null) throw new Error("Baseline trials must not contain an architecture instruction hash.");
   const date = new Date().toISOString();
   const runId = "GPL-" + date.replace(/[-:.TZ]/g, "").slice(0, 14) + "-" + (input.case_id ?? "XX") + "-" + (input.condition ?? "unknown") + "-" + crypto.randomUUID().slice(0, 8);
   const record = {
@@ -145,6 +242,7 @@ export function createRunRecord(input) {
     condition: input.condition,
     subject: input.subject,
     prompt_sha256: sha256(input.prompt),
+    trial_execution: { ...input.trial_execution, raw_response_sha256: sha256(input.response) },
     response: input.response,
     scores: input.scores,
     critical_failures: input.critical_failures ?? [],
@@ -205,6 +303,23 @@ export function buildComparison(records) {
     let invalidPair = false;
     if (baseline.prompt_sha256 !== assisted.prompt_sha256) {
       issues.push(caseId + ": paired prompts differ; comparison is invalid");
+      invalidPair = true;
+    }
+    if (!baseline.trial_execution || !assisted.trial_execution ||
+        baseline.trial_execution.unpersonalized_confirmed !== true || assisted.trial_execution.unpersonalized_confirmed !== true ||
+        !baseline.trial_execution.context_reference || !assisted.trial_execution.context_reference ||
+        baseline.trial_execution.canonical_prompt_sha256 !== baseline.prompt_sha256 ||
+        assisted.trial_execution.canonical_prompt_sha256 !== assisted.prompt_sha256 ||
+        baseline.trial_execution.raw_response_sha256 !== sha256(baseline.response) ||
+        assisted.trial_execution.raw_response_sha256 !== sha256(assisted.response) ||
+        (assisted.condition === "architecture_assisted" && !/^[a-f0-9]{64}$/.test(assisted.trial_execution.architecture_instruction_sha256 ?? "")) ||
+        baseline.trial_execution.architecture_instruction_sha256 != null) {
+      issues.push(caseId + " repetition " + repetition + ": trial isolation or capture provenance is missing/invalid");
+      invalidPair = true;
+    }
+    if (baseline.trial_execution?.trial_id === assisted.trial_execution?.trial_id ||
+        baseline.trial_execution?.blind_label === assisted.trial_execution?.blind_label) {
+      issues.push(caseId + " repetition " + repetition + ": paired trials must have distinct trial IDs and blind labels");
       invalidPair = true;
     }
     if (baseline.subject !== assisted.subject) {
@@ -354,12 +469,12 @@ export function renderReport(records) {
 }
 
 function usage() {
-  console.log("Usage: node tools/performance-lab/runner.mjs record <trial.json> <ledger.json> | validate <ledger.json> | report <ledger.json> <output.md> | sign-manifest <payload.json> <private-key.pem> <output.json> | verify-manifest <manifest.json> <trusted-public-key.pem> <evidence-root> <expected-revision> <expected-signer-id> <expected-signer-role>");
+  console.log("Usage: node tools/performance-lab/runner.mjs validate-matrix <trial-matrix.csv> | record <trial.json> <ledger.json> | validate <ledger.json> | report <ledger.json> <output.md> | sign-manifest <payload.json> <private-key.pem> <output.json> | verify-manifest <manifest.json> <trusted-public-key.pem> <evidence-root> <expected-revision> <expected-signer-id> <expected-signer-role>");
 }
 
 if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
   const [command, input, output] = process.argv.slice(2);
-  if (command === "record" && input && output) {
+  if (command === "validate-matrix" && input) {\n    const errors = validateTrialMatrix(fs.readFileSync(input, "utf8"));\n    if (errors.length) { console.error(errors.join("\\n")); process.exitCode = 1; }\n    else console.log("Validated all 30 planned trial rows; capture gates are enforced for any started trial.");\n  } else if (command === "record" && input && output) {
     const payload = loadJson(input);
     const record = createRunRecord(payload);
     const count = appendRunRecord(record, output);
