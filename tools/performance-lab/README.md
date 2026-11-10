@@ -28,11 +28,11 @@ Eight dimensions, each scored 0–5: accuracy, reasoning, evidence, calibration,
 ## Trial protocol
 
 1. Use identical prompts, constraints, tools, and information for baseline and architecture-assisted conditions.
-2. Capture raw responses verbatim. Hash the exact prompt with SHA-256 and place the digest in `prompt_sha256`.
+2. Capture raw responses verbatim. Hash the exact prompt with SHA-256 and place the digest in `prompt_sha256`; also record the raw-response SHA-256 in the trial matrix.
 3. Randomize response labels before scoring. Assessors must not know the condition.
-4. Use different independent assessors for baseline and assisted responses, or have multiple assessors score both under a documented blinded protocol. The current report flags identical assessor IDs for paired records.
+4. Use the same independent blinded scorer for both conditions in each pair to reduce inter-rater confounding. A separate independent adversarial reviewer must assess every response and must not be the scorer.
 5. Record evidence references and critical failures. A score without rationale/evidence is not sufficient for operational approval.
-6. Submit **30 records**: five cases × two conditions × three repetitions. Repetition numbers 1, 2, and 3 must be present for every case-condition combination. The comparison runner pairs by case and repetition and reports each paired delta plus per-case mean and min/max across the three repetitions; it never substitutes a single overall average for case-level results.
+6. Follow [the controlled trial execution runbook](TRIAL-EXECUTION.md) and the operator-only [30-trial execution matrix](evidence/trial-matrix.csv). Keep the condition map away from scorers. Submit **30 records**: five cases × two conditions × three repetitions. Repetition numbers 1, 2, and 3 must be present for every case-condition combination. The comparison runner pairs by case and repetition and reports each paired delta plus per-case mean and min/max across the three repetitions; it never substitutes a single overall average for case-level results.
 
 ## Record format
 
