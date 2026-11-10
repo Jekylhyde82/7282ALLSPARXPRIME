@@ -228,9 +228,12 @@ export function renderReport(records) {
     lines.push("| " + summary.case_id + " | " + summary.repetitions_present + "/3 | " + cells.join(" | ") + " |");
   }
   lines.push("", "## Critical failures", "");
-  const failures = result.pairs.flatMap(p => p.critical_failures.map(x => "- " + p.case_id + ": " + x));
-  lines.push(...(failures.length ? failures : ["- None recorded in supplied records. This is not proof that none occurred."]));
-  lines.push("", "## Evidence and independence gaps", "");
+  const failures = [
+    ...result.pairs.flatMap(p => p.critical_failures.map(x => "- " + p.case_id + ": " + x)),
+    ...result.issues.filter(x => /critical failure recorded|adversarial failure/i.test(x)).map(x => "- " + x)
+  ];
+  lines.push(...(failures.length ? [...new Set(failures)] : ["- None recorded in supplied records. This is not proof that none occurred."]));
+  lines.push("", "## Eligibility, evidence and independence gaps", "");
   lines.push(...(result.issues.length ? result.issues.map(x => "- " + x) : ["- Pair completeness, assessor independence and blinding are attested in supplied records; attestations still require external validation."]));
   lines.push("", "## Operational decision", "",
     "NOT OPERATIONAL unless all 15 pairs are present (five cases × three repetitions), schema validation passes, independent assessors verify source evidence, adversarial checks are reviewed, CI passes, and a separate release reviewer signs the evidence package.", "");
