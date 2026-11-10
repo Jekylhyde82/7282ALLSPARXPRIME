@@ -60,7 +60,7 @@ test("duplicate condition within a repetition is rejected from clean pairing",()
   const a=record("architecture_assisted","same-scorer","P01",1);
   const duplicate=record("baseline","same-scorer","P01",1);
   const result=buildComparison([b,a,duplicate]);
-  assert.ok(result.issues.some(x=>x.includes("P01: duplicate baseline record")));
+  assert.ok(result.issues.some(x=>x.includes("P01: duplicate baseline record for repetition 1")));
 });
 
 test("report keeps operational status on HOLD",()=>{
@@ -98,7 +98,7 @@ test("missing required adversarial check blocks comparison readiness",()=>{
 });
 
 test("run records cannot self-promote verification status",()=>{
-  const trial={case_id:"P01",condition:"baseline",subject:"GPT-6",prompt:cases.cases.find(c=>c.id==="P01").prompt,response:"Response",scores:Object.fromEntries(dims.map(d=>[d,3])),evidence:[{kind:"test",reference:"test://evidence"}],assessor:{assessor_id:"scorer",blinded_condition:true,independent:true},adversarial_review:{reviewer_id:"critic",blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"Reviewed."},{check_id:"AC02",outcome:"PASS",finding:"Reviewed."}]},verification_status:"INDEPENDENTLY_REVIEWED"};
+  const trial={case_id:"P01",repetition:1,condition:"baseline",subject:"GPT-6",prompt:cases.cases.find(c=>c.id==="P01").prompt,response:"Response",scores:Object.fromEntries(dims.map(d=>[d,3])),evidence:[{kind:"test",reference:"test://evidence"}],assessor:{assessor_id:"scorer",blinded_condition:true,independent:true},adversarial_review:{reviewer_id:"critic",blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"Reviewed."},{check_id:"AC02",outcome:"PASS",finding:"Reviewed."}]},verification_status:"INDEPENDENTLY_REVIEWED"};
   const record=createRunRecord(trial);
   assert.equal(record.verification_status,"NOT_VERIFIED");
   assert.ok(validateRunRecord({...record,verification_status:"INDEPENDENTLY_REVIEWED"}).some(error=>error.includes("must equal")));
