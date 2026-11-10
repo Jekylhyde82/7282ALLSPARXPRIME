@@ -120,6 +120,9 @@ importers:
       '@types/react-dom':
         specifier: 19.0.2
         version: 19.0.2(@types/react@19.0.2)
+      ajv:
+        specifier: 8.17.1
+        version: 8.17.1
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.5.2)
