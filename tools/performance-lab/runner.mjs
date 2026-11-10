@@ -217,6 +217,7 @@ export function validateTrialMatrix(csvText) {
     for (const key of ["raw_response_sha256","canonical_prompt_sha256"]) if (!/^[a-f0-9]{64}$/.test(row[key])) errors.push("row " + line + ": " + key + " must be a SHA-256 digest");
     if (row.condition === "architecture_assisted" && !/^[a-f0-9]{64}$/.test(row.architecture_instruction_sha256)) errors.push("row " + line + ": assisted trial requires architecture_instruction_sha256");
     if (row.condition === "baseline" && row.architecture_instruction_sha256) errors.push("row " + line + ": baseline trial must not contain architecture_instruction_sha256");
+    if (row.status === "CAPTURED" && (row.scorer_id || row.adversarial_reviewer_id)) errors.push("row " + line + ": CAPTURED trial must not contain assessor identities before blinded assessment");
     if (row.status === "ASSESSED" && (!row.scorer_id || !row.adversarial_reviewer_id || row.scorer_id === row.adversarial_reviewer_id)) errors.push("row " + line + ": assessed trial requires distinct scorer and adversarial reviewer IDs");
   }
   for (const caseId of ["P01","P02","P03","P04","P05"]) for (const repetition of ["1","2","3"]) {
@@ -525,8 +526,8 @@ if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === imp
     const privateKeyPem = fs.readFileSync(output, "utf8");
     const signed = signEvidenceManifest(payload, privateKeyPem);
     const manifestErrors = validateSchema(signed, loadJson(path.join(ROOT, "schema/evidence-manifest.schema.json")));
-    if (manifestErrors.length) throw new Error(manifestErrors.join("\\n"));
-    fs.writeFileSync(process.argv[5], JSON.stringify(signed, null, 2) + "\\n", { flag: "wx", mode: 0o600 });
+    if (manifestErrors.length) throw new Error(manifestErrors.join("\n"));
+    fs.writeFileSync(process.argv[5], JSON.stringify(signed, null, 2) + "\n", { flag: "wx", mode: 0o600 });
     console.log("Signed evidence manifest written to " + process.argv[5]);
   } else if (command === "verify-manifest" && input && output && process.argv[5] && process.argv[6] && process.argv[7] && process.argv[8]) {
     const manifest = loadJson(input);
@@ -539,7 +540,7 @@ if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === imp
       expectedSignerRole: process.argv[8]
     });
     if (errors.length) {
-      console.error(errors.join("\\n"));
+      console.error(errors.join("\n"));
       process.exitCode = 1;
     } else {
       console.log("Evidence manifest signature, trusted-key fingerprint, revision binding, and artifact hashes verified.");
