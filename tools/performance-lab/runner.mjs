@@ -26,8 +26,23 @@ export function validateSchema(value, schema, pointer = "$") {
   return (validate.errors ?? []).map(error => pointer + (error.instancePath || "") + ": " + error.message);
 }
 
+export function isRfc3339Timestamp(value) {
+  if (typeof value !== "string") return false;
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(?:Z|([+-])(\d{2}):(\d{2}))$/.exec(value);
+  if (!match) return false;
+  const [, year, month, day, hour, minute, second, , offsetHour, offsetMinute] = match;
+  const date = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+  if (date.getUTCFullYear() !== Number(year) || date.getUTCMonth() + 1 !== Number(month) || date.getUTCDate() !== Number(day)) return false;
+  if (Number(hour) > 23 || Number(minute) > 59 || Number(second) > 59) return false;
+  if (offsetHour !== undefined && (Number(offsetHour) > 23 || Number(offsetMinute) > 59)) return false;
+  return Number.isFinite(Date.parse(value));
+}
+
 export function validateRunRecord(record, schema = loadJson(SCHEMA_PATH)) {
-  return validateSchema(record, schema);
+  const errors = validateSchema(record, schema);
+  if (record && !isRfc3339Timestamp(record.created_at)) errors.push("$.created_at: must be a valid RFC 3339 timestamp");
+  if (record?.trial_execution && !isRfc3339Timestamp(record.trial_execution.captured_at)) errors.push("$.trial_execution.captured_at: must be a valid RFC 3339 timestamp");
+  return errors;
 }
 
 export function sha256(text) {
@@ -193,7 +208,7 @@ export function validateTrialMatrix(csvText) {
     if (!row.model_label) errors.push("row " + line + ": captured trial requires model_label");
     if (row.context_type !== "Unpersonalized Temporary Chat") errors.push("row " + line + ": context_type must be Unpersonalized Temporary Chat");
     if (!row.context_reference) errors.push("row " + line + ": captured trial requires context_reference");
-    if (!row.captured_at || Number.isNaN(Date.parse(row.captured_at))) errors.push("row " + line + ": captured_at must be a valid timestamp");
+    if (!isRfc3339Timestamp(row.captured_at)) errors.push("row " + line + ": captured_at must be a valid timestamp");
     if (!row.settings) errors.push("row " + line + ": captured trial requires settings metadata");
     if (!row.tools_used) errors.push("row " + line + ": captured trial must explicitly record tools_used (use none when unused)");
     if (!row.capture_reference) errors.push("row " + line + ": captured trial requires capture_reference");
@@ -224,6 +239,7 @@ export function validateTrialMatrix(csvText) {
 
 export function createRunRecord(input) {
   if (!input || typeof input !== "object" || Array.isArray(input)) throw new Error("Trial input must be a JSON object.");
+  if (typeof input.response !== "string" || !input.response.length) throw new Error("Trial input requires the complete verbatim response.");
   if (typeof input.prompt !== "string" || !input.prompt.trim()) throw new Error("Trial input requires the exact non-empty prompt.");
   const benchmarkCase = loadJson(CASES_PATH).cases.find(c => c.id === input.case_id);
   if (!benchmarkCase) throw new Error("Unknown benchmark case: " + input.case_id);
