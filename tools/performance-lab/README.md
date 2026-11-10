@@ -106,18 +106,18 @@ Example trial-input skeleton (scores are placeholders, not results):
 }
 ```
 
-The `repetition` field must be 1, 2, or 3. The example is a format illustration only. Do not submit it as a completed trial. Each case's required adversarial check IDs are defined in `cases.json`; all must be assessed. Use `FAIL` when a defect is found and preserve the finding. Do not mark an unchecked item as `PASS`.
+Every run record must include `trial_execution` with the exact matrix `trial_id` and `blind_label`, `unpersonalized_confirmed: true`, context reference, capture timestamp, canonical prompt hash, and raw-response hash. Assisted records also require the architecture-instruction SHA-256; baseline records must omit it. The runner recomputes the response hash and rejects mismatches. Run `validate-matrix` before capture and after every matrix update; it enforces the 30 planned rows, unique IDs, pair coverage, and all capture/isolation fields for started trials. The `repetition` field must be 1, 2, or 3. The example is a format illustration only. Do not submit it as a completed trial. Each case's required adversarial check IDs are defined in `cases.json`; all must be assessed. Use `FAIL` when a defect is found and preserve the finding. Do not mark an unchecked item as `PASS`.
 
 ## Commands
 
 ```bash
-node tools/performance-lab/runner.mjs record path/to/trial-input.json path/to/records.json
+node tools/performance-lab/runner.mjs validate-matrix tools/performance-lab/evidence/trial-matrix.csv\nnode tools/performance-lab/runner.mjs record path/to/trial-input.json path/to/records.json
 node tools/performance-lab/runner.mjs validate path/to/records.json
 node tools/performance-lab/runner.mjs report path/to/records.json reports/comparison.md
 node --test tests/performance-lab.test.mjs
 ```
 
-The comparison engine is fail-closed for fields represented in its run-record schema: both records must have matching canonical-prompt hashes and model subjects, evidence references with SHA-256 digests, calibrated scorer and adversarial-reviewer metadata, matching evaluator attestations, rationales for all eight dimensions, the same blinded scorer for both conditions, and a distinct blinded adversarial reviewer with every required check assessed. Duplicate records, missing evidence, incomplete reviews, calibration gaps, evaluator identity mismatches, scorer/reviewer conflicts, recorded critical failures, and failed adversarial checks invalidate that pair. Findings remain visible in the report issues; they are not converted into clean averages.
+The comparison engine is fail-closed for fields represented in its run-record schema, including explicit Unpersonalized-session confirmation, distinct trial/blind IDs, canonical prompt provenance and a response hash recomputed from the retained response: both records must have matching canonical-prompt hashes and model subjects, evidence references with SHA-256 digests, calibrated scorer and adversarial-reviewer metadata, matching evaluator attestations, rationales for all eight dimensions, the same blinded scorer for both conditions, and a distinct blinded adversarial reviewer with every required check assessed. Duplicate records, missing evidence, incomplete reviews, calibration gaps, evaluator identity mismatches, scorer/reviewer conflicts, recorded critical failures, and failed adversarial checks invalidate that pair. Findings remain visible in the report issues; they are not converted into clean averages.
 
 Evidence hashes are integrity identifiers, not proof of authenticity. The signed evidence manifest schema is `schema/evidence-manifest.schema.json`. The runner can sign a manifest with an Ed25519 private key held by the evidence custodian and verify its signature using an independently provisioned trusted public key. Verification checks the expected candidate revision, trusted-key fingerprint, artifact path containment, and SHA-256 of every listed artifact. The trusted public key, expected signer ID, and required signer role must be obtained from an out-of-band trust record; the verifier checks all three against the signed manifest. A manifest cannot establish its own trust anchor. The independent reviewer must separately verify that the trusted key is legitimately bound to the named custodian and that key custody is sound.
 
