@@ -9,7 +9,7 @@ This isolated toolset defines five paired benchmark cases, a run-record JSON Sch
 
 The runner validates submitted records and produces a comparison report. It does **not** invoke ChatGPT or another model, establish a baseline automatically, judge semantic correctness, authenticate assessor identities, or independently verify evidence. Baseline and architecture-assisted answers must be collected under controlled conditions and entered as records. Never fabricate scores or use synthetic data as measured results.
 
-The schema uses a documented, intentionally limited JSON Schema keyword subset in the dependency-free validator: `type`, `required`, `properties`, `additionalProperties`, `items`, `enum`, `const`, `minimum`, `maximum`, `minLength`, and `pattern`. It is **not** a complete Draft 2020-12 implementation. Before production use, replace or independently validate this subset with a standards-compliant validator pinned in the lockfile.
+The run-record schema is validated with Ajv 8.17.1 using its Draft 2020-12 implementation (`ajv/dist/2020.js`). Ajv is pinned as a direct development dependency and in the pnpm lockfile. The dedicated CI workflow installs that exact validator version before running the tests. Schema changes must continue to be validated against the declared Draft 2020-12 dialect.
 
 ## Five test cases
 
