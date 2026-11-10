@@ -76,7 +76,7 @@ Before scoring experimental outputs, calibrate both AI evaluators on a held-out 
 - The AI scorer and AI adversarial reviewer must not be the same model instance, agent, provider account, or shared conversation. Record known common dependencies.
 - A human adjudicator must review every critical failure, every disagreement that could change a pair's eligibility or comparative conclusion, and any suspected evaluator bias. Preserve the original AI outputs; adjudication supplements rather than overwrites them.
 - Assessor identity, blinding, evaluator configuration, and evidence provenance must be independently checked; self-attestation alone is not authentication.
-- Every comparison pair is fail-closed: missing evidence references or SHA-256 digests, incomplete scorer/reviewer attestations, scorer/reviewer conflicts, failed evaluator calibration, missing adversarial checks, any NOT_ASSESSED check, or any critical/adversarial failure prevents that pair from producing a comparative delta.
+- Every comparison pair is fail-closed for the conditions the current runner can inspect: missing evidence references or SHA-256 digests, incomplete scorer/reviewer attestations, scorer/reviewer conflicts, missing adversarial checks, any NOT_ASSESSED check, or any critical/adversarial failure. **Evaluator calibration is an additional mandatory release gate, but the current runner does not ingest or verify calibration evidence; an external independent release reviewer must block scoring approval and release if calibration evidence is absent or failed.**
 - A SHA-256 digest establishes a content fingerprint only when checked against the retained artifact. It does not authenticate who captured, scored, or reviewed that artifact. Retain independently signed reviewer statements and an evidence manifest outside the run-record self-attestations.
 
 ## Scoring
@@ -86,5 +86,7 @@ Score each response from 0–5 on accuracy, reasoning, evidence, calibration, ca
 ## Completion gate
 
 The experiment remains NOT VERIFIED until all 30 raw outputs are captured, all 15 pairs are complete, independent blinded scoring and separate adversarial review are complete, evidence references and response hashes are checked, and an independent reviewer signs a revision-bound evidence manifest.
+
+**Implementation limitation:** the current run-record schema and comparison runner do not yet store or programmatically enforce evaluator calibration results, per-dimension rationales, or signed evaluator identity. These must be retained in the external evidence package and checked by the independent release reviewer. The protocol is defined; this enforcement is not implemented in the runner.
 
 **Current result:** no model trials have been executed and no performance improvement or regression is claimed.
