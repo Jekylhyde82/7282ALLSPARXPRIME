@@ -36,7 +36,7 @@ Eight dimensions, each scored 0–5: accuracy, reasoning, evidence, calibration,
 
 ## Record format
 
-Create a JSON array of run records conforming to `schema/run-record.schema.json`. Example skeleton:
+Create a trial-input JSON object with the exact `prompt`, response, case, condition, scores and assessor fields; run the `record` command to generate the run ID, timestamp and SHA-256 prompt hash and append the validated record atomically. Then validate the ledger. The ledger is a JSON array of run records conforming to `schema/run-record.schema.json`. Example skeleton:
 
 ```json
 {
@@ -69,12 +69,12 @@ The zero scores above are placeholders, not results. Do not submit the example a
 ## Commands
 
 ```bash
-node tools/performance-lab/runner.mjs validate path/to/records.json
+node tools/performance-lab/runner.mjs record path/to/trial-input.json path/to/records.json\nnode tools/performance-lab/runner.mjs validate path/to/records.json
 node tools/performance-lab/runner.mjs report path/to/records.json reports/comparison.md
 node --test tests/performance-lab.test.mjs
 ```
 
-The report displays per-dimension deltas for each complete pair and lists missing pairs, assessor-independence gaps and critical failures. It does not calculate a single misleading average.
+The report displays per-dimension deltas for each complete pair and lists missing pairs, assessor-independence and paired-assessor gaps and critical failures. It does not calculate a single misleading average.
 
 ## Adversarial verification
 
