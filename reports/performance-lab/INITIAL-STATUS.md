@@ -2,7 +2,7 @@
 
 **Benchmark:** GENESIS-PERFORMANCE-LAB-001  
 **Report type:** Initial readiness / no-trial status  
-**Candidate revision:** f870edea1734036c70f12e098376a4ddb234d8df  
+**Candidate revision:** 806fcf46394e6baf71f33fe10bd33b5fc35bc645  
 **Trial records received:** 0  
 **Operational decision:** HOLD — NOT OPERATIONAL
 
