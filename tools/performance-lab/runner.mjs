@@ -63,6 +63,7 @@ export function createRunRecord(input) {
     benchmark_id: "GENESIS-PERFORMANCE-LAB-001",
     run_id: runId,
     case_id: input.case_id,
+    repetition: input.repetition,
     condition: input.condition,
     subject: input.subject,
     prompt_sha256: sha256(input.prompt),
@@ -103,16 +104,17 @@ export function buildComparison(records) {
   const issues = [];
   const grouped = new Map();
   for (const record of records) {
-    const key = record.case_id;
+    const key = record.case_id + ":" + record.repetition;
     if (!grouped.has(key)) grouped.set(key, {});
     const group = grouped.get(key);
     if (group[record.condition]) issues.push(key + ": duplicate " + record.condition + " record");
     group[record.condition] = record;
   }
   for (const caseId of ["P01","P02","P03","P04","P05"]) {
-    const group = grouped.get(caseId) ?? {};
+    for (const repetition of [1,2,3]) {
+    const group = grouped.get(caseId + ":" + repetition) ?? {};
     if (!group.baseline || !group.architecture_assisted) {
-      issues.push(caseId + ": missing baseline or architecture-assisted run");
+      issues.push(caseId + " repetition " + repetition + ": missing baseline or architecture-assisted run");
       continue;
     }
     const baseline = group.baseline;
@@ -155,6 +157,7 @@ export function buildComparison(records) {
     for (const dimension of DIMENSIONS) delta[dimension] = assisted.scores[dimension] - baseline.scores[dimension];
     pairs.push({
       case_id: caseId,
+      repetition,
       baseline_run_id: baseline.run_id,
       assisted_run_id: assisted.run_id,
       delta,
@@ -165,8 +168,23 @@ export function buildComparison(records) {
         ...(assisted.adversarial_review?.checks ?? []).filter(x => x.outcome === "FAIL").map(x => "assisted adversarial " + x.check_id + ": " + x.finding)
       ]
     });
+    }
   }
-  return { pairs, issues };
+  const summaries = ["P01","P02","P03","P04","P05"].map(caseId => {
+    const casePairs = pairs.filter(pair => pair.case_id === caseId);
+    const delta = {};
+    for (const dimension of DIMENSIONS) {
+      const values = casePairs.map(pair => pair.delta[dimension]);
+      delta[dimension] = values.length ? {
+        mean: values.reduce((sum, value) => sum + value, 0) / values.length,
+        min: Math.min(...values),
+        max: Math.max(...values),
+        repetitions_present: values.length
+      } : { mean: null, min: null, max: null, repetitions_present: 0 };
+    }
+    return { case_id: caseId, repetitions_present: casePairs.length, delta };
+  });
+  return { pairs, summaries, issues };
 }
 
 export function renderReport(records) {
@@ -178,12 +196,19 @@ export function renderReport(records) {
     "",
     "Generated: " + new Date().toISOString(),
     "",
-    "| Case | Run pair | Accuracy Δ | Reasoning Δ | Evidence Δ | Calibration Δ | Capability Δ | Reliability Δ | Safety Δ | Synergy Δ |",
-    "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|"
+    "| Case | Rep | Run pair | Accuracy Δ | Reasoning Δ | Evidence Δ | Calibration Δ | Capability Δ | Reliability Δ | Safety Δ | Synergy Δ |",
+    "|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|"
   ];
   for (const p of result.pairs) {
-    lines.push("| " + p.case_id + " | " + p.baseline_run_id + " → " + p.assisted_run_id + " | " +
+    lines.push("| " + p.case_id + " | " + p.repetition + " | " + p.baseline_run_id + " → " + p.assisted_run_id + " | " +
       DIMENSIONS.map(d => p.delta[d]).join(" | ") + " |");
+  }
+  lines.push("", "## Three-repetition case summaries", "",
+    "| Case | Complete pairs | Accuracy mean [min,max] | Reasoning mean [min,max] | Evidence mean [min,max] | Calibration mean [min,max] | Capability mean [min,max] | Reliability mean [min,max] | Safety mean [min,max] | Synergy mean [min,max] |",
+    "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|");
+  for (const summary of result.summaries) {
+    const cells = DIMENSIONS.map(d => { const v = summary.delta[d]; return v.mean === null ? "—" : v.mean.toFixed(2) + " [" + v.min + "," + v.max + "]"; });
+    lines.push("| " + summary.case_id + " | " + summary.repetitions_present + "/3 | " + cells.join(" | ") + " |");
   }
   lines.push("", "## Critical failures", "");
   const failures = result.pairs.flatMap(p => p.critical_failures.map(x => "- " + p.case_id + ": " + x));
