@@ -13,7 +13,7 @@ function record(condition, assessorId, caseId="P01", repetition=1) {
     benchmark_id:"GENESIS-PERFORMANCE-LAB-001",run_id:`GPL-20261110-${caseId}-R${repetition}-${condition === "baseline" ? "B" : "A"}`,
     case_id:caseId,repetition,condition,subject:"GPT-6",prompt_sha256:sha256("identical prompt"),
     response:"Recorded trial response.",scores:Object.fromEntries(dims.map(d=>[d,3])),
-    critical_failures:[],evidence:[{kind:"test fixture",reference:"test://evidence"}],assessor:{assessor_id:assessorId,blinded_condition:true,independent:true},
+    critical_failures:[],evidence:[{kind:"test fixture",reference:"test://evidence",sha256:sha256("fixture evidence")}],assessor:{assessor_id:assessorId,blinded_condition:true,independent:true},
     adversarial_review:{reviewer_id:"critic-" + assessorId,blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"No unsupported claim found."},{check_id:"AC02",outcome:"PASS",finding:"Uncertainty was stated."}]},
     limitations:[],verification_status:"NOT_VERIFIED",created_at:"2026-11-10T00:00:00.000Z"
   };
@@ -95,10 +95,11 @@ test("adversarial failures are surfaced and missing independent critic blocks re
   const b=record("baseline","score-A"),a=record("architecture_assisted","score-A");
   a.adversarial_review.checks[0]={check_id:"AC01",outcome:"FAIL",finding:"Unsupported factual assertion."};
   const result=buildComparison([b,a]);
-  assert.ok(result.pairs[0].critical_failures.some(x=>x.includes("Unsupported factual assertion")));
+  assert.equal(result.pairs.length,0,"failed adversarial checks must not produce a certifiable comparison delta");
+  assert.ok(result.issues.some(x=>x.includes("Unsupported factual assertion")));
   a.adversarial_review.reviewer_id=a.assessor.assessor_id;
   const blocked=buildComparison([b,a]);
-  assert.ok(blocked.issues.some(x=>x.includes("must be distinct from scorer")));
+  assert.ok(blocked.issues.some(x=>x.includes("distinct from scorer")));
 });
 
 test("missing required adversarial check blocks comparison readiness",()=>{
@@ -110,10 +111,43 @@ test("missing required adversarial check blocks comparison readiness",()=>{
 });
 
 test("run records cannot self-promote verification status",()=>{
-  const trial={case_id:"P01",repetition:1,condition:"baseline",subject:"GPT-6",prompt:cases.cases.find(c=>c.id==="P01").prompt,response:"Response",scores:Object.fromEntries(dims.map(d=>[d,3])),evidence:[{kind:"test",reference:"test://evidence"}],assessor:{assessor_id:"scorer",blinded_condition:true,independent:true},adversarial_review:{reviewer_id:"critic",blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"Reviewed."},{check_id:"AC02",outcome:"PASS",finding:"Reviewed."}]},verification_status:"INDEPENDENTLY_REVIEWED"};
+  const trial={case_id:"P01",repetition:1,condition:"baseline",subject:"GPT-6",prompt:cases.cases.find(c=>c.id==="P01").prompt,response:"Response",scores:Object.fromEntries(dims.map(d=>[d,3])),evidence:[{kind:"test",reference:"test://evidence",sha256:sha256("fixture evidence")}],assessor:{assessor_id:"scorer",blinded_condition:true,independent:true},adversarial_review:{reviewer_id:"critic",blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"Reviewed."},{check_id:"AC02",outcome:"PASS",finding:"Reviewed."}]},verification_status:"INDEPENDENTLY_REVIEWED"};
   const record=createRunRecord(trial);
   assert.equal(record.verification_status,"NOT_VERIFIED");
   assert.ok(validateRunRecord({...record,verification_status:"INDEPENDENTLY_REVIEWED"}).some(error=>error.includes("equal to constant")));
+});
+
+
+test("comparison fails closed when evidence hashes are missing",()=>{
+  const b=record("baseline","scorer"),a=record("architecture_assisted","scorer");
+  delete b.evidence[0].sha256;
+  const result=buildComparison([b,a]);
+  assert.equal(result.pairs.length,0);
+  assert.ok(result.issues.some(x=>x.includes("evidence reference and SHA-256 are required")));
+});
+
+test("comparison fails closed when scorer independence or blinding is absent",()=>{
+  const b=record("baseline","scorer"),a=record("architecture_assisted","scorer");
+  a.assessor.independent=false;
+  const result=buildComparison([b,a]);
+  assert.equal(result.pairs.length,0);
+  assert.ok(result.issues.some(x=>x.includes("independent blinded scorer evidence")));
+});
+
+test("comparison fails closed when adversarial review is missing or incomplete",()=>{
+  const b=record("baseline","scorer"),a=record("architecture_assisted","scorer");
+  a.adversarial_review.blinded_condition=false;
+  const result=buildComparison([b,a]);
+  assert.equal(result.pairs.length,0);
+  assert.ok(result.issues.some(x=>x.includes("independent blinded adversarial review missing")));
+});
+
+test("recorded critical failures prevent a clean comparative delta",()=>{
+  const b=record("baseline","scorer"),a=record("architecture_assisted","scorer");
+  a.critical_failures=["unsafe instruction"];
+  const result=buildComparison([b,a]);
+  assert.equal(result.pairs.length,0);
+  assert.ok(result.issues.some(x=>x.includes("critical failure recorded")));
 });
 
 test("paired comparisons reject prompt or model subject drift",()=>{
@@ -126,6 +160,6 @@ test("paired comparisons reject prompt or model subject drift",()=>{
   assert.equal(result.pairs.length,0,"mismatched prompts or model subjects must never produce a comparative delta");
 });
 test("recording rejects a prompt that differs from the canonical case",()=>{
-  const trial={case_id:"P01",condition:"baseline",subject:"GPT-6",prompt:"not the canonical prompt",response:"response",scores:Object.fromEntries(dims.map(d=>[d,3])),evidence:[{kind:"test",reference:"test://evidence"}],assessor:{assessor_id:"scorer",blinded_condition:true,independent:true},adversarial_review:{reviewer_id:"critic",blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"Reviewed."},{check_id:"AC02",outcome:"PASS",finding:"Reviewed."}]}};
+  const trial={case_id:"P01",condition:"baseline",subject:"GPT-6",prompt:"not the canonical prompt",response:"response",scores:Object.fromEntries(dims.map(d=>[d,3])),evidence:[{kind:"test",reference:"test://evidence",sha256:sha256("fixture evidence")}],assessor:{assessor_id:"scorer",blinded_condition:true,independent:true},adversarial_review:{reviewer_id:"critic",blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"Reviewed."},{check_id:"AC02",outcome:"PASS",finding:"Reviewed."}]}};
   assert.throws(()=>createRunRecord(trial),/canonical benchmark case prompt/);
 });
