@@ -23,7 +23,8 @@ This register distinguishes defects in the implemented toolchain from deliberate
 | PL-010 | Low | GitHub Actions use major-version action tags (for example, `actions/checkout@v4` and `actions/setup-node@v4`) rather than reviewed immutable commit SHAs. Current logs also emit Node.js 20 deprecation warnings for those actions. | **OPEN** | Review action provenance and compatibility, pin actions to verified full commit SHAs, and define a controlled update process. Do not blindly copy unverified hashes. |
 | PL-011 | Low | The README evidence-manifest verification example contained duplicated signer ID/role arguments. | **RESOLVED IN CURRENT BRANCH** | Corrected the command to match the runner's six-argument CLI contract. Verify the documentation correction on the resulting branch head and retain the CI result. |
 | PL-012 | High | The runbook specified eight 0–5 scoring dimensions but did not define sufficiently anchored, dimension-specific scoring criteria. | **OPEN — APPROVAL GATE** | Added proposed `SCORING-RUBRIC.md`, `CALIBRATION-PLAN-TEMPLATE.md`, and `schema/calibration-plan.schema.json`, with CLI validation for frozen thresholds, separate evaluators, held-out human-adjudicated coverage, and at least two independent signed human approvals. The issue remains an approval gate until qualified reviewers approve and sign the exact rubric hash and numerical calibration thresholds before evaluator calibration or experimental scoring. |
-| PL-013 | High | The operator matrix did not contain a dedicated machine-auditable confirmation that Unpersonalized Temporary Chat was selected, nor separate prompt/instruction hashes. | **IMPLEMENTED WITH EXTERNAL ATTESTATION LIMIT — CI REQUIRED** | Protocol 1.5 validates the operator CSV, requires TRUE for every started trial, enforces canonical prompt and assisted-instruction hashes, and binds run records to trial/blind IDs, context metadata and response hashes. Software cannot prove that the operator actually selected the UI state; raw capture evidence and independent review remain mandatory. |
+| PL-013 | High | The operator matrix did not contain a dedicated machine-auditable confirmation that Unpersonalized Temporary Chat was selected, nor separate prompt/instruction hashes. | **IMPLEMENTED WITH EXTERNAL ATTESTATION LIMIT — CI REQUIRED** | Protocol 1.5 validates the operator CSV, requires TRUE for every started trial, checks canonical prompt hashes against `cases.json`, checks assisted-instruction hashes against the frozen `ARCHITECTURE-INSTRUCTION.txt`, and binds run records to trial/blind IDs, context metadata and response bytes. Software cannot prove that the operator actually selected the UI state; raw capture evidence and independent review remain mandatory. |
+| PL-015 | High | Matrix CSV parsing accepted malformed quote placement, and captured prompt/instruction hashes were only checked for digest shape/pair consistency rather than against the registered source text. | **IMPLEMENTED — CURRENT-HEAD CI REQUIRED** | CSV parsing now rejects quotes in unquoted fields and characters after closing quotes. Captured prompt hashes are checked against the canonical case prompt; assisted instruction hashes are checked against the frozen instruction artifact. Added negative tests for wrong but syntactically valid hashes and malformed CSV quoting. |
 
 ## Verified implementation and test evidence
 
@@ -32,7 +33,7 @@ This register distinguishes defects in the implemented toolchain from deliberate
 - The tests cover repetition bounds and pairing, duplicate records, prompt/model drift, fail-closed evidence and assessor/reviewer checks, calibration metadata, per-dimension rationales, signed-manifest revision/key/artifact verification, path traversal and signature tampering.
 - The signed evidence-manifest verifier checks Ed25519 signatures, externally supplied trusted-key fingerprints, exact candidate revision binding, path containment and actual artifact SHA-256 values.
 - The 30-row operator matrix defines five cases × two conditions × three repetitions. The matrix is a plan, not evidence that any trial was executed.
-- The current CI pass verifies automated toolchain checks on the exact tested revision only. It does not verify model outputs, independent assessment, identity authentication or operational readiness.
+- Historical CI passes verify only their exact tested revisions. The current candidate has no returned workflow run/check result yet. CI does not verify model outputs, independent assessment, identity authentication or operational readiness.
 
 ## Improvement backlog
 
@@ -40,13 +41,13 @@ This register distinguishes defects in the implemented toolchain from deliberate
 2. Obtain independent human approval of the anchored scoring rubric and pre-registered numerical calibration thresholds; establish and preserve the held-out, human-adjudicated calibration reference set for both separate AI evaluators before scoring experimental responses.
 3. Independently verify assessor/reviewer identity, blinding, evaluator configuration and signed evidence provenance.
 4. Cross-check every run-record evidence reference against the signed manifest and retained artifact bytes.
-5. Add RFC 3339 date-time validation with semantic negative tests.
+5. **RESOLVED IN BRANCH — CI REQUIRED:** strict RFC 3339 timestamp validation and semantic negative tests.
 6. Decide whether a second independent scorer is required for every response; preserve the same blinded scorer across each pair.
 7. Improve adversarial-review auditability without treating machine-readable PASS fields as semantic proof.
 8. Report descriptive uncertainty honestly; avoid unjustified inference from three repetitions.
 9. Pin GitHub Actions to reviewed immutable SHAs and address Node.js runtime deprecation warnings.
 10. Obtain independent release approval against the exact final candidate revision.
-11. Enforce protocol 1.5 matrix isolation and provenance columns during execution and manifest review.
+11. **IMPLEMENTED IN BRANCH — CI REQUIRED:** machine-enforced protocol 1.5 matrix isolation, canonical source hashes and provenance columns.
 
 | PL-014 | Critical | Operator-matrix isolation and capture provenance were documented but not enforced by the runner; run records did not bind trial IDs/context confirmation to response bytes. | **IMPLEMENTED — CURRENT-HEAD CI REQUIRED** | Added strict 20-column CSV validation for all 30 planned rows, unique trial/blind IDs, exact pair coverage, capture-state metadata, Unpersonalized confirmation, prompt/instruction/response hashes, and assessor separation for assessed rows. Prompt hashes are now checked against `cases.json`, and assisted-instruction hashes against a frozen instruction artifact. CSV malformed quoting is rejected. Run records require trial_execution metadata, strict RFC 3339 timestamps, and recompute the raw-response SHA-256. Independent operator confirmation and identity authentication remain external. |
 
