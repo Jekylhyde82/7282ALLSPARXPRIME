@@ -74,5 +74,5 @@ test("missing required adversarial check blocks comparison readiness",()=>{
 
 test("run records cannot self-promote verification status",()=>{
   const trial={case_id:"P01",condition:"baseline",subject:"GPT-6",prompt:"Exact prompt",response:"Response",scores:Object.fromEntries(dims.map(d=>[d,3])),evidence:[{kind:"test",reference:"test://evidence"}],assessor:{assessor_id:"scorer",blinded_condition:true,independent:true},adversarial_review:{reviewer_id:"critic",blinded_condition:true,independent:true,checks:[{check_id:"AC01",outcome:"PASS",finding:"Reviewed."},{check_id:"AC02",outcome:"PASS",finding:"Reviewed."}]},verification_status:"INDEPENDENTLY_REVIEWED"};
-  assert.throws(()=>createRunRecord(trial),/must equal/);
+  const record=createRunRecord(trial);\n  assert.equal(record.verification_status,"NOT_VERIFIED");\n  assert.ok(validateRunRecord({...record,verification_status:"INDEPENDENTLY_REVIEWED"}).some(error=>error.includes("must equal")));
 });
