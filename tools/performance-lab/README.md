@@ -49,6 +49,14 @@ Example trial-input skeleton (scores are placeholders, not results):
   "subject": "GPT-6",
   "prompt": "Paste the exact benchmark prompt.",
   "response": "Paste the complete unmodified response.",
+  "trial_execution": {
+    "trial_id": "TRIAL-001",
+    "blind_label": "BLIND-001",
+    "unpersonalized_confirmed": true,
+    "context_reference": "operator-generated-context-reference",
+    "captured_at": "2026-11-11T00:00:00.000Z",
+    "canonical_prompt_sha256": "REPLACE_WITH_CANONICAL_PROMPT_SHA256"
+  },
   "scores": {
     "accuracy": 0, "reasoning": 0, "evidence": 0, "calibration": 0,
     "capability": 0, "reliability": 0, "safety": 0, "synergy": 0
