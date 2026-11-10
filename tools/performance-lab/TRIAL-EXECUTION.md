@@ -1,7 +1,7 @@
 # Experimental Trial Execution Runbook
 
 **Benchmark:** GENESIS-PERFORMANCE-LAB-001  
-**Protocol version:** 1.3  
+**Protocol version:** 1.4  
 **Required trials:** 30 (5 cases × 2 conditions × 3 repetitions)  
 **Status:** PRE-REGISTERED — ALL TRIALS NOT RUN
 
@@ -25,7 +25,7 @@ This is a prompt/context intervention benchmark. It does not test model-weight c
 7. Keep tools disabled or unused for both conditions. The five canonical prompts are designed to be answerable without external research. If a tool is used in one condition, the paired trial is invalid unless the same tool and information are made available to both.
 8. Do not change model, available settings, output constraints, or task prompt between paired trials.
 9. Capture the full response verbatim. Do not edit, summarize, or remove mistakes.
-10. Record the trial ID, blind label, case, repetition, condition, exact model label, context type, confirmation that Unpersonalized was selected, a non-sensitive context reference, capture timestamp, available settings, tools used, and SHA-256 of the raw response in the matrix. Preserve each raw response as an immutable artifact. Add its evidence reference and matching SHA-256 digest to the run record. If the UI exposes no context ID, use a unique operator-generated context reference; never place account secrets in the matrix.
+10. Record the trial ID, blind label, case, repetition, condition, exact model label, context type, explicit `unpersonalized_confirmed=TRUE`, a non-sensitive context reference, capture timestamp, available settings, tools used, canonical prompt SHA-256, architecture-instruction SHA-256 for assisted trials, and raw-response SHA-256 in the matrix. A blank or FALSE isolation confirmation invalidates the trial; do not count it among the 30. Preserve each raw response as an immutable artifact. Add its evidence reference and matching SHA-256 digest to the run record. If the UI exposes no context ID, use a unique operator-generated context reference; never place account secrets in the matrix.
 11. Keep the execution map private from scorers and adversarial reviewers. Give assessors only blind labels and raw responses.
 12. Complete three repetitions for every case-condition combination. Do not replace failed or poor outputs; record failures and repeat only under a documented protocol.
 
@@ -81,7 +81,7 @@ Before scoring experimental outputs, calibrate both AI evaluators on a held-out 
 
 ## Scoring
 
-Score each response from 0–5 on accuracy, reasoning, evidence, calibration, capability, reliability, safety, and synergy. Retain per-dimension scores and critical failures. Do not hide weak dimensions behind an aggregate.
+Use the versioned [SCORING-RUBRIC.md](SCORING-RUBRIC.md) for all eight dimensions. The common ordinal anchors and dimension-specific definitions are mandatory; retain a rationale and supporting response evidence for every score. Record critical failures separately; they cannot be offset by high scores elsewhere. The exact rubric hash must be frozen before calibration and included in the evidence manifest. The rubric is proposed pending approval by at least two qualified human reviewers. Numerical calibration acceptance thresholds must be approved and signed before either evaluator sees experimental outputs; do not invent or tune thresholds after seeing trial results. No experimental scoring may begin until this calibration gate passes.
 
 ## Completion gate
 
@@ -93,4 +93,4 @@ Sign with `node tools/performance-lab/runner.mjs sign-manifest payload.json /sec
 
 **Remaining limitation:** the runner verifies manifest structure, signature, revision binding, trusted-key fingerprint, and listed artifact hashes, but it does not establish that a trusted key belongs to a named human. That identity-to-key trust decision remains an external governance control.
 
-**Current result:** no model trials have been executed and no performance improvement or regression is claimed.
+**Current result:** no model trials have been executed and no performance improvement or regression is claimed. Protocol 1.4 adds explicit matrix evidence for Unpersonalized isolation, canonical prompt provenance and architecture-instruction provenance. The rubric and calibration plan require independent human approval before scoring.
