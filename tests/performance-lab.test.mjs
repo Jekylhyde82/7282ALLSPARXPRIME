@@ -25,7 +25,7 @@ test("invalid score and unknown property are rejected",()=>{
   assert.ok(errors.some(e=>e.includes("must be <= 5")));
 });
 test("pair comparison calculates per-dimension deltas",()=>{
-  const b=record("baseline","A"),a=record("architecture_assisted","B");
+  const b=record("baseline","reviewer"),a=record("architecture_assisted","reviewer");
   a.scores.accuracy=5;
   const result=buildComparison([b,a]);
   assert.equal(result.pairs[0].delta.accuracy,2);
