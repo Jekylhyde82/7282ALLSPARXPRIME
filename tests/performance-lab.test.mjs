@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { validateSchema, validateRunRecord, buildComparison, renderReport, sha256, createRunRecord, appendRunRecord, verifyEvidenceManifest, canonicalize, signEvidenceManifest, validateTrialMatrix, isRfc3339Timestamp } from "../tools/performance-lab/runner.mjs";
+import { validateSchema, validateRunRecord, buildComparison, renderReport, sha256, createRunRecord, appendRunRecord, verifyEvidenceManifest, canonicalize, signEvidenceManifest, validateTrialMatrix, isRfc3339Timestamp, validateCalibrationPlan } from "../tools/performance-lab/runner.mjs";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -284,4 +284,23 @@ test("RFC 3339 timestamps reject impossible dates and malformed offsets",()=>{
   assert.equal(isRfc3339Timestamp("2026-11-10T25:00:00Z"),false);
   const invalid={...record("baseline","A"),created_at:"2026-02-30T00:00:00Z"};
   assert.ok(validateRunRecord(invalid,schema).some(error=>error.includes("valid RFC 3339 timestamp")));
+});
+
+test("calibration plan requires frozen thresholds, distinct evaluators and two independent human approvals",()=>{
+  const evaluator=(id)=>({evaluator_id:id,provider:"provider",model:"model",version:"1",instruction_sha256:"a".repeat(64),configuration_reference:"evidence://evaluator"});
+  const reviewer=(id)=>({reviewer_id:id,qualification_basis:"Independent qualified reviewer",independent:true,decision:"APPROVE",approved_at:"2026-11-11T00:00:00Z",signed_statement_reference:"evidence://approval-"+id,signing_key_sha256:"b".repeat(64)});
+  const plan={
+    benchmark_id:"GENESIS-PERFORMANCE-LAB-001",plan_version:"1.0",protocol_version:"1.5",
+    candidate_revision:"c".repeat(40),rubric_sha256:"d".repeat(64),frozen_at:"2026-11-11T00:00:00Z",
+    experimental_output_accessed:false,
+    calibration_dataset:{reference:"evidence://heldout-set",sha256:"e".repeat(64),sample_size:25,cases_covered:["P01","P02","P03","P04","P05"],seeded_critical_failure_count:3,human_adjudicated:true},
+    evaluators:{scorer:evaluator("scorer-A"),adversarial_reviewer:evaluator("reviewer-B")},
+    thresholds:{minimum_exact_agreement:0.8,per_dimension_agreement_metric:"exact agreement",minimum_per_dimension_agreement:0.75,minimum_quadratic_weighted_kappa:0.7,kappa_not_calculable_rule:"Report not calculable and adjudicate",minimum_critical_failure_sensitivity:1,maximum_critical_failure_false_positive_rate:0.1,material_disagreement_definition:"Any disagreement changing pair eligibility or critical-failure classification",missing_response_rule:"Fail closed; mark trial invalid pending protocol-approved replacement",fresh_set_recalibration_rule:"Any failed threshold requires a fresh held-out set before scoring"},
+    reviewer_approvals:[reviewer("human-A"),reviewer("human-B")]
+  };
+  assert.deepEqual(validateCalibrationPlan(plan),[]);
+  assert.ok(validateCalibrationPlan({...plan,evaluators:{scorer:evaluator("same"),adversarial_reviewer:evaluator("same")}}).some(error=>error.includes("distinct evaluator")));
+  assert.ok(validateCalibrationPlan({...plan,reviewer_approvals:[reviewer("human-A")]}).length>0);
+  assert.ok(validateCalibrationPlan({...plan,experimental_output_accessed:true}).length>0);
+  assert.ok(validateCalibrationPlan({...plan,reviewer_approvals:[reviewer("human-A"),reviewer("human-A")]}).some(error=>error.includes("unique")));
 });
