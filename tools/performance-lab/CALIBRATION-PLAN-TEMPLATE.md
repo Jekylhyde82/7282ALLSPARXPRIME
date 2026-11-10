@@ -4,7 +4,7 @@
 **Protocol:** 1.5  
 **Status:** TEMPLATE ONLY — NOT APPROVED; DO NOT SCORE EXPERIMENTAL TRIALS
 
-This template must be completed and approved by at least two qualified, independent human reviewers before either evaluator is exposed to experimental outputs. No threshold is preselected by the implementation team. Reviewers must choose and justify thresholds based on the benchmark purpose, ordinal scale, held-out calibration-set composition, and acceptable risk.
+This template must be completed as a machine-readable plan conforming to `schema/calibration-plan.schema.json`, validated with `validate-calibration-plan`, and approved by at least two qualified, independent human reviewers before either evaluator is exposed to experimental outputs. No threshold is preselected by the implementation team. Reviewers must choose and justify thresholds based on the benchmark purpose, ordinal scale, held-out calibration-set composition, and acceptable risk.
 
 ## 1. Frozen benchmark materials
 
