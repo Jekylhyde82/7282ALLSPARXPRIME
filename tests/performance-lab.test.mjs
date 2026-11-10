@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { validateSchema, validateRunRecord, buildComparison, renderReport, sha256 } from "../tools/performance-lab/runner.mjs";
-import fs from "node:fs";
+import { validateSchema, validateRunRecord, buildComparison, renderReport, sha256, createRunRecord, appendRunRecord } from "../tools/performance-lab/runner.mjs";
+import fs from "node:fs";\nimport os from "node:os";\nimport path from "node:path";
 
 const schema = JSON.parse(fs.readFileSync(new URL("../tools/performance-lab/schema/run-record.schema.json", import.meta.url)));
 const dims = ["accuracy","reasoning","evidence","calibration","capability","reliability","safety","synergy"];
@@ -38,4 +38,15 @@ test("missing pair and same assessor are flagged",()=>{
 test("report keeps operational status on HOLD",()=>{
   const report=renderReport([record("baseline","A"),record("architecture_assisted","B")]);
   assert.match(report,/NOT OPERATIONAL/);
+});
+
+test("automated record creation hashes the exact prompt and appends atomically",()=>{
+  const trial={case_id:"P01",condition:"baseline",subject:"GPT-6",prompt:"Exact controlled prompt",response:"Captured response",scores:Object.fromEntries(dims.map(d=>[d,3])),assessor:{assessor_id:"reviewer",blinded_condition:true,independent:true}};
+  const record=createRunRecord(trial);
+  assert.equal(record.prompt_sha256,sha256(trial.prompt));
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),"genesis-lab-"));
+  const ledger=path.join(dir,"runs.json");
+  assert.equal(appendRunRecord(record,ledger),1);
+  assert.equal(JSON.parse(fs.readFileSync(ledger,"utf8")).length,1);
+  fs.rmSync(dir,{recursive:true,force:true});
 });
