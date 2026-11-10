@@ -125,7 +125,8 @@ Every run record must include `trial_execution` with the exact matrix `trial_id`
 
 ```bash
 node tools/performance-lab/runner.mjs validate-matrix tools/performance-lab/evidence/trial-matrix.csv
-node tools/performance-lab/runner.mjs validate-calibration-plan path/to/approved-calibration-plan.json\nnode tools/performance-lab/runner.mjs record path/to/trial-input.json path/to/records.json
+node tools/performance-lab/runner.mjs validate-calibration-plan path/to/approved-calibration-plan.json
+node tools/performance-lab/runner.mjs record path/to/trial-input.json path/to/records.json
 node tools/performance-lab/runner.mjs validate path/to/records.json
 node tools/performance-lab/runner.mjs report path/to/records.json reports/comparison.md
 node --test tests/performance-lab.test.mjs
