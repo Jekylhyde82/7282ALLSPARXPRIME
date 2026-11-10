@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Jekylhyde82/7282ALLSPARXPRIME/blob/main/tools/performance-lab/schema/run-record.schema.json",
+  "title": "Genesis Performance Lab Run Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "benchmark_id",
+    "run_id",
+    "case_id",
+    "condition",
+    "subject",
+    "prompt_sha256",
+    "response",
+    "scores",
+    "critical_failures",
+    "evidence",
+    "assessor",
+    "limitations",
+    "verification_status",
+    "created_at"
+  ],
+  "properties": {
+    "benchmark_id": {
+      "const": "GENESIS-PERFORMANCE-LAB-001"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 8
+    },
+    "case_id": {
+      "type": "string",
+      "enum": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05"
+      ]
+    },
+    "condition": {
+      "type": "string",
+      "enum": [
+        "baseline",
+        "architecture_assisted"
+      ]
+    },
+    "subject": {
+      "type": "string",
+      "minLength": 1
+    },
+    "prompt_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "response": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "accuracy",
+        "reasoning",
+        "evidence",
+        "calibration",
+        "capability",
+        "reliability",
+        "safety",
+        "synergy"
+      ],
+      "properties": {
+        "accuracy": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "reasoning": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "evidence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "calibration": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "capability": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "reliability": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "safety": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "synergy": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        }
+      }
+    },
+    "critical_failures": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "reference"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "assessor": {
+      "type": "object",
+      "required": [
+        "assessor_id",
+        "blinded_condition",
+        "independent"
+      ],
+      "properties": {
+        "assessor_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "blinded_condition": {
+          "type": "boolean"
+        },
+        "independent": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "verification_status": {
+      "type": "string",
+      "enum": [
+        "NOT_VERIFIED",
+        "PENDING_INDEPENDENT_REVIEW",
+        "INDEPENDENTLY_REVIEWED"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "minLength": 20
+    }
+  }
+}
