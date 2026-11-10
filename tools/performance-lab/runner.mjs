@@ -162,7 +162,7 @@ export function validateTrialMatrix(csvText) {
   try { rows = parseCsv(csvText); }
   catch (error) { return [error.message]; }
   if (!rows.length) return ["trial matrix is empty"];
-  if (JSON.stringify(rows[0]) !== JSON.stringify(MATRIX_COLUMNS)) return ["trial matrix header does not match the required 20-column protocol 1.4 format"];
+  if (JSON.stringify(rows[0]) !== JSON.stringify(MATRIX_COLUMNS)) return ["trial matrix header does not match the required 20-column protocol 1.5 format"];
   if (rows.length !== 31) errors.push("trial matrix must contain exactly 30 trial rows");
   const seenTrialIds = new Set(), seenBlindLabels = new Set(), combinations = new Set();
   const records = [];
