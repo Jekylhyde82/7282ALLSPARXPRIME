@@ -1,7 +1,7 @@
 # Experimental Trial Execution Runbook
 
 **Benchmark:** GENESIS-PERFORMANCE-LAB-001  
-**Protocol version:** 1.2  
+**Protocol version:** 1.3  
 **Required trials:** 30 (5 cases × 2 conditions × 3 repetitions)  
 **Status:** PRE-REGISTERED — ALL TRIALS NOT RUN
 
@@ -76,7 +76,7 @@ Before scoring experimental outputs, calibrate both AI evaluators on a held-out 
 - The AI scorer and AI adversarial reviewer must not be the same model instance, agent, provider account, or shared conversation. Record known common dependencies.
 - A human adjudicator must review every critical failure, every disagreement that could change a pair's eligibility or comparative conclusion, and any suspected evaluator bias. Preserve the original AI outputs; adjudication supplements rather than overwrites them.
 - Assessor identity, blinding, evaluator configuration, and evidence provenance must be independently checked; self-attestation alone is not authentication.
-- Every comparison pair is fail-closed for the conditions the current runner can inspect: missing evidence references or SHA-256 digests, incomplete scorer/reviewer attestations, scorer/reviewer conflicts, missing adversarial checks, any NOT_ASSESSED check, or any critical/adversarial failure. **Evaluator calibration is an additional mandatory release gate, but the current runner does not ingest or verify calibration evidence; an external independent release reviewer must block scoring approval and release if calibration evidence is absent or failed.**
+- Every comparison pair is fail-closed for missing evidence references or SHA-256 digests, incomplete scorer/reviewer attestations, scorer/reviewer conflicts, missing or duplicate adversarial checks, any NOT_ASSESSED check, critical/adversarial failures, missing evaluator calibration PASS evidence, missing calibration references/hashes, evaluator identity mismatches, and missing per-dimension rationales. These checks are enforced by the current run-record schema and comparison runner. The runner validates the supplied calibration metadata and digest format; it does not independently validate the referenced calibration artifact bytes or prove evaluator quality.
 - A SHA-256 digest establishes a content fingerprint only when checked against the retained artifact. It does not authenticate who captured, scored, or reviewed that artifact. Retain independently signed reviewer statements and an evidence manifest outside the run-record self-attestations.
 
 ## Scoring
@@ -85,8 +85,12 @@ Score each response from 0–5 on accuracy, reasoning, evidence, calibration, ca
 
 ## Completion gate
 
-The experiment remains NOT VERIFIED until all 30 raw outputs are captured, all 15 pairs are complete, independent blinded scoring and separate adversarial review are complete, evidence references and response hashes are checked, and an independent reviewer signs a revision-bound evidence manifest.
+The experiment remains NOT VERIFIED until all 30 raw outputs are captured, all 15 pairs are complete, independent blinded scoring and separate adversarial review are complete, evidence references and response hashes are checked, and an independent reviewer verifies the Ed25519-signed, revision-bound evidence manifest against an independently provisioned trusted public key.
 
-**Implementation limitation:** the current run-record schema and comparison runner do not yet store or programmatically enforce evaluator calibration results, per-dimension rationales, or signed evaluator identity. These must be retained in the external evidence package and checked by the independent release reviewer. The protocol is defined; this enforcement is not implemented in the runner.
+**Signed evidence manifest:** every release evidence package must include `evidence-manifest.json`, validated against `schema/evidence-manifest.schema.json`. The manifest binds the package to the exact 40-character candidate commit and lists each retained artifact by relative path, kind, and SHA-256. An authorized custodian signs the canonical manifest payload using Ed25519; the verifier checks the signature, public-key fingerprint, expected revision, path containment, and actual artifact bytes. Use an independently provisioned trusted public key; never trust a key merely because it is included in the manifest or repository. The public-key-to-human-identity binding and key custody must be confirmed out of band by the independent release reviewer.
+
+Sign with `node tools/performance-lab/runner.mjs sign-manifest payload.json /secure/path/custodian-private-key.pem evidence-manifest.json`. Verify with `node tools/performance-lab/runner.mjs verify-manifest evidence-manifest.json /secure/path/trusted-custodian-public-key.pem evidence/ <candidate-commit-sha>`. Keep private keys outside the repository and evidence archive. The verifier checks artifact bytes at paths relative to the evidence root; do not use absolute paths or path traversal. Signature verification proves possession of the corresponding private key, not the real-world identity of its holder.
+
+**Remaining limitation:** the runner verifies manifest structure, signature, revision binding, trusted-key fingerprint, and listed artifact hashes, but it does not establish that a trusted key belongs to a named human. That identity-to-key trust decision remains an external governance control.
 
 **Current result:** no model trials have been executed and no performance improvement or regression is claimed.
