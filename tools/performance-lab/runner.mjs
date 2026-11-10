@@ -54,6 +54,9 @@ export function sha256(text) {
 export function createRunRecord(input) {
   if (!input || typeof input !== "object" || Array.isArray(input)) throw new Error("Trial input must be a JSON object.");
   if (typeof input.prompt !== "string" || !input.prompt.trim()) throw new Error("Trial input requires the exact non-empty prompt.");
+  const benchmarkCase = loadJson(CASES_PATH).cases.find(c => c.id === input.case_id);
+  if (!benchmarkCase) throw new Error("Unknown benchmark case: " + input.case_id);
+  if (input.prompt !== benchmarkCase.prompt) throw new Error("Prompt must exactly match the canonical benchmark case prompt.");
   const date = new Date().toISOString();
   const runId = "GPL-" + date.replace(/[-:.TZ]/g, "").slice(0, 14) + "-" + (input.case_id ?? "XX") + "-" + (input.condition ?? "unknown") + "-" + crypto.randomUUID().slice(0, 8);
   const record = {
@@ -114,6 +117,8 @@ export function buildComparison(records) {
     }
     const baseline = group.baseline;
     const assisted = group.architecture_assisted;
+    if (baseline.prompt_sha256 !== assisted.prompt_sha256) issues.push(caseId + ": paired prompts differ; comparison is invalid");
+    if (baseline.subject !== assisted.subject) issues.push(caseId + ": paired model subjects differ; comparison is invalid");
     for (const record of [baseline, assisted]) {
       if (!Array.isArray(record.evidence) || record.evidence.length === 0) {
         issues.push(caseId + " " + record.condition + ": no supporting evidence references recorded");
