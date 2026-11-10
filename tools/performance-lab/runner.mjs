@@ -73,7 +73,8 @@ export function createRunRecord(input) {
     created_at:date
   };
   const errors=validateRunRecord(record);
-  if(errors.length) throw new Error(errors.join("\\n"));
+  if(errors.length) throw new Error(errors.join("\
+"));
   return record;
 }
 
@@ -82,15 +83,18 @@ export function appendRunRecord(record, ledgerPath) {
   if(!Array.isArray(existing)) throw new Error("Existing run ledger must be a JSON array.");
   const schema=loadJson(SCHEMA_PATH);
   const errors=[...existing.flatMap((r,i)=>validateRunRecord(r,schema).map(e=>`existing[${i}] ${e}`)),...validateRunRecord(record,schema)];
-  if(errors.length) throw new Error(errors.join("\\n"));
+  if(errors.length) throw new Error(errors.join("\
+"));
   const next=[...existing,record];
   fs.mkdirSync(path.dirname(path.resolve(ledgerPath)),{recursive:true});
   const temp=`${ledgerPath}.${process.pid}.tmp`;
-  fs.writeFileSync(temp,JSON.stringify(next,null,2)+"\\n",{flag:"wx"});
+  fs.writeFileSync(temp,JSON.stringify(next,null,2)+"\
+",{flag:"wx"});
   fs.renameSync(temp,ledgerPath);
   return next.length;
 }
-\nexport function buildComparison(records) {
+
+export function buildComparison(records) {
   const pairs = [];
   const issues = [];
   const grouped = new Map();
@@ -144,7 +148,8 @@ export function renderReport(records) {
   lines.push("", "## Evidence and independence gaps", "");
   lines.push(...(issues.length ? issues.map(x=>`- ${x}`) : ["- Pair completeness, assessor independence and blinding are attested in the supplied records; attestations still require external validation."]));
   lines.push("", "## Operational decision", "", "NOT OPERATIONAL unless all five pairs are present, schema validation passes, independent assessors verify the source evidence, adversarial checks are reviewed, CI passes, and a separate release reviewer signs the evidence package.", "");
-  return lines.join("\n");
+  return lines.join("
+");
 }
 
 function usage() {
@@ -153,21 +158,29 @@ function usage() {
 
 if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
 const [command, input, output] = process.argv.slice(2);
-if (command === "record" && input && output) {\n  const payload=loadJson(input);\n  const record=createRunRecord(payload);\n  const count=appendRunRecord(record,output);\n  console.log(`Recorded ${record.run_id}; ledger contains ${count} record(s).`);\n} else if (command === "validate" && input) {
+if (command === "record" && input && output) {
+  const payload=loadJson(input);
+  const record=createRunRecord(payload);
+  const count=appendRunRecord(record,output);
+  console.log(`Recorded ${record.run_id}; ledger contains ${count} record(s).`);
+} else if (command === "validate" && input) {
   const records = loadJson(input);
   if (!Array.isArray(records)) throw new Error("Input must be a JSON array of run records.");
   const schema = loadJson(SCHEMA_PATH);
   const errors = records.flatMap((r,i)=>validateRunRecord(r,schema).map(e=>`record[${i}] ${e}`));
-  if (errors.length) { console.error(errors.join("\n")); process.exitCode = 1; }
+  if (errors.length) { console.error(errors.join("
+")); process.exitCode = 1; }
   else console.log(`Validated ${records.length} run record(s) against the Performance Lab schema.`);
 } else if (command === "report" && input && output) {
   const records = loadJson(input);
   const schema = loadJson(SCHEMA_PATH);
   const errors = records.flatMap((r,i)=>validateRunRecord(r,schema).map(e=>`record[${i}] ${e}`));
-  if (errors.length) { console.error(errors.join("\n")); process.exitCode = 1; }
+  if (errors.length) { console.error(errors.join("
+")); process.exitCode = 1; }
   else {
     fs.mkdirSync(path.dirname(path.resolve(output)),{recursive:true});
-    fs.writeFileSync(output,renderReport(records)+"\n");
+    fs.writeFileSync(output,renderReport(records)+"
+");
     console.log(`Report written to ${output}`);
   }
 } else usage();
