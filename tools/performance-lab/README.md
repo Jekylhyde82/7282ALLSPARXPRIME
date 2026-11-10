@@ -82,7 +82,11 @@ node tools/performance-lab/runner.mjs report path/to/records.json reports/compar
 node --test tests/performance-lab.test.mjs
 ```
 
-The report displays per-dimension deltas for each complete pair and lists missing pairs, assessor-independence and paired-assessor gaps and critical failures. It does not calculate a single misleading average.
+The comparison engine is fail-closed: a pair produces no comparative delta unless both records have matching canonical-prompt hashes and model subjects, non-empty evidence references with SHA-256 digests, an independent blinded scorer, the same scorer for both conditions, and a separate independent blinded adversarial reviewer with every required check assessed. Duplicate records, missing evidence, incomplete reviews, scorer/reviewer conflicts, recorded critical failures, and failed adversarial checks invalidate that pair. Findings remain visible in the report issues; they are not converted into clean averages.
+
+Evidence hashes are integrity identifiers, not proof of authenticity. The runner does not retrieve evidence bytes, validate a hash against an external artifact, authenticate reviewer identity, or verify reviewer signatures. Those controls require an external evidence custodian/release reviewer and signed evidence manifest.
+
+The report displays per-dimension deltas only for eligible pairs and lists missing pairs and evidence/review integrity gaps. It does not calculate a single misleading average.
 
 ## Adversarial verification
 
