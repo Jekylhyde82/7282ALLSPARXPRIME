@@ -23,7 +23,7 @@ This is a prompt/context intervention benchmark. It does not test model-weight c
 5. Keep tools disabled or unused for both conditions. The five canonical prompts are designed to be answerable without external research. If a tool is used in one condition, the paired trial is invalid unless the same tool and information are made available to both.
 6. Do not change model, available settings, output constraints, or task prompt between paired trials.
 7. Capture the full response verbatim. Do not edit, summarize, or remove mistakes.
-8. Record the trial ID, blind label, case, repetition, condition, exact model label, context type, a non-sensitive context reference, capture timestamp, available settings, tools used, and SHA-256 of the raw response in the matrix. If the UI exposes no context ID, use a unique operator-generated context reference; never place account secrets in the matrix.
+8. Record the trial ID, blind label, case, repetition, condition, exact model label, context type, a non-sensitive context reference, capture timestamp, available settings, tools used, and SHA-256 of the raw response in the matrix. Preserve each raw response as an immutable artifact. Add its evidence reference and matching SHA-256 digest to the run record. If the UI exposes no context ID, use a unique operator-generated context reference; never place account secrets in the matrix.
 9. Keep the execution map private from scorers and adversarial reviewers. Give assessors only blind labels and raw responses.
 10. Complete three repetitions for every case-condition combination. Do not replace failed or poor outputs; record failures and repeat only under a documented protocol.
 
@@ -51,6 +51,8 @@ The operator-only execution order is recorded in `evidence/trial-matrix.csv`. Th
 - The reviewer must not be the scorer and must not see condition labels.
 - Record rationale for every dimension and each adversarial check. A numeric score without rationale is insufficient.
 - Assessor identity, blinding, and evidence provenance must be independently checked; self-attestation alone is not authentication.
+- Every comparison pair is fail-closed: missing evidence references or SHA-256 digests, incomplete scorer/reviewer attestations, scorer/reviewer conflicts, missing adversarial checks, any NOT_ASSESSED check, or any critical/adversarial failure prevents that pair from producing a comparative delta.
+- A SHA-256 digest establishes a content fingerprint only when checked against the retained artifact. It does not authenticate who captured, scored, or reviewed that artifact. Retain independently signed reviewer statements and an evidence manifest outside the run-record self-attestations.
 
 ## Scoring
 
