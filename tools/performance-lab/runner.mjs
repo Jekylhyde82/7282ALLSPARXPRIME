@@ -517,7 +517,11 @@ function usage() {
 
 if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
   const [command, input, output] = process.argv.slice(2);
-  if (command === "validate-calibration-plan" && input) {\n    const errors = validateCalibrationPlan(loadJson(input));\n    if (errors.length) { console.error(errors.join("\\n")); process.exitCode = 1; }\n    else console.log("Calibration plan schema, evaluator separation, reviewer approvals and timestamps validated. Human identity/key binding remains an independent governance check.");\n  } else if (command === "validate-matrix" && input) {
+  if (command === "validate-calibration-plan" && input) {
+    const errors = validateCalibrationPlan(loadJson(input));
+    if (errors.length) { console.error(errors.join("\n")); process.exitCode = 1; }
+    else console.log("Calibration plan schema, evaluator separation, reviewer approvals and timestamps validated. Human identity/key binding remains an independent governance check.");
+  } else if (command === "validate-matrix" && input) {
     const errors = validateTrialMatrix(fs.readFileSync(input, "utf8"));
     if (errors.length) { console.error(errors.join("\n")); process.exitCode = 1; }
     else console.log("Validated all 30 planned trial rows; capture gates are enforced for any started trial.");
