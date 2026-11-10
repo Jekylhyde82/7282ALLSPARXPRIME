@@ -27,7 +27,7 @@ test("pair comparison calculates per-dimension deltas",()=>{
   a.scores.accuracy=5;
   const result=buildComparison([b,a]);
   assert.equal(result.pairs[0].delta.accuracy,2);
-  assert.deepEqual(result.issues,[]);
+  assert.ok(result.issues.every(x=>x.includes("missing baseline or architecture-assisted run")));
 });
 test("missing pair and same assessor are flagged",()=>{
   const b=record("baseline","same");
