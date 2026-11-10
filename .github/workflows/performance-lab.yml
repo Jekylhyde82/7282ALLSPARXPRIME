@@ -27,6 +27,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: Install pinned JSON Schema validator
+        run: npm install --no-save --package-lock=false --ignore-scripts ajv@8.17.1
       - name: Run Performance Lab tests
         run: node --test tests/performance-lab.test.mjs
       - name: Validate benchmark case definitions
