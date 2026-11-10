@@ -132,7 +132,7 @@ test("comparison fails closed when scorer independence or blinding is absent",()
   a.assessor.independent=false;
   const result=buildComparison([b,a]);
   assert.equal(result.pairs.length,0);
-  assert.ok(result.issues.some(x=>x.includes("independent blinded scorer evidence")));
+  assert.ok(result.issues.some(x=>x.includes("independent blinded scorer attestation")));
 });
 
 test("comparison fails closed when adversarial review is missing or incomplete",()=>{
@@ -140,7 +140,7 @@ test("comparison fails closed when adversarial review is missing or incomplete",
   a.adversarial_review.blinded_condition=false;
   const result=buildComparison([b,a]);
   assert.equal(result.pairs.length,0);
-  assert.ok(result.issues.some(x=>x.includes("independent blinded adversarial review missing")));
+  assert.ok(result.issues.some(x=>x.includes("independent blinded adversarial-review attestation is missing")));
 });
 
 test("recorded critical failures prevent a clean comparative delta",()=>{
