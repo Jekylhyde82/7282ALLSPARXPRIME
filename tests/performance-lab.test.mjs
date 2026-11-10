@@ -5,7 +5,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-const schema = JSON.parse(fs.readFileSync(new URL("../tools/performance-lab/schema/run-record.schema.json", import.meta.url)));\nconst cases = JSON.parse(fs.readFileSync(new URL("../tools/performance-lab/cases.json", import.meta.url)));
+const schema = JSON.parse(fs.readFileSync(new URL("../tools/performance-lab/schema/run-record.schema.json", import.meta.url)));
+const cases = JSON.parse(fs.readFileSync(new URL("../tools/performance-lab/cases.json", import.meta.url)));
 const dims = ["accuracy","reasoning","evidence","calibration","capability","reliability","safety","synergy"];
 function record(condition, assessorId, caseId="P01") {
   return {
