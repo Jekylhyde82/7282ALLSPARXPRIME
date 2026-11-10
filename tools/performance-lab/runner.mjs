@@ -34,6 +34,79 @@ export function sha256(text) {
   return crypto.createHash("sha256").update(text).digest("hex");
 }
 
+export function canonicalize(value) {
+  if (Array.isArray(value)) return "[" + value.map(canonicalize).join(",") + "]";
+  if (value && typeof value === "object") {
+    return "{" + Object.keys(value).sort().map(key => JSON.stringify(key) + ":" + canonicalize(value[key])).join(",") + "}";
+  }
+  return JSON.stringify(value);
+}
+
+export function verifyEvidenceManifest(manifest, { publicKeyPem, evidenceRoot, expectedRevision }) {
+  const errors = [];
+  const manifestSchema = loadJson(path.join(ROOT, "schema/evidence-manifest.schema.json"));
+  errors.push(...validateSchema(manifest, manifestSchema));
+  if (errors.length) return errors;
+  if (manifest.revision !== expectedRevision) errors.push("manifest revision does not match the expected candidate revision");
+  let publicKey;
+  try {
+    publicKey = crypto.createPublicKey(publicKeyPem);
+  } catch {
+    errors.push("trusted public key cannot be parsed");
+    return errors;
+  }
+  const publicDer = publicKey.export({ type: "spki", format: "der" });
+  const fingerprint = sha256(publicDer);
+  if (fingerprint !== manifest.signature.public_key_sha256) errors.push("manifest signing key fingerprint does not match the externally supplied trusted public key");
+  const { signature, ...signedPayload } = manifest;
+  let signatureValid = false;
+  try {
+    signatureValid = crypto.verify(null, Buffer.from(canonicalize(signedPayload)), publicKey, Buffer.from(signature.value, "base64"));
+  } catch {
+    signatureValid = false;
+  }
+  if (!signatureValid) errors.push("Ed25519 manifest signature is invalid");
+  let root;
+  try {
+    root = fs.realpathSync(evidenceRoot);
+  } catch {
+    errors.push("evidence root does not exist or cannot be resolved");
+    return errors;
+  }
+  const seen = new Set();
+  for (const artifact of manifest.artifacts) {
+    if (seen.has(artifact.path)) {
+      errors.push("duplicate artifact path: " + artifact.path);
+      continue;
+    }
+    seen.add(artifact.path);
+    if (path.isAbsolute(artifact.path) || artifact.path.split(/[\\/]/).includes("..")) {
+      errors.push("artifact path must be relative and must not traverse directories: " + artifact.path);
+      continue;
+    }
+    let resolved;
+    try {
+      resolved = fs.realpathSync(path.resolve(root, artifact.path));
+    } catch {
+      errors.push("artifact is missing or cannot be resolved: " + artifact.path);
+      continue;
+    }
+    if (!resolved.startsWith(root + path.sep)) {
+      errors.push("artifact resolves outside the evidence root: " + artifact.path);
+      continue;
+    }
+    let actual;
+    try {
+      actual = crypto.createHash("sha256").update(fs.readFileSync(resolved)).digest("hex");
+    } catch {
+      errors.push("artifact cannot be read: " + artifact.path);
+      continue;
+    }
+    if (actual !== artifact.sha256) errors.push("artifact SHA-256 mismatch: " + artifact.path);
+  }
+  return errors;
+}
+
 export function createRunRecord(input) {
   if (!input || typeof input !== "object" || Array.isArray(input)) throw new Error("Trial input must be a JSON object.");
   if (typeof input.prompt !== "string" || !input.prompt.trim()) throw new Error("Trial input requires the exact non-empty prompt.");
@@ -259,7 +332,7 @@ export function renderReport(records) {
 }
 
 function usage() {
-  console.log("Usage: node tools/performance-lab/runner.mjs record <trial.json> <ledger.json> | validate <ledger.json> | report <ledger.json> <output.md>");
+  console.log("Usage: node tools/performance-lab/runner.mjs record <trial.json> <ledger.json> | validate <ledger.json> | report <ledger.json> <output.md> | verify-manifest <manifest.json> <trusted-public-key.pem> <evidence-root> <expected-revision>");
 }
 
 if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
@@ -279,6 +352,20 @@ if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === imp
       process.exitCode = 1;
     } else {
       console.log("Validated " + records.length + " run record(s) against the Performance Lab schema.");
+    }
+  } else if (command === "verify-manifest" && input && output && process.argv[5] && process.argv[6]) {
+    const manifest = loadJson(input);
+    const publicKeyPem = fs.readFileSync(output, "utf8");
+    const errors = verifyEvidenceManifest(manifest, {
+      publicKeyPem,
+      evidenceRoot: process.argv[5],
+      expectedRevision: process.argv[6]
+    });
+    if (errors.length) {
+      console.error(errors.join("\\n"));
+      process.exitCode = 1;
+    } else {
+      console.log("Evidence manifest signature, trusted-key fingerprint, revision binding, and artifact hashes verified.");
     }
   } else if (command === "report" && input && output) {
     const records = loadJson(input);
