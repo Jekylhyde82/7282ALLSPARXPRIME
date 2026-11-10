@@ -8,6 +8,7 @@
     "benchmark_id",
     "run_id",
     "case_id",
+    "repetition",
     "condition",
     "subject",
     "prompt_sha256",
@@ -38,6 +39,11 @@
         "P04",
         "P05"
       ]
+    },
+    "repetition": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3
     },
     "condition": {
       "type": "string",
