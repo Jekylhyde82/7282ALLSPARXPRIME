@@ -171,12 +171,7 @@
       }
     },
     "verification_status": {
-      "type": "string",
-      "enum": [
-        "NOT_VERIFIED",
-        "PENDING_INDEPENDENT_REVIEW",
-        "INDEPENDENTLY_REVIEWED"
-      ]
+      "const": "NOT_VERIFIED"
     },
     "created_at": {
       "type": "string",
