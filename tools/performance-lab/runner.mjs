@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const SCHEMA_PATH = path.join(ROOT, "schema/run-record.schema.json");
@@ -112,6 +112,7 @@ function usage() {
   console.log("Usage: node tools/performance-lab/runner.mjs <validate|report> <records.json> [output.md]");
 }
 
+if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
 const [command, input, output] = process.argv.slice(2);
 if (command === "validate" && input) {
   const records = loadJson(input);
@@ -131,3 +132,5 @@ if (command === "validate" && input) {
     console.log(`Report written to ${output}`);
   }
 } else usage();
+
+}
