@@ -36,17 +36,17 @@ Eight dimensions, each scored 0–5: accuracy, reasoning, evidence, calibration,
 
 ## Record format
 
-Create a trial-input JSON object with the exact `prompt`, response, case, condition, scores and assessor fields; run the `record` command to generate the run ID, timestamp and SHA-256 prompt hash and append the validated record atomically. Then validate the ledger. The ledger is a JSON array of run records conforming to `schema/run-record.schema.json`. Example skeleton:
+Create a trial-input JSON object containing the exact prompt, verbatim response, case, condition, scores, independent scorer attestation, and separate adversarial-review record. The `record` command generates the run ID, timestamp, and SHA-256 prompt hash, validates the record, and atomically appends it to the ledger.
+
+Example trial-input skeleton (scores are placeholders, not results):
 
 ```json
 {
-  "benchmark_id": "GENESIS-PERFORMANCE-LAB-001",
-  "run_id": "GPL-20261110-P01-B",
   "case_id": "P01",
   "condition": "baseline",
   "subject": "GPT-6",
-  "prompt_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  "response": "Paste the complete unmodified response here.",
+  "prompt": "Paste the exact benchmark prompt.",
+  "response": "Paste the complete unmodified response.",
   "scores": {
     "accuracy": 0, "reasoning": 0, "evidence": 0, "calibration": 0,
     "capability": 0, "reliability": 0, "safety": 0, "synergy": 0
@@ -54,17 +54,24 @@ Create a trial-input JSON object with the exact `prompt`, response, case, condit
   "critical_failures": [],
   "evidence": [],
   "assessor": {
-    "assessor_id": "reviewer-A",
+    "assessor_id": "independent-scorer-A",
     "blinded_condition": true,
     "independent": true
   },
-  "limitations": [],
-  "verification_status": "NOT_VERIFIED",
-  "created_at": "2026-11-10T00:00:00.000Z"
+  "adversarial_review": {
+    "reviewer_id": "independent-critic-A",
+    "blinded_condition": true,
+    "independent": true,
+    "checks": [
+      {"check_id": "AC01", "outcome": "PASS", "finding": "Explain the evidence for this finding."},
+      {"check_id": "AC02", "outcome": "PASS", "finding": "Explain the evidence for this finding."}
+    ]
+  },
+  "limitations": []
 }
 ```
 
-The zero scores above are placeholders, not results. Do not submit the example as a completed trial. Replace the prompt hash with the real SHA-256 digest.
+The example is a format illustration only. Do not submit it as a completed trial. Each case's required adversarial check IDs are defined in `cases.json`; all must be assessed. Use `FAIL` when a defect is found and preserve the finding. Do not mark an unchecked item as `PASS`.
 
 ## Commands
 
