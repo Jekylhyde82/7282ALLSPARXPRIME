@@ -23,7 +23,7 @@ Prompts and case-specific adversarial checks are in `cases.json`.
 
 ## Scoring
 
-Eight dimensions, each scored 0–5: accuracy, reasoning, evidence, calibration, capability, reliability, safety, synergy. A low score or critical failure must not be hidden by an aggregate. Assessors must record their rationale and supporting evidence in the external evidence package; the current run record retains scores, evidence references, critical failures and basic assessor attestations. Evaluator calibration, rationale capture and signed identity are not yet programmatically enforced by the runner.
+Eight dimensions, each scored 0–5: accuracy, reasoning, evidence, calibration, capability, reliability, safety, synergy. A low score or critical failure must not be hidden by an aggregate. Assessors must record their rationale and supporting evidence in each run record. The schema requires evaluator calibration metadata, calibration artifact references/hashes, evaluator identity metadata, and rationale for all eight dimensions; the comparison runner rejects missing or inconsistent entries.
 
 ## Trial protocol
 
@@ -37,7 +37,7 @@ Eight dimensions, each scored 0–5: accuracy, reasoning, evidence, calibration,
 
 ## Record format
 
-Create a trial-input JSON object containing the exact prompt, verbatim response, case, condition, scores, independent scorer attestation, and separate adversarial-review record. The `record` command generates the run ID, timestamp, and SHA-256 prompt hash, validates the record, and atomically appends it to the ledger.
+Create a trial-input JSON object containing the exact prompt, verbatim response, case, condition, scores, calibrated evaluator metadata and rationales, independent scorer attestation, and separate adversarial-review record. The `record` command generates the run ID, timestamp, and SHA-256 prompt hash, validates the record, and atomically appends it to the ledger.
 
 Example trial-input skeleton (scores are placeholders, not results):
 
@@ -83,9 +83,21 @@ node tools/performance-lab/runner.mjs report path/to/records.json reports/compar
 node --test tests/performance-lab.test.mjs
 ```
 
-The comparison engine is fail-closed for fields represented in its current run-record schema: a pair produces no comparative delta unless both records have matching canonical-prompt hashes and model subjects, non-empty evidence references with SHA-256 digests, an independent blinded scorer, the same scorer for both conditions, and a separate independent blinded adversarial reviewer with every required check assessed. Evaluator calibration and signed identity are external release gates, not yet machine-enforced by the runner. Duplicate records, missing evidence, incomplete reviews, scorer/reviewer conflicts, recorded critical failures, and failed adversarial checks invalidate that pair. Findings remain visible in the report issues; they are not converted into clean averages.
+The comparison engine is fail-closed for fields represented in its run-record schema: both records must have matching canonical-prompt hashes and model subjects, evidence references with SHA-256 digests, calibrated scorer and adversarial-reviewer metadata, matching evaluator attestations, rationales for all eight dimensions, the same blinded scorer for both conditions, and a distinct blinded adversarial reviewer with every required check assessed. Duplicate records, missing evidence, incomplete reviews, calibration gaps, evaluator identity mismatches, scorer/reviewer conflicts, recorded critical failures, and failed adversarial checks invalidate that pair. Findings remain visible in the report issues; they are not converted into clean averages.
 
-Evidence hashes are integrity identifiers, not proof of authenticity. The runner does not retrieve evidence bytes, validate a hash against an external artifact, authenticate reviewer identity, or verify reviewer signatures. Those controls require an external evidence custodian/release reviewer and signed evidence manifest.
+Evidence hashes are integrity identifiers, not proof of authenticity. The signed evidence manifest schema is `schema/evidence-manifest.schema.json`. The runner can sign a manifest with an Ed25519 private key held by the evidence custodian and verify its signature using an independently provisioned trusted public key. Verification checks the expected candidate revision, trusted-key fingerprint, artifact path containment, and SHA-256 of every listed artifact. The trusted public key must be obtained out of band; a manifest cannot establish its own trust anchor. The independent reviewer must separately verify that the trusted key is legitimately bound to the named custodian and that key custody is sound.
+
+Commands:
+
+```bash
+# Sign a manifest payload; private key stays outside the repository
+node tools/performance-lab/runner.mjs sign-manifest payload.json /secure/path/custodian-private-key.pem evidence-manifest.json
+
+# Verify signature, key fingerprint, revision binding, and evidence bytes
+node tools/performance-lab/runner.mjs verify-manifest evidence-manifest.json /secure/path/trusted-custodian-public-key.pem evidence/ <candidate-commit-sha>
+```
+
+The manifest signs a deterministic canonical JSON representation of every manifest field except `signature`. Artifact paths must be relative to the evidence root and cannot escape it. Signature verification proves possession of a private key, not the real-world identity of its holder.
 
 The report displays per-dimension deltas only for eligible pairs and lists missing pairs and evidence/review integrity gaps. It does not calculate a single misleading average.
 
@@ -111,6 +123,6 @@ Pull requests and pushes touching this toolset run Node tests and schema checks.
 - raw outputs and evidence references are retained and independently checked;
 - adversarial findings and remediation are reviewed;
 - automated tests and CI pass on the exact candidate commit;
-- a reviewer independent of implementation signs a revision-bound evidence manifest.
+- a reviewer independent of implementation verifies the Ed25519-signed, revision-bound evidence manifest using an independently provisioned trusted public key and confirms the custodian identity-to-key binding.
 
 No model-weight change, persistent installation, autonomous execution, external deployment, or model-quality improvement is claimed by this repository change.
