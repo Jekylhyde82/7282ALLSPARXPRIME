@@ -131,12 +131,12 @@ export function buildComparison(records) {
     const assistedAssessor = assisted.assessor?.assessor_id;
     for (const record of [baseline, assisted]) {
       if (!record.assessor?.assessor_id || record.assessor.independent !== true || record.assessor.blinded_condition !== true) {
-        issues.push(caseId + " " + record.condition + ": authenticated independent blinded scorer evidence is missing or incomplete");
+        issues.push(caseId + " " + record.condition + ": independent blinded scorer attestation is missing or incomplete");
         invalidPair = true;
       }
       const review = record.adversarial_review;
       if (!review || !review.reviewer_id || review.independent !== true || review.blinded_condition !== true) {
-        issues.push(caseId + " " + record.condition + ": independent blinded adversarial review missing or incomplete");
+        issues.push(caseId + " " + record.condition + ": independent blinded adversarial-review attestation is missing or incomplete");
         invalidPair = true;
       }
       if (review && (!review.reviewer_id || review.reviewer_id === record.assessor?.assessor_id)) {
