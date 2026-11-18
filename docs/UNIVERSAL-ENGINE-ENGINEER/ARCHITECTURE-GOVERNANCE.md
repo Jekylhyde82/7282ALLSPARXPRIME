@@ -3,14 +3,14 @@
 
 **Document status:** Architecture baseline committed to a working branch; not a claim of runtime implementation.  
 **Canonical architecture identity:** U.N.I.V.E.R.S.A.L. E.N.G.I.N.E. / E.N.G.I.N.E.E.R.  
-**Unified conversational/engineering identity:** OMNIVELOCITY PRIME GENIUS ENGINEER  
+**Unified conversational/engineering identity:** MULTIVERSAL OMNIVELOCITY PRIME — GENIUS ENGINEER PRIME  
 **Governing directive:** Build for capability today. Design for possibilities tomorrow. Engineer for evolution indefinitely.
 
 ## 1. Authority and naming
 
 This document consolidates governing decisions into one architecture. Historical names, repositories, branches, and artifacts are provenance only; they are not parallel product architectures. New work must use the canonical architecture identity above.
 
-GENIUS ENGINEER and OMNIVELOCITY are fused into **OMNIVELOCITY PRIME GENIUS ENGINEER**. Their capabilities are coordinated within one identity, not implemented as competing or parallel systems:
+GENIUS ENGINEER and OMNIVELOCITY are fused into **MULTIVERSAL OMNIVELOCITY PRIME — GENIUS ENGINEER PRIME**. Their capabilities are coordinated within one identity, not implemented as competing or parallel systems:
 
 - GENIUS: reasoning, learning, creativity, problem-solving, and critical thought.
 - ENGINEER: architecture, design, implementation, integration, testing, and optimisation.
@@ -156,3 +156,12 @@ Existing repository work and open pull requests must be audited and migrated int
 ## 13. Governing phrase
 
 **Build for capability today. Design for possibilities tomorrow. Engineer for evolution indefinitely.**
+
+
+## 14. Canonical component architecture register
+
+The authoritative component-level contract and initial named-component inventory are maintained in [COMPONENT-ARCHITECTURE-REGISTER.md](./COMPONENT-ARCHITECTURE-REGISTER.md). Every component must be registered against that contract, including stable identity, purpose, scope, specialist capabilities, interfaces, dependencies, permissions, lifecycle, provenance, verification evidence, and evolution policy.
+
+UAIE PRIME and UPN PRIME each retain their nine defined specialist identities within one unified component. Other components use ninefold topology only where justified; the universal component contract applies to every component regardless of topology. No component is considered implemented or verified merely because its architecture record exists.
+
+The register's 9 Major Divisions, 90 Systems, 184 Architecture records, 18 Responsibility Layers, 9 UMICs, 81 subordinate Core positions, and 81 Engines are governed targets. Missing mappings and the relationship between subordinate Core positions and Engines remain explicit reconciliation work; equal counts do not imply one-to-one mapping.
