@@ -53,7 +53,7 @@ test("rejects unsupported event types and malformed records", () => {
   assert.throws(() => createRegistryRecord({ ...base, sequence: 99 }), /reserved or unknown field/);
   const malformed = verifyRegistryChain([{ ...createRegistryRecord(base), injected: true }]);
   assert.equal(malformed.valid, false);
-  assert.equal(malformed.reason, "Registry record contains an unknown field.");
+  assert.equal(malformed.reason, "Registry record contains an unknown field or is not an object.");
 });
 
 test("rejects unknown nested actor and decision fields", () => {
