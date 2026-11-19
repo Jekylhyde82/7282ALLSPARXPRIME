@@ -126,7 +126,7 @@ test("denies elevated permissions unless local policy and trusted approval both 
     "ELEVATED_PERMISSION_APPROVAL_NOT_VERIFIED");
 
   const verifier = trustedVerifier(manifest);
-  const original = await verifier({});
+  const original = await verifier({ manifest_digest: manifestDigest(manifest), package_digest: manifest.package.digest });
   original.security_review.approved_permissions = ["credentials:read"];
   const result = await evaluateCapabilityPolicy(manifest, policy, async () => original);
   assert.equal(result.allowed, true);
