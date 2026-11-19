@@ -233,3 +233,33 @@ A claim must link to commit, test run, reviewer and environment evidence as appl
 4. Implement schema validation and policy interfaces before provider adapters.
 5. Select one read-only pilot adapter and define its conformance suite.
 6. Keep this specification in draft until review and acceptance evidence exist.
+
+## 17. Baseline repository audit — verified against `main`
+
+This is a limited source inspection of the current default branch, not a complete security audit.
+
+### 17.1 Existing SYPHON-related implementation
+
+The current `main` branch contains:
+- `src/lib/allsparxPrime/runtime.ts`: a narrow ALLSPARX PRIME / SYPHON adapter for the CloudCredits.io Ask AI startup-deal recommendation workflow;
+- `tests/syphon-runtime.test.mjs`: Node tests covering endpoint protocol restrictions, URL credential/fragment rejection, redirect rejection, bounded JSON response size, UTF-8 and response-shape validation, prompt limits, localhost development, and sanitized provider errors;
+- `package.json`: a `test:syphon` script invoking that runtime test file;
+- `.github/workflows/syphon-baseline.yml`: a pull-request workflow that installs locked dependencies, runs SYPHON runtime tests, runs Astro checks and attempts a production build.
+
+The runtime applies a 30-second request timeout, HTTPS except localhost development, rejects redirects, caps provider responses at 64 KiB, validates a bounded response shape and explicitly returns `verified: false`. These are useful existing controls and must be preserved.
+
+### 17.2 Gaps before UCIOA production use
+
+The inspected baseline does **not** establish the full UCIOA capability:
+- the current adapter is task-specific, not a general provider-neutral capability adapter framework;
+- no canonical provider/capability registry or UCIOA lifecycle state machine was identified in the inspected files;
+- no generic policy-enforcement point or approval workflow was identified in the inspected runtime;
+- the browser-facing configuration described in README uses `PUBLIC_AI_CHAT_ENDPOINT`; public build variables must never contain secrets, and authenticated provider access should move behind a server-side boundary;
+- the existing evidence object is request-level response-validation metadata, not a durable, tamper-evident audit ledger;
+- the current test workflow does not yet run UCIOA schema, policy, adapter-conformance, threat-model or recovery acceptance suites.
+
+These are findings from the files inspected, not proof that no related work exists elsewhere in every branch or external system. Reconcile the full repository and protected pull requests before declaring any gap globally absent.
+
+### 17.3 Immediate implementation decision
+
+Do not replace the existing SYPHON runtime or change its provider contract as part of this documentation PR. Preserve its current safety tests. The first UCIOA code increment should add schemas and validation for capability/provider records plus lifecycle transitions, with tests, before introducing new provider adapters. Separately design a server-side authenticated proxy for any provider requiring credentials; do not expose credentials through `PUBLIC_*` variables or browser code.
