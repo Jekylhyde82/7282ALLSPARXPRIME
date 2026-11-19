@@ -1,7 +1,21 @@
-# ALLSPARX PRIME Universal Capability System
+# Universal Engineer — Universal Capability Acquisition System
 
-Status: PROPOSED ARCHITECTURE — not implemented or enabled at runtime.
-Owner: ALLSPARX PRIME architecture. Security and evidence controls: SYPHON.
+Status: PARTIALLY IMPLEMENTED IN AN OPEN DRAFT BRANCH — NOT DEPLOYED OR PRODUCTION-VERIFIED.
+Architectural owner: Universal Engineer. Universal Engine is a governed consumer of approved capabilities. SYPHON provides governed orchestration/integration and security-boundary functions; it does not grant permissions or certify outcomes.
+
+## Canonical identity, ownership and component boundaries
+
+The canonical project name is **Universal Capability Acquisition System**. Its ownership is intrinsic to **Universal Engineer** within the wider U.N.I.V.E.R.S.A.L. E.N.G.I.N.E. / E.N.G.I.N.E.E.R. architecture. It is not a separate top-level project and it is not owned by Universal Engine.
+
+The named components are distinct:
+
+- **Universal Capability Acquisition System:** the complete capability discovery, evaluation, acquisition, packaging, integration, lifecycle and evidence system.
+- **Universal Capability Acquisition Register (UCA-REG-001):** the authoritative logical register for candidate capabilities, provenance, evaluations, approvals, lifecycle state and verification evidence. The repository's append-only capability registry is an implementation component intended to serve this register; its durable production backing is not yet established.
+- **Universal Capability Evaluation Engine:** the evaluation capability. The current deterministic policy and improvement-assessment modules are primitives, not proof that the complete evaluation engine exists.
+- **SYPHON Acquisition Orchestration Layer:** the governed coordination and integration layer. The current continuous-improvement coordinator is a workflow primitive; SYPHON's provider/security gateway role remains distinct and must not be bypassed.
+- **Universal Engine:** consumes capabilities only through approved, versioned and governed interfaces. It does not own acquisition or grant acquisition permissions.
+
+The repository's existing package and application identity is still `cloudcredits.io`, and the repository is a fork of the CloudCredits.io project. This workstream records the Universal Engineer architecture in the existing working repository; it does **not** establish this repository as the canonical source-of-truth repository for the entire Universal Engine / Engineer architecture. That repository-level designation must be verified before production deployment or cross-project integration.
 
 ## Architectural decision
 
