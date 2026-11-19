@@ -15,7 +15,7 @@
     "check": "astro check",
     "format": "prettier -w ./src",
     "test:syphon": "node --test tests/syphon-runtime.test.mjs",
-    "test:starwire": "node --test tests/starwire-syphon.test.mjs tests/starwire-candidate.test.mjs"
+    "test:starwire": "node --test tests/starwire-syphon.test.mjs tests/starwire-candidate.test.mjs tests/starwire-sourcey.test.mjs"
   },
   "dependencies": {
     "@astrojs/check": "0.9.4",
