@@ -30,6 +30,13 @@ export interface SyphonCapture {
   byteLength: number;
   sha256: string;
   body: string;
+  responseMetadata: {
+    requestId: string | null;
+    sourceyReleaseId: string | null;
+    sourceyArtifactSha256: string | null;
+    etag: string | null;
+    lastModified: string | null;
+  };
   verification: "CAPTURED_NOT_VERIFIED";
 }
 
@@ -194,6 +201,13 @@ export async function captureSyphonSource(
       byteLength: bytes.byteLength,
       sha256: toHex(digest),
       body,
+      responseMetadata: {
+        requestId: response.headers.get("x-request-id"),
+        sourceyReleaseId: response.headers.get("x-sourcey-release-id"),
+        sourceyArtifactSha256: response.headers.get("x-sourcey-artifact-sha256"),
+        etag: response.headers.get("etag"),
+        lastModified: response.headers.get("last-modified"),
+      },
       verification: "CAPTURED_NOT_VERIFIED",
     };
   } catch (error) {
