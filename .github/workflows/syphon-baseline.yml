@@ -2,7 +2,7 @@ name: SYPHON baseline checks
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, starwire/vision-production-foundation]
 
 permissions:
   contents: read
