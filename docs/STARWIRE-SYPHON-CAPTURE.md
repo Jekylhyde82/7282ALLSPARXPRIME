@@ -33,6 +33,17 @@ This first slice does **not**:
 
 The public-hostname check is a guardrail, not a complete SSRF defence. Production deployment requires network-level egress restrictions that block loopback, private, link-local, metadata-service and other non-public destinations after DNS resolution, including DNS-rebinding protections. Source allowlists, reviewed terms, robots-policy evidence, secret management, durable audit storage, and independent security review remain mandatory.
 
+
+## Candidate evidence and decision-support contracts
+
+The initial pure policy module is available at `src/lib/starwire/candidate.ts`.
+
+- `validateCandidate` checks required provenance, canonical timestamps, SHA-256 digest shape, HTTPS source/evidence URLs, advertised-claim fields, eligibility structure, and mandatory Original Idea Value.
+- `evaluateCandidate` computes a reproducible, equally weighted nine-criterion AFI PRIME decision-support score. Each criterion is explicitly bounded from 0 to 5. Missing official verification, unconfirmed eligibility, or unapproved source terms prevent a `PRIORITIZE` recommendation.
+- `evaluateUaieGate` rejects contradictory official evidence, holds incomplete candidates, and only returns `ELIGIBLE_FOR_HUMAN_REVIEW` when the evidence and assessment gates pass. It always sets `humanApprovalRequired: true` and `registerWriteAuthorized: false`.
+
+The score is a transparent baseline, not an autonomous intelligence verdict. The weights require calibration against real outcomes and independent review. The module does not create durable audit records, authenticate approvers, implement a lifecycle state machine, or write to the acquisition register. No candidate can be approved, acquired, or integrated by these pure functions.
+
 ## Tests and CI
 
 Run:
