@@ -9,7 +9,7 @@ permissions:
 
 concurrency:
   group: syphon-baseline-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   baseline:
@@ -34,6 +34,42 @@ jobs:
       - name: Run SYPHON runtime contract tests
         id: syphon-tests
         run: pnpm test:syphon
+      - name: Run capability manifest contract tests
+        id: capability-manifest-tests
+        run: pnpm test:capability-manifest
+      - name: Run capability manifest schema validation tests
+        id: capability-manifest-validation-tests
+        run: pnpm test:capability-manifest-validation
+      - name: Run read-only capability discovery tests
+        id: capability-discovery-tests
+        run: pnpm test:capability-discovery
+      - name: Run Cloudflare Worker webhook and snapshot boundary tests
+        id: cloudflare-worker-tests
+        run: pnpm test:cloudflare-worker
+      - name: Run continuous improvement pipeline orchestration tests
+        id: continuous-improvement-pipeline-tests
+        run: pnpm test:continuous-improvement-pipeline
+      - name: Run evidence-based improvement assessment tests
+        id: improvement-assessment-tests
+        run: pnpm test:improvement-assessment
+      - name: Run repository snapshot acquisition tests
+        id: repository-snapshot-acquirer-tests
+        run: pnpm test:repository-snapshot-acquirer
+      - name: Run source repository inventory contract tests
+        id: source-repository-record-tests
+        run: pnpm test:source-repository-record
+      - name: Run capability registry contract tests
+        id: capability-registry-tests
+        run: pnpm test:capability-registry
+      - name: Run append-only capability registry service tests
+        id: capability-registry-service-tests
+        run: pnpm test:capability-registry-service
+      - name: Run capability registry chain integrity tests
+        id: capability-registry-chain-tests
+        run: pnpm test:capability-registry-chain
+      - name: Run capability policy tests
+        id: capability-policy-tests
+        run: pnpm test:capability-policy
       - name: Run Astro type and content checks
         id: check
         run: pnpm check
