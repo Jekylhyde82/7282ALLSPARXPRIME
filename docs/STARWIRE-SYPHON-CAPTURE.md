@@ -34,6 +34,21 @@ This first slice does **not**:
 The public-hostname check is a guardrail, not a complete SSRF defence. Production deployment requires network-level egress restrictions that block loopback, private, link-local, metadata-service and other non-public destinations after DNS resolution, including DNS-rebinding protections. Source allowlists, reviewed terms, robots-policy evidence, secret management, durable audit storage, and independent security review remain mandatory.
 
 
+
+## Sourcey API integration
+
+A read-only Sourcey adapter is available at `src/lib/starwire/sourcey.ts`. It builds requests for the documented API resources:
+
+- `GET /v1/status`, `GET /v1/release`, and `GET /v1/catalog`.
+- `GET /v1/search/offers?q=...&limit=...` with bounded query and limit values.
+- `GET /v1/changes?cursor=...` with the opaque cursor passed through unchanged after URL encoding.
+
+Every request must pass through the caller-supplied SYPHON policy for source ID `sourcey-api` and canonical origin `https://api.sourcey.com`. The adapter does not silently enable the source or approve terms. Sourcey documents anonymous read access and publishes its facts under CC BY 4.0; source configuration still requires a recorded terms/access review before production enablement.
+
+The generic SYPHON capture now preserves the Sourcey response headers `x-request-id`, `x-sourcey-release-id`, and `x-sourcey-artifact-sha256`, alongside ETag and Last-Modified. The adapter exposes the release and artifact digest as source revision metadata. Downstream normalization must also retain each Sourcey `offer_id` and `revision_digest`, the original vendor evidence URLs, eligibility unknowns, disputes, vendor attestation and offer-terms assurance. Attribution must identify Sourcey and CC BY 4.0; never collapse Sourcey's registry evidence into an untraceable summary.
+
+Sourcey is a discovery/evidence input only. Its eligibility evaluation is not vendor approval, its offer records are not guaranteed current entitlements, and STARWIRE must not apply for or redeem offers on the user's behalf.
+
 ## Candidate evidence and decision-support contracts
 
 The initial pure policy module is available at `src/lib/starwire/candidate.ts`.
