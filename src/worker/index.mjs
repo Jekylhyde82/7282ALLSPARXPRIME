@@ -235,6 +235,46 @@ async function fetchPinnedArchive(owner, repository, sourceCommit, token) {
   throw new Error("archive_redirect_limit");
 }
 
+async function sha256Hex(value) {
+  const digestBytes = new Uint8Array(await crypto.subtle.digest("SHA-256", value));
+  return "sha256:" + Array.from(digestBytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+async function readVerifiedSnapshot(bucket, objectKey, expectedSourceCommit) {
+  const object = await bucket.get(objectKey);
+  if (!object) return null;
+  if (typeof object.arrayBuffer !== "function") throw new Error("snapshot_body_unavailable");
+  if (Number.isFinite(object.size) && object.size > MAX_ARCHIVE_BYTES) {
+    throw new Error("snapshot_integrity_mismatch");
+  }
+  const bytes = new Uint8Array(await object.arrayBuffer());
+  const digest = await sha256Hex(bytes);
+  const metadata = object.customMetadata ?? {};
+  if (metadata.source_commit_sha !== expectedSourceCommit ||
+      metadata.archive_digest !== digest ||
+      (Number.isFinite(object.size) && object.size !== bytes.byteLength)) {
+    throw new Error("snapshot_integrity_mismatch");
+  }
+  const storedChecksum = object.checksums?.sha256;
+  if (storedChecksum) {
+    const checksumBytes = storedChecksum instanceof ArrayBuffer
+      ? new Uint8Array(storedChecksum)
+      : ArrayBuffer.isView(storedChecksum)
+        ? new Uint8Array(storedChecksum.buffer, storedChecksum.byteOffset, storedChecksum.byteLength)
+        : null;
+    if (!checksumBytes || checksumBytes.byteLength !== 32 ||
+        "sha256:" + Array.from(checksumBytes, (byte) => byte.toString(16).padStart(2, "0")).join("") !== digest) {
+      throw new Error("snapshot_storage_checksum_mismatch");
+    }
+  }
+  return Object.freeze({
+    source_commit_sha: expectedSourceCommit,
+    archive_digest: digest,
+    object_key: objectKey,
+    acquired_at: metadata.acquired_at || null,
+  });
+}
+
 export class SnapshotCoordinator {
   constructor(state, env) {
     this.state = state;
@@ -282,33 +322,28 @@ export class SnapshotCoordinator {
     const parts = event.repository_full_name.split("/");
     const objectKey = "snapshots/" + parts[0] + "/" + parts[1] + "/" + event.source_commit_sha + ".tar.gz";
     try {
-      const existing = await this.env.SNAPSHOTS.head(objectKey);
+      const existing = await readVerifiedSnapshot(this.env.SNAPSHOTS, objectKey, event.source_commit_sha);
       if (existing) {
-        const existingDigest = existing.customMetadata?.archive_digest;
-        if (existing.customMetadata?.source_commit_sha !== event.source_commit_sha ||
-            !/^sha256:[a-f0-9]{64}$/.test(existingDigest || "")) {
-          throw new Error("snapshot_object_conflict");
-        }
         await this.state.storage.put("snapshot", {
           status: "stored",
-          source_commit_sha: event.source_commit_sha,
-          archive_digest: existingDigest,
-          object_key: objectKey,
-          acquired_at: existing.customMetadata?.acquired_at || new Date().toISOString(),
+          source_commit_sha: existing.source_commit_sha,
+          archive_digest: existing.archive_digest,
+          object_key: existing.object_key,
+          acquired_at: existing.acquired_at || new Date().toISOString(),
           delivery_id: event.delivery_id,
         });
         return response(200, {
           status: "already_present",
-          source_commit_sha: event.source_commit_sha,
-          archive_digest: existingDigest,
-          object_key: objectKey,
+          source_commit_sha: existing.source_commit_sha,
+          archive_digest: existing.archive_digest,
+          object_key: existing.object_key,
         });
       }
 
       const now = new Date().toISOString();
       const archive = await fetchPinnedArchive(parts[0], parts[1], event.source_commit_sha, this.env.GITHUB_API_TOKEN);
+      const digest = await sha256Hex(archive);
       const digestBytes = new Uint8Array(await crypto.subtle.digest("SHA-256", archive));
-      const digest = "sha256:" + Array.from(digestBytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
       const metadata = {
         repository_full_name: event.repository_full_name,
         source_commit_sha: event.source_commit_sha,
@@ -322,23 +357,49 @@ export class SnapshotCoordinator {
         extracted: "false",
       };
 
-      await this.env.SNAPSHOTS.put(objectKey, archive, {
+      const storedObject = await this.env.SNAPSHOTS.put(objectKey, archive, {
+        onlyIf: { etagDoesNotMatch: "*" },
+        sha256: digestBytes.buffer,
         httpMetadata: { contentType: "application/gzip" },
         customMetadata: metadata,
       });
+      if (!storedObject) {
+        // A competing writer won the atomic create-only condition. Never overwrite it.
+        const winner = await readVerifiedSnapshot(this.env.SNAPSHOTS, objectKey, event.source_commit_sha);
+        if (!winner) throw new Error("snapshot_create_conflict_without_object");
+        await this.state.storage.put("snapshot", {
+          status: "stored",
+          source_commit_sha: winner.source_commit_sha,
+          archive_digest: winner.archive_digest,
+          object_key: winner.object_key,
+          acquired_at: winner.acquired_at || now,
+          delivery_id: event.delivery_id,
+        });
+        return response(200, {
+          status: "already_present",
+          source_commit_sha: winner.source_commit_sha,
+          archive_digest: winner.archive_digest,
+          object_key: winner.object_key,
+        });
+      }
+
+      const verified = await readVerifiedSnapshot(this.env.SNAPSHOTS, objectKey, event.source_commit_sha);
+      if (!verified || verified.archive_digest !== digest) {
+        throw new Error("snapshot_readback_verification_failed");
+      }
       await this.state.storage.put("snapshot", {
         status: "stored",
-        source_commit_sha: event.source_commit_sha,
-        archive_digest: digest,
-        object_key: objectKey,
-        acquired_at: now,
+        source_commit_sha: verified.source_commit_sha,
+        archive_digest: verified.archive_digest,
+        object_key: verified.object_key,
+        acquired_at: verified.acquired_at || now,
         delivery_id: event.delivery_id,
       });
       return response(200, {
         status: "stored",
-        source_commit_sha: event.source_commit_sha,
-        archive_digest: digest,
-        object_key: objectKey,
+        source_commit_sha: verified.source_commit_sha,
+        archive_digest: verified.archive_digest,
+        object_key: verified.object_key,
       });
     } catch (error) {
       const code = typeof error?.message === "string" ? error.message.slice(0, 100) : "snapshot_failed";
