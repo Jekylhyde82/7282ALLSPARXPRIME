@@ -83,7 +83,7 @@ test("rejects unsupported media types", async () => {
 test("enforces declared and streamed response limits", async () => {
   resetSyphonRateLimitForTests();
   await assert.rejects(captureSyphonSource("https://example.org/a", basePolicy({ maximumResponseBytes: 4 }), {
-    fetchImpl: async () => response("12345"),
+    fetchImpl: async () => response("12345", { headers: { "content-type": "text/plain", "content-length": "5" } }),
   }), /size limit/);
   resetSyphonRateLimitForTests();
   await assert.rejects(captureSyphonSource("https://example.org/a", basePolicy({ maximumResponseBytes: 4 }), {
