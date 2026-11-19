@@ -41,6 +41,7 @@ test("captures permitted text with provenance and SHA-256 digest", async () => {
   assert.equal(captured.byteLength, 18);
   assert.match(captured.sha256, /^[a-f0-9]{64}$/);
   assert.equal(captured.verification, "CAPTURED_NOT_VERIFIED");
+  assert.deepEqual(captured.responseMetadata, { requestId: null, sourceyReleaseId: null, sourceyArtifactSha256: null, etag: null, lastModified: null });
 });
 
 test("fails closed when source is disabled or terms are not approved", async () => {
@@ -71,6 +72,24 @@ test("rejects redirects rather than following them", async () => {
       throw new TypeError("redirect rejected");
     },
   }), /redirect rejected/);
+});
+
+test("preserves source release, artifact digest and request provenance headers", async () => {
+  resetSyphonRateLimitForTests();
+  const captured = await captureSyphonSource("https://example.org/a", basePolicy(), {
+    fetchImpl: async () => response("{}", { headers: {
+      "content-type": "application/json",
+      "x-request-id": "req-123",
+      "x-sourcey-release-id": "release-456",
+      "x-sourcey-artifact-sha256": "b".repeat(64),
+      "etag": '"release-etag"',
+      "last-modified": "Thu, 20 Nov 2026 00:00:00 GMT",
+    } }),
+  });
+  assert.equal(captured.responseMetadata.requestId, "req-123");
+  assert.equal(captured.responseMetadata.sourceyReleaseId, "release-456");
+  assert.equal(captured.responseMetadata.sourceyArtifactSha256, "b".repeat(64));
+  assert.equal(captured.responseMetadata.etag, '"release-etag"');
 });
 
 test("rejects unsupported media types", async () => {
