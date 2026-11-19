@@ -296,3 +296,121 @@ test("Durable Object returns retryable processing while an acquisition lease is 
   assert.equal(response.status, 202);
   assert.equal((await response.json()).status, "processing");
 });
+
+
+test("rejects an existing snapshot whose stored bytes do not match its recorded digest", async () => {
+  const originalFetch = globalThis.fetch;
+  let fetchCalls = 0;
+  const corruptBytes = new Uint8Array([0x1f, 0x8b, 0x00, 0x01]);
+  const claimedBytes = new Uint8Array([0x1f, 0x8b, 0x08, 0x00, 0x01]);
+  const claimedDigestBytes = new Uint8Array(await crypto.subtle.digest("SHA-256", claimedBytes));
+  const claimedDigest = "sha256:" + Array.from(claimedDigestBytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+  const state = {
+    storage: {
+      async transaction(fn) { return fn({ get: async () => null, put: async () => {} }); },
+      async put() {},
+    },
+  };
+  const bucket = {
+    async get() {
+      return {
+        size: corruptBytes.byteLength,
+        customMetadata: { source_commit_sha: "b".repeat(40), archive_digest: claimedDigest },
+        async arrayBuffer() { return corruptBytes.buffer.slice(0); },
+      };
+    },
+    async put() { throw new Error("must_not_overwrite_corrupt_snapshot"); },
+  };
+  globalThis.fetch = async () => { fetchCalls += 1; throw new Error("must_not_fetch_when_existing_object_is_corrupt"); };
+  try {
+    const coordinator = new SnapshotCoordinator(state, { SNAPSHOTS: bucket });
+    const response = await coordinator.fetch(new Request("https://snapshot.internal/process", {
+      method: "POST",
+      body: JSON.stringify({
+        repository_full_name: "Jekylhyde82/7282ALLSPARXPRIME",
+        source_commit_sha: "b".repeat(40),
+        merge_commit_sha: "a".repeat(40),
+        pull_request_number: 22,
+        license_expression: "MIT",
+      }),
+    }));
+    assert.equal(response.status, 503);
+    assert.equal((await response.json()).error, "snapshot_integrity_mismatch");
+    assert.equal(fetchCalls, 0);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("a competing create-only snapshot writer is reconciled without overwriting the winner", async () => {
+  const originalFetch = globalThis.fetch;
+  const bytes = new Uint8Array([0x1f, 0x8b, 0x08, 0x00, 0x01]);
+  const digestBytes = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
+  const digest = "sha256:" + Array.from(digestBytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+  let getCount = 0;
+  let putCount = 0;
+  const stateValues = new Map();
+  const state = {
+    storage: {
+      async transaction(fn) {
+        return fn({
+          get: async (key) => stateValues.get(key),
+          put: async (key, value) => stateValues.set(key, value),
+        });
+      },
+      async put(key, value) { stateValues.set(key, value); },
+    },
+  };
+  const bucket = {
+    async get() {
+      getCount += 1;
+      if (getCount === 1) return null;
+      return {
+        size: bytes.byteLength,
+        customMetadata: {
+          source_commit_sha: "b".repeat(40),
+          archive_digest: digest,
+          acquired_at: "2026-11-19T00:00:00.000Z",
+        },
+        checksums: { sha256: digestBytes.buffer },
+        async arrayBuffer() { return bytes.buffer.slice(0); },
+      };
+    },
+    async put(_key, _body, options) {
+      putCount += 1;
+      assert.equal(options.onlyIf.etagDoesNotMatch, "*");
+      return null;
+    },
+  };
+  globalThis.fetch = async (url) => {
+    if (String(url).includes("/commits/")) {
+      return new Response(JSON.stringify({ sha: "b".repeat(40) }), { headers: { "content-type": "application/json" } });
+    }
+    if (String(url).includes("/tarball/")) {
+      return new Response(null, { status: 302, headers: { location: "https://codeload.github.com/archive.tar.gz" } });
+    }
+    if (String(url).startsWith("https://codeload.github.com/")) return new Response(bytes);
+    throw new Error("unexpected_url");
+  };
+  try {
+    const coordinator = new SnapshotCoordinator(state, { SNAPSHOTS: bucket });
+    const response = await coordinator.fetch(new Request("https://snapshot.internal/process", {
+      method: "POST",
+      body: JSON.stringify({
+        repository_full_name: "Jekylhyde82/7282ALLSPARXPRIME",
+        source_commit_sha: "b".repeat(40),
+        merge_commit_sha: "a".repeat(40),
+        pull_request_number: 22,
+        license_expression: "MIT",
+      }),
+    }));
+    const result = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(result.status, "already_present");
+    assert.equal(result.archive_digest, digest);
+    assert.equal(putCount, 1);
+    assert.equal(getCount, 2);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
