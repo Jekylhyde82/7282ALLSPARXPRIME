@@ -56,6 +56,9 @@ A read-only adapter is available at `src/lib/starwire/foropensource.ts` for the 
 
 The source's offers dataset is published under CC BY 4.0 and must be attributed to **foropensource**. The repository's code is MIT, but the offers data and separate exports have different licences; STARWIRE must not apply the offers-data licence to the exports. The adapter only handles the offers directory, not the separately licensed sponsorship exports.
 
+**Source-count discrepancy to retain as a data-quality flag:** the live directory page currently advertises 170 offers, while its linked repository README reports 164 companies in the data directory and the repository's About text reports 163. These are different measures and may reflect update timing, but they do not reconcile as one count. STARWIRE must capture the exact source, revision and retrieval time for each figure and must not repeat a headline count as a verified total without reconciling the pinned repository tree and live directory.
+
+
 The API and raw-content hosts require separate SYPHON source policies. The adapter does not enable either source, infer permission from the public repository, or perform repository matching/application actions. Preserve the Git commit SHA, per-file Git blob SHA, captured bytes and timestamps. The registry's verification dates are source claims; official provider terms still need independent verification.
 
 ## Candidate evidence and decision-support contracts
