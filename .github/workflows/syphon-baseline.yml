@@ -34,7 +34,7 @@ jobs:
       - name: Run SYPHON runtime contract tests
         id: syphon-tests
         run: pnpm test:syphon
-      - name: Run STARWIRE SYPHON source capture tests
+      - name: Run STARWIRE SYPHON, Sourcey and governance tests
         id: starwire-tests
         run: pnpm test:starwire
       - name: Run Astro type and content checks
