@@ -170,9 +170,23 @@ test("Durable Object pins the source commit, hashes the archive and stores immut
     },
   };
   const bucket = {
-    async head(key) { return stored.get(key) ?? null; },
+    async get(key) {
+      const item = stored.get(key);
+      if (!item) return null;
+      return {
+        size: item.body.byteLength,
+        customMetadata: item.customMetadata,
+        checksums: { sha256: item.checksum },
+        async arrayBuffer() { return item.body.buffer.slice(item.body.byteOffset, item.body.byteOffset + item.body.byteLength); },
+      };
+    },
     async put(key, body, options) {
-      stored.set(key, { customMetadata: options.customMetadata, body });
+      assert.equal(options.onlyIf.etagDoesNotMatch, "*");
+      assert.equal(options.sha256.byteLength, 32);
+      if (stored.has(key)) return null;
+      const bytes = new Uint8Array(body);
+      stored.set(key, { customMetadata: options.customMetadata, body: bytes, checksum: options.sha256 });
+      return { key, size: bytes.byteLength };
     },
   };
   try {
@@ -220,8 +234,19 @@ test("Durable Object verifies the R2 object before treating a retry as already s
       },
     },
   };
+  const existingBytes = new Uint8Array([0x1f, 0x8b, 0x08, 0x00, 0x01]);
+  const existingDigestBytes = new Uint8Array(await crypto.subtle.digest("SHA-256", existingBytes));
+  const actualDigest = "sha256:" + Array.from(existingDigestBytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+  previous.archive_digest = actualDigest;
   const bucket = {
-    async head() { return { customMetadata: { archive_digest: previous.archive_digest, source_commit_sha: previous.source_commit_sha } }; },
+    async get() {
+      return {
+        size: existingBytes.byteLength,
+        customMetadata: { archive_digest: previous.archive_digest, source_commit_sha: previous.source_commit_sha },
+        checksums: { sha256: existingDigestBytes.buffer },
+        async arrayBuffer() { return existingBytes.buffer.slice(0); },
+      };
+    },
   };
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () => { fetchCalls += 1; throw new Error("must_not_download"); };
