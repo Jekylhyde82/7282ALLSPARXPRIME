@@ -3,7 +3,7 @@
 **Version:** 0.1.0-draft  
 **Status:** Proposed specification; implementation and verification pending  
 **Parent:** NINEFOLD INTRINSIC → Universal Engineer → Universal Capability Acquisition System  
-**Working branch:** `engineer/capability-integration-spec-v0.1`
+**Working branch:** `engineer/ucioa-spec-clean-v0.1`
 
 > PROOF BEFORE CLAIM. EVIDENCE BEFORE CONFIDENCE. VERIFICATION BEFORE COMPLETION.
 
