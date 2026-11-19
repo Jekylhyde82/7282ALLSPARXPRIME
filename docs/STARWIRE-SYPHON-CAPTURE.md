@@ -49,6 +49,15 @@ The generic SYPHON capture now preserves the Sourcey response headers `x-request
 
 Sourcey is a discovery/evidence input only. Its eligibility evaluation is not vendor approval, its offer records are not guaranteed current entitlements, and STARWIRE must not apply for or redeem offers on the user's behalf.
 
+
+## Free for Open Source registry integration
+
+A read-only adapter is available at `src/lib/starwire/foropensource.ts` for the public `natwar86/foropensource` repository. It pins the current branch to a full commit SHA before reading the `data/offers/` index, then permits individual YAML records to be fetched from the corresponding immutable commit on `raw.githubusercontent.com`. It validates filenames, commit identifiers, repository paths and download hosts rather than following arbitrary URLs from untrusted index data.
+
+The source's offers dataset is published under CC BY 4.0 and must be attributed to **foropensource**. The repository's code is MIT, but the offers data and separate exports have different licences; STARWIRE must not apply the offers-data licence to the exports. The adapter only handles the offers directory, not the separately licensed sponsorship exports.
+
+The API and raw-content hosts require separate SYPHON source policies. The adapter does not enable either source, infer permission from the public repository, or perform repository matching/application actions. Preserve the Git commit SHA, per-file Git blob SHA, captured bytes and timestamps. The registry's verification dates are source claims; official provider terms still need independent verification.
+
 ## Candidate evidence and decision-support contracts
 
 The initial pure policy module is available at `src/lib/starwire/candidate.ts`.
