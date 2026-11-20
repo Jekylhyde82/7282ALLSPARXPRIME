@@ -43,6 +43,7 @@ export interface SourceyOfferProvenance {
   sourceRecordId: string | null;
   sourceRecordRevision: string | null;
   sourceRecordUrl: string | null;
+  providerUrl: string | null;
   sourceReleaseId: string | null;
   sourceArtifactSha256: string | null;
 }
@@ -70,31 +71,40 @@ const slugPath = (value: string, field: string): string => {
  * this function never synthesizes IDs, revision digests or canonical URLs.
  */
 export function extractSourceyOfferProvenance(
-  offer: unknown,
+  record: unknown,
   releaseMetadata: unknown = null,
 ): SourceyOfferProvenance {
-  if (!isRecord(offer)) throw new Error("Sourcey offer record must be an object.");
+  if (!isRecord(record)) throw new Error("Sourcey offer record must be an object.");
+  const offer = isRecord(record.offer) ? record.offer : record;
   const release = isRecord(releaseMetadata) ? releaseMetadata : {};
-  const artifactSha256 = optionalText(
-    release.artifact_sha256 ?? offer.artifact_sha256,
+  const artifactRaw = optionalText(
+    release.artifact_sha256 ?? release.sourceyArtifactSha256 ?? offer.artifact_sha256,
     "artifact_sha256",
   );
-  if (artifactSha256 !== null && !/^[a-f0-9]{64}$/i.test(artifactSha256))
-    throw new Error("Sourcey artifact_sha256 must be a 64-character SHA-256 digest.");
-  const canonicalUrl = optionalText(offer.canonical_url, "canonical_url");
-  if (canonicalUrl !== null) {
+  let artifactSha256: string | null = null;
+  if (artifactRaw !== null) {
+    const match = /^(?:sha256:)?([a-f0-9]{64})$/i.exec(artifactRaw);
+    if (!match) throw new Error("Sourcey artifact_sha256 must be a 64-character SHA-256 digest, optionally prefixed with sha256:.");
+    artifactSha256 = match[1].toLowerCase();
+  }
+  const canonicalUrl = optionalText(record.canonical_url ?? offer.canonical_url, "canonical_url");
+  const access = isRecord(offer.access) ? offer.access : {};
+  const providerUrl = optionalText(access.url, "offer access URL");
+  for (const [label, value] of [["canonical_url", canonicalUrl], ["offer access URL", providerUrl]] as const) {
+    if (value === null) continue;
     let parsed: URL;
-    try { parsed = new URL(canonicalUrl); }
-    catch { throw new Error("Sourcey canonical_url must be a valid HTTPS URL."); }
+    try { parsed = new URL(value); }
+    catch { throw new Error(`Sourcey ${label} must be a valid HTTPS URL.`); }
     if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.hash)
-      throw new Error("Sourcey canonical_url must be HTTPS and contain no credentials or fragment.");
+      throw new Error(`Sourcey ${label} must be HTTPS and contain no credentials or fragment.`);
   }
   return {
     sourceRecordId: optionalText(offer.offer_id, "offer_id"),
     sourceRecordRevision: optionalText(offer.revision_digest, "revision_digest"),
     sourceRecordUrl: canonicalUrl,
-    sourceReleaseId: optionalText(release.release_id ?? offer.release_id, "release_id"),
-    sourceArtifactSha256: artifactSha256?.toLowerCase() ?? null,
+    providerUrl,
+    sourceReleaseId: optionalText(release.release_id ?? release.sourceyReleaseId ?? offer.release_id, "release_id"),
+    sourceArtifactSha256: artifactSha256,
   };
 }
 
