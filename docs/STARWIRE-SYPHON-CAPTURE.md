@@ -40,12 +40,14 @@ The public-hostname check is a guardrail, not a complete SSRF defence. Productio
 A read-only Sourcey adapter is available at `src/lib/starwire/sourcey.ts`. It builds requests for the documented API resources:
 
 - `GET /v1/status`, `GET /v1/release`, and `GET /v1/catalog`.
+- Entity, Program and Offer reads by stable ID or slug under `/v1/entities`, `/v1/programs`, and `/v1/offers`.
 - `GET /v1/search/offers?q=...&limit=...` with bounded query and limit values.
+- Provenance, revision-provenance, event and observation reads under `/v1/provenance`, `/v1/revisions/{id}/provenance`, `/v1/events`, and `/v1/observations`.
 - `GET /v1/changes?cursor=...` with the opaque cursor passed through unchanged after URL encoding.
 
 Every request must pass through the caller-supplied SYPHON policy for source ID `sourcey-api` and canonical origin `https://api.sourcey.com`. The adapter does not silently enable the source or approve terms. Sourcey documents anonymous read access and publishes its facts under CC BY 4.0; source configuration still requires a recorded terms/access review before production enablement.
 
-The generic SYPHON capture now preserves the Sourcey response headers `x-request-id`, `x-sourcey-release-id`, and `x-sourcey-artifact-sha256`, alongside ETag and Last-Modified. The adapter exposes the release and artifact digest as source revision metadata. Downstream normalization must also retain each Sourcey `offer_id` and `revision_digest`, the original vendor evidence URLs, eligibility unknowns, disputes, vendor attestation and offer-terms assurance. Attribution must identify Sourcey and CC BY 4.0; never collapse Sourcey's registry evidence into an untraceable summary.
+The generic SYPHON capture now preserves the Sourcey response headers `x-request-id`, `x-sourcey-release-id`, and `x-sourcey-artifact-sha256`, alongside ETag and Last-Modified. The adapter exposes the release and artifact digest as source revision metadata. `extractSourceyOfferProvenance` preserves explicit `offer_id`, `revision_digest`, canonical source-record URL, `release_id` and artifact SHA-256 without inventing missing values. Downstream normalization must also retain the original vendor evidence URLs, eligibility unknowns, disputes, vendor attestation and offer-terms assurance. Attribution must identify Sourcey and CC BY 4.0; never collapse Sourcey's registry evidence into an untraceable summary.
 
 Sourcey is a discovery/evidence input only. Its eligibility evaluation is not vendor approval, its offer records are not guaranteed current entitlements, and STARWIRE must not apply for or redeem offers on the user's behalf.
 
