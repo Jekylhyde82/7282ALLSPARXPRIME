@@ -7,7 +7,7 @@ const compiled = ts.transpileModule(source, {
   compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext },
 }).outputText;
 const runtimeUrl = `data:text/javascript;base64,${Buffer.from(compiled).toString("base64")}`;
-const { buildSourceyRequest, captureSourceyResource } = await import(runtimeUrl);
+const { buildSourceyRequest, captureSourceyResource, extractSourceyOfferProvenance } = await import(runtimeUrl);
 
 test("builds documented Sourcey read-only resource URLs", () => {
   assert.equal(buildSourceyRequest({ kind: "status" }).url, "https://api.sourcey.com/v1/status");
