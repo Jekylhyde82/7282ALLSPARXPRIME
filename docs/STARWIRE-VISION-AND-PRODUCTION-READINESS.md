@@ -79,7 +79,7 @@ Every collection operation must:
 Every candidate must retain, at minimum:
 
 - Stable candidate ID and schema version (current candidate evidence contract: schema v2).
-- Source ID, source type, canonical URL, exact source location, source-published licence, stable upstream record ID, immutable source revision/commit, release ID, upstream artifact digest, and the original provider URL as a separate field. Fields unavailable from a source remain explicitly unknown/null.
+- Source ID, source type, canonical URL, exact source location, source-published licence, stable upstream record ID, record-level revision digest, immutable source revision/commit, upstream artifact ID (including Git blob identifiers), release ID, upstream artifact SHA-256 digest, and the original provider URL as a separate field. Fields unavailable from a source remain explicitly unknown/null.
 - Retrieved-at timestamp, source-updated timestamp where available, and last official-provider verification timestamp.
 - Provider and programme names as published.
 - Original provider URL and the relationship between source URL and provider URL.
