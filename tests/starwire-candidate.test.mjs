@@ -11,13 +11,17 @@ const { validateCandidate, evaluateCandidate, evaluateUaieGate } = await import(
 
 const candidate = (overrides = {}) => ({
   id: "cand-001",
-  schemaVersion: 1,
+  schemaVersion: 2,
   state: "DISCOVERED",
   source: {
     sourceId: "source-001", sourceUrl: "https://example.org/offers",
     retrievedAt: "2026-11-20T00:00:00.000Z", contentSha256: "a".repeat(64),
     termsApproved: true,
+    sourceLicense: "CC-BY-4.0", sourceRecordId: "offer-001",
+    sourceRevision: "a1b2c3d4", sourceReleaseId: "release-2026-11",
+    sourceArtifactSha256: "b".repeat(64),
   },
+  providerUrl: "https://provider.example.org/programme",
   providerName: "Example Provider",
   programmeName: "Builder Credits",
   advertisedBenefit: { claim: "Up to $500 credits", value: 500, unit: "USD credit", currency: "USD" },
@@ -39,6 +43,19 @@ const high = {
 
 test("valid candidate preserves Original Idea Value and source provenance", () => {
   assert.deepEqual(validateCandidate(candidate()), []);
+});
+test("retains source licence, record, revision, release and provider provenance", () => {
+  const value = candidate();
+  assert.equal(value.source.sourceLicense, "CC-BY-4.0");
+  assert.equal(value.source.sourceRecordId, "offer-001");
+  assert.equal(value.source.sourceRevision, "a1b2c3d4");
+  assert.equal(value.source.sourceReleaseId, "release-2026-11");
+  assert.equal(value.source.sourceArtifactSha256, "b".repeat(64));
+  assert.equal(value.providerUrl, "https://provider.example.org/programme");
+});
+test("rejects malformed artifact digest and unsafe provider URL", () => {
+  assert.ok(validateCandidate(candidate({ source: { ...candidate().source, sourceArtifactSha256: "bad" } })).some(x => x.includes("artifact SHA-256")));
+  assert.ok(validateCandidate(candidate({ providerUrl: "http://provider.example.org" })).some(x => x.includes("Provider URL")));
 });
 test("rejects missing Original Idea Value, malformed digest and non-HTTPS source", () => {
   assert.ok(validateCandidate(candidate({ originalIdeaValue: { value: " ", linkedIdeaId: null } })).some(x => x.includes("Original Idea Value")));
