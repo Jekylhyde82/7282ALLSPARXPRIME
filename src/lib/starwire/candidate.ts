@@ -221,6 +221,12 @@ export function evaluateUaieGate(
   assessment: AfiAssessment | null,
 ): UaieGateResult {
   const reasons = validateCandidate(candidate);
+  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate))
+    return { candidateId: "", decision: "HOLD", reasons, humanApprovalRequired: true, registerWriteAuthorized: false };
+  if (!candidate.officialVerification || typeof candidate.officialVerification !== "object" ||
+      !candidate.eligibility || typeof candidate.eligibility !== "object" ||
+      !candidate.source || typeof candidate.source !== "object")
+    return { candidateId: requiredText(candidate.id) ? candidate.id : "", decision: "HOLD", reasons, humanApprovalRequired: true, registerWriteAuthorized: false };
   if (candidate.officialVerification.status === "CONTRADICTED")
     return { candidateId: candidate.id, decision: "REJECT", reasons: [...reasons, "Official-provider evidence contradicts the advertised opportunity."], humanApprovalRequired: true, registerWriteAuthorized: false };
   if (!candidate.source.termsApproved) reasons.push("Source terms/access approval is absent.");
