@@ -44,21 +44,38 @@ test("extracts explicit Sourcey offer and release provenance without fabricating
     sourceRecordUrl: "https://sourcey.com/c/acme/offers/acme-startup",
     providerUrl: null,
     sourceReleaseId: "release_789", sourceArtifactSha256: digest,
+    sourceTrust: {
+      freshness: null, dispute: null, vendorAttestationStatus: null,
+      entityIdentityAssuranceStatus: null, offerTermsAssuranceStatus: null,
+      lifecycle: null, basisEventIds: [], observationIds: [],
+    },
   });
   assert.deepEqual(extractSourceyOfferProvenance({ title: "Unversioned offer" }), {
     sourceRecordId: null, sourceRecordRevision: null, sourceRecordUrl: null,
     providerUrl: null, sourceReleaseId: null, sourceArtifactSha256: null,
+    sourceTrust: {
+      freshness: null, dispute: null, vendorAttestationStatus: null,
+      entityIdentityAssuranceStatus: null, offerTermsAssuranceStatus: null,
+      lifecycle: null, basisEventIds: [], observationIds: [],
+    },
   });
   assert.throws(() => extractSourceyOfferProvenance({ offer_id: "off_123" }, { artifact_sha256: "bad" }), /SHA-256/);
   assert.throws(() => extractSourceyOfferProvenance({ canonical_url: "http://evil.example/offer" }), /HTTPS/);
   assert.equal(extractSourceyOfferProvenance({}, { artifact_sha256: "A".repeat(64) }).sourceArtifactSha256, "a".repeat(64));
   const live = extractSourceyOfferProvenance({
     entity_id: "ent_123",
+    entity: { identity_assurance: { status: "verified" } },
     canonical_url: "https://sourcey.com/c/acme/offers/cloud-credit",
     offer: {
       offer_id: "off_123",
       revision_digest: `sha256:${"d".repeat(64)}`,
       access: { url: "https://provider.example.com/startups" },
+      lifecycle: "active",
+      provenance: {
+        freshness: "stale", dispute: "none",
+        vendor_attestation: { status: "none" },
+        basis_event_ids: ["sha256:event-001"],
+      },
     },
   }, {
     release_id: `sha256:${"e".repeat(64)}`,
@@ -70,6 +87,11 @@ test("extracts explicit Sourcey offer and release provenance without fabricating
   assert.equal(live.providerUrl, "https://provider.example.com/startups");
   assert.equal(live.sourceReleaseId, `sha256:${"e".repeat(64)}`);
   assert.equal(live.sourceArtifactSha256, "f".repeat(64));
+  assert.deepEqual(live.sourceTrust, {
+    freshness: "stale", dispute: "none", vendorAttestationStatus: "none",
+    entityIdentityAssuranceStatus: "verified", offerTermsAssuranceStatus: null,
+    lifecycle: "active", basisEventIds: ["sha256:event-001"], observationIds: [],
+  });
 });
 test("preserves Sourcey's opaque change cursor without inventing pagination", () => {
   const cursor = "cursor+opaque/with==symbols";
