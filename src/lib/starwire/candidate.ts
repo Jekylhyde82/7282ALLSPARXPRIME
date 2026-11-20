@@ -98,8 +98,28 @@ const validTimestamp = (value: string): boolean =>
 const validDigest = (value: string): boolean => /^[a-f0-9]{64}$/.test(value);
 
 export function validateCandidate(candidate: CandidateEvidence): string[] {
+  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate))
+    return ["Candidate must be an object."];
   const errors: string[] = [];
+  if (!candidate.source || typeof candidate.source !== "object" || Array.isArray(candidate.source))
+    return ["Candidate source provenance must be an object."];
+  if (!candidate.advertisedBenefit || typeof candidate.advertisedBenefit !== "object" || Array.isArray(candidate.advertisedBenefit))
+    return ["Advertised benefit must be an object."];
+  if (!candidate.eligibility || typeof candidate.eligibility !== "object" || Array.isArray(candidate.eligibility))
+    return ["Eligibility must be an object."];
+  if (!candidate.officialVerification || typeof candidate.officialVerification !== "object" || Array.isArray(candidate.officialVerification))
+    return ["Official verification must be an object."];
+  if (!candidate.originalIdeaValue || typeof candidate.originalIdeaValue !== "object" || Array.isArray(candidate.originalIdeaValue))
+    return ["Original Idea Value must be an object."];
   if (candidate.schemaVersion !== 2) errors.push("Unsupported candidate schema version.");
+  if (!["DISCOVERED", "PROPOSED", "UNDER_EVALUATION", "APPROVED", "REJECTED", "RETIRED", "INTEGRATED"].includes(candidate.state))
+    errors.push("Candidate lifecycle state is invalid.");
+  if (typeof candidate.source.termsApproved !== "boolean")
+    errors.push("Source terms approval must be an explicit boolean.");
+  if (!["UNKNOWN", "CONFIRMED", "INELIGIBLE"].includes(candidate.eligibility.status))
+    errors.push("Eligibility status is invalid.");
+  if (!["UNVERIFIED", "VERIFIED", "CONTRADICTED"].includes(candidate.officialVerification.status))
+    errors.push("Official verification status is invalid.");
   if (!requiredText(candidate.id)) errors.push("Candidate ID is required.");
   if (!requiredText(candidate.source.sourceId)) errors.push("Source ID is required.");
   let sourceUrl: URL | null = null;
@@ -137,14 +157,18 @@ export function validateCandidate(candidate: CandidateEvidence): string[] {
     errors.push("Advertised benefit value must be null or a non-negative finite number.");
   if (!Array.isArray(candidate.eligibility.requirements) || !Array.isArray(candidate.eligibility.unknowns))
     errors.push("Eligibility requirements and unknowns must be arrays.");
+  else if (![...candidate.eligibility.requirements, ...candidate.eligibility.unknowns].every(requiredText))
+    errors.push("Eligibility requirements and unknowns must contain non-empty text values.");
   if (!Array.isArray(candidate.restrictions)) errors.push("Restrictions must be an array.");
+  else if (!candidate.restrictions.every(requiredText))
+    errors.push("Restrictions must contain non-empty text values.");
   if (candidate.expiryAt !== null && !validTimestamp(candidate.expiryAt))
     errors.push("Expiry must be null or a canonical ISO-8601 UTC timestamp.");
   if (candidate.officialVerification.verifiedAt !== null && !validTimestamp(candidate.officialVerification.verifiedAt))
     errors.push("Official verification timestamp must be null or a canonical ISO-8601 UTC timestamp.");
   if (!Array.isArray(candidate.officialVerification.evidenceUrls))
     errors.push("Official verification evidence URLs must be an array.");
-  for (const evidenceUrl of candidate.officialVerification.evidenceUrls) {
+  if (Array.isArray(candidate.officialVerification.evidenceUrls)) for (const evidenceUrl of candidate.officialVerification.evidenceUrls) {
     try {
       const parsed = new URL(evidenceUrl);
       if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.hash)
@@ -153,6 +177,8 @@ export function validateCandidate(candidate: CandidateEvidence): string[] {
   }
   if (!requiredText(candidate.originalIdeaValue.value))
     errors.push("Original Idea Value is mandatory and must be preserved.");
+  if (candidate.originalIdeaValue.linkedIdeaId !== null && !requiredText(candidate.originalIdeaValue.linkedIdeaId))
+    errors.push("Linked Original Idea ID must be non-empty text or null.");
   return errors;
 }
 
