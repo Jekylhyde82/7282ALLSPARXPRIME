@@ -55,7 +55,7 @@ export function extractForOpenSourceOfferProvenance(
 ): ForOpenSourceOfferProvenance {
   if (!SHA_PATTERN.test(commitSha)) throw new Error("Free for Open Source provenance requires a full commit SHA.");
   if (!offer || typeof offer !== "object" ||
-      !/^[a-z0-9]+(?:-[a-z0-9]+)*\\.ya?ml$/i.test(offer.name) ||
+      !/^[a-z0-9]+(?:-[a-z0-9]+)*\.ya?ml$/i.test(offer.name) ||
       offer.path !== `data/offers/${offer.name}` ||
       !SHA_PATTERN.test(offer.sha))
     throw new Error("Free for Open Source offer provenance requires a validated immutable offer-index entry.");
