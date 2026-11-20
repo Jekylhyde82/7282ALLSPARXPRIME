@@ -46,6 +46,16 @@ export interface ForOpenSourceOfferProvenance {
   sourceArtifactId: string;
   sourceReleaseId: null;
   sourceArtifactSha256: null;
+  sourceTrust: {
+    freshness: null;
+    dispute: null;
+    vendorAttestationStatus: null;
+    entityIdentityAssuranceStatus: null;
+    offerTermsAssuranceStatus: null;
+    lifecycle: null;
+    basisEventIds: [];
+    observationIds: [];
+  };
 }
 
 /** Map a validated immutable GitHub offer-index entry to candidate provenance. */
@@ -68,6 +78,11 @@ export function extractForOpenSourceOfferProvenance(
     sourceArtifactId: `git-blob-sha1:${offer.sha}`,
     sourceReleaseId: null,
     sourceArtifactSha256: null,
+    sourceTrust: {
+      freshness: null, dispute: null, vendorAttestationStatus: null,
+      entityIdentityAssuranceStatus: null, offerTermsAssuranceStatus: null,
+      lifecycle: null, basisEventIds: [], observationIds: [],
+    },
   };
 }
 
