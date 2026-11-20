@@ -12,6 +12,7 @@ const {
   extractForOpenSourceCommitSha,
   parseForOpenSourceOfferIndex,
   captureForOpenSourceResource,
+  extractForOpenSourceOfferProvenance,
 } = await import(runtimeUrl);
 
 const commit = "a".repeat(40);
@@ -60,6 +61,21 @@ test("validates the offer index and constrains download hosts", () => {
   assert.throws(() => parseForOpenSourceOfferIndex(JSON.stringify({ not: "an array" })), /must be an array/);
 });
 
+test("maps immutable offer records to explicit candidate provenance", () => {
+  const record = { name: "browserstack.yaml", path: "data/offers/browserstack.yaml", sha: "b".repeat(40), downloadUrl: `https://raw.githubusercontent.com/natwar86/foropensource/${commit}/data/offers/browserstack.yaml` };
+  assert.deepEqual(extractForOpenSourceOfferProvenance(record, commit), {
+    sourceLicense: "CC-BY-4.0",
+    sourceRecordId: "data/offers/browserstack.yaml",
+    sourceRecordRevision: null,
+    sourceRecordUrl: `https://github.com/natwar86/foropensource/blob/${commit}/data/offers/browserstack.yaml`,
+    sourceRevision: commit,
+    sourceArtifactId: `git-blob-sha1:${"b".repeat(40)}`,
+    sourceReleaseId: null,
+    sourceArtifactSha256: null,
+  });
+  assert.throws(() => extractForOpenSourceOfferProvenance(record, "main"), /full commit SHA/);
+  assert.throws(() => extractForOpenSourceOfferProvenance({ ...record, sha: "bad" }, commit), /validated immutable/);
+});
 test("captures only through matching approved source policies", async () => {
   const apiPolicy = policy("foropensource-github-api", "https://api.github.com");
   const rawPolicy = policy("foropensource-raw", "https://raw.githubusercontent.com");
