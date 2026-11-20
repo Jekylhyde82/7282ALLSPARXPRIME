@@ -49,6 +49,8 @@ test("extracts explicit Sourcey offer and release provenance without fabricating
     sourceReleaseId: null, sourceArtifactSha256: null,
   });
   assert.throws(() => extractSourceyOfferProvenance({ offer_id: "off_123" }, { artifact_sha256: "bad" }), /SHA-256/);
+  assert.throws(() => extractSourceyOfferProvenance({ canonical_url: "http://evil.example/offer" }), /HTTPS/);
+  assert.equal(extractSourceyOfferProvenance({}, { artifact_sha256: "A".repeat(64) }).sourceArtifactSha256, "a".repeat(64));
 });
 test("preserves Sourcey's opaque change cursor without inventing pagination", () => {
   const cursor = "cursor+opaque/with==symbols";
