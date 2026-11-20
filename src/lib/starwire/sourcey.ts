@@ -55,7 +55,7 @@ const optionalText = (value: unknown, field: string): string | null => {
   return value;
 };
 const pathId = (value: string, field: string): string => {
-  if (!value.trim() || value.length > 256 || /[\\u0000-\\u001f\\u007f]/.test(value))
+  if (!value.trim() || value.length > 256 || /[\u0000-\u001f\u007f]/.test(value))
     throw new Error(`Sourcey ${field} must be 1–256 printable characters.`);
   return encodeURIComponent(value);
 };
