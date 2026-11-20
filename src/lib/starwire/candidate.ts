@@ -15,6 +15,7 @@ export interface CandidateEvidence {
   state: CandidateState;
   source: {
     sourceId: string;
+    captureId: string;
     sourceUrl: string;
     /** Canonical URL of the exact source record or immutable source artifact. */
     sourceRecordUrl: string | null;
@@ -113,6 +114,8 @@ export function validateCandidate(candidate: CandidateEvidence): string[] {
     return ["Official verification must be an object."];
   if (!candidate.originalIdeaValue || typeof candidate.originalIdeaValue !== "object" || Array.isArray(candidate.originalIdeaValue))
     return ["Original Idea Value must be an object."];
+  if (!candidate.sourceTrust || typeof candidate.sourceTrust !== "object" || Array.isArray(candidate.sourceTrust))
+    return ["Source trust metadata must be an object."];
   if (candidate.schemaVersion !== 2) errors.push("Unsupported candidate schema version.");
   if (!["DISCOVERED", "PROPOSED", "UNDER_EVALUATION", "APPROVED", "REJECTED", "RETIRED", "INTEGRATED"].includes(candidate.state))
     errors.push("Candidate lifecycle state is invalid.");
@@ -124,6 +127,7 @@ export function validateCandidate(candidate: CandidateEvidence): string[] {
     errors.push("Official verification status is invalid.");
   if (!requiredText(candidate.id)) errors.push("Candidate ID is required.");
   if (!requiredText(candidate.source.sourceId)) errors.push("Source ID is required.");
+  if (!requiredText(candidate.source.captureId)) errors.push("Source capture ID is required.");
   let sourceUrl: URL | null = null;
   try { sourceUrl = new URL(candidate.source.sourceUrl); } catch { /* validated below */ }
   if (!sourceUrl || sourceUrl.protocol !== "https:" || sourceUrl.username || sourceUrl.password || sourceUrl.hash)
@@ -184,6 +188,22 @@ export function validateCandidate(candidate: CandidateEvidence): string[] {
         errors.push("Official evidence URLs must be HTTPS and contain no credentials or fragment.");
     } catch { errors.push("An official evidence URL is invalid."); }
   }
+  for (const [label, value] of [
+    ["Source freshness", candidate.sourceTrust.freshness],
+    ["Source dispute state", candidate.sourceTrust.dispute],
+    ["Source vendor attestation", candidate.sourceTrust.vendorAttestationStatus],
+    ["Source entity identity assurance", candidate.sourceTrust.entityIdentityAssuranceStatus],
+    ["Source offer terms assurance", candidate.sourceTrust.offerTermsAssuranceStatus],
+    ["Source lifecycle", candidate.sourceTrust.lifecycle],
+  ] as const) {
+    if (value !== null && !requiredText(value)) errors.push(`${label} must be non-empty text or null.`);
+  }
+  if (!Array.isArray(candidate.sourceTrust.basisEventIds) ||
+      !candidate.sourceTrust.basisEventIds.every(requiredText))
+    errors.push("Source basis event IDs must be an array of non-empty text values.");
+  if (!Array.isArray(candidate.sourceTrust.observationIds) ||
+      !candidate.sourceTrust.observationIds.every(requiredText))
+    errors.push("Source observation IDs must be an array of non-empty text values.");
   if (!requiredText(candidate.originalIdeaValue.value))
     errors.push("Original Idea Value is mandatory and must be preserved.");
   if (candidate.originalIdeaValue.linkedIdeaId !== null && !requiredText(candidate.originalIdeaValue.linkedIdeaId))
