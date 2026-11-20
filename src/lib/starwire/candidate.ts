@@ -23,8 +23,12 @@ export interface CandidateEvidence {
     sourceLicense: string | null;
     /** Stable ID of the source's own record (e.g. Sourcey offer_id). */
     sourceRecordId: string | null;
+    /** Record-level revision digest (e.g. Sourcey revision_digest). */
+    sourceRecordRevision: string | null;
     /** Immutable source revision, commit, or version identifier when available. */
     sourceRevision: string | null;
+    /** Immutable upstream artifact identifier (e.g. Git blob SHA-1). */
+    sourceArtifactId: string | null;
     /** Source release identifier when the upstream publishes releases. */
     sourceReleaseId: string | null;
     /** SHA-256 of the upstream release/artifact when independently supplied. */
@@ -107,7 +111,9 @@ export function validateCandidate(candidate: CandidateEvidence): string[] {
   for (const [label, value] of [
     ["Source licence", candidate.source.sourceLicense],
     ["Source record ID", candidate.source.sourceRecordId],
+    ["Source record revision", candidate.source.sourceRecordRevision],
     ["Source revision", candidate.source.sourceRevision],
+    ["Source artifact ID", candidate.source.sourceArtifactId],
     ["Source release ID", candidate.source.sourceReleaseId],
   ] as const) {
     if (value !== null && !requiredText(value)) errors.push(`${label} must be non-empty text or null.`);
