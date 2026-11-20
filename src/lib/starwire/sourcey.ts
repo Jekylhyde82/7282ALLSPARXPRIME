@@ -81,12 +81,20 @@ export function extractSourceyOfferProvenance(
   );
   if (artifactSha256 !== null && !/^[a-f0-9]{64}$/i.test(artifactSha256))
     throw new Error("Sourcey artifact_sha256 must be a 64-character SHA-256 digest.");
+  const canonicalUrl = optionalText(offer.canonical_url, "canonical_url");
+  if (canonicalUrl !== null) {
+    let parsed: URL;
+    try { parsed = new URL(canonicalUrl); }
+    catch { throw new Error("Sourcey canonical_url must be a valid HTTPS URL."); }
+    if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.hash)
+      throw new Error("Sourcey canonical_url must be HTTPS and contain no credentials or fragment.");
+  }
   return {
     sourceRecordId: optionalText(offer.offer_id, "offer_id"),
     sourceRecordRevision: optionalText(offer.revision_digest, "revision_digest"),
-    sourceRecordUrl: optionalText(offer.canonical_url, "canonical_url"),
+    sourceRecordUrl: canonicalUrl,
     sourceReleaseId: optionalText(release.release_id ?? offer.release_id, "release_id"),
-    sourceArtifactSha256: artifactSha256,
+    sourceArtifactSha256: artifactSha256?.toLowerCase() ?? null,
   };
 }
 
