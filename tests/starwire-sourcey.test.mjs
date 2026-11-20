@@ -42,15 +42,34 @@ test("extracts explicit Sourcey offer and release provenance without fabricating
   }, { release_id: "release_789", artifact_sha256: digest }), {
     sourceRecordId: "off_123", sourceRecordRevision: "rev_456",
     sourceRecordUrl: "https://sourcey.com/c/acme/offers/acme-startup",
+    providerUrl: null,
     sourceReleaseId: "release_789", sourceArtifactSha256: digest,
   });
   assert.deepEqual(extractSourceyOfferProvenance({ title: "Unversioned offer" }), {
     sourceRecordId: null, sourceRecordRevision: null, sourceRecordUrl: null,
-    sourceReleaseId: null, sourceArtifactSha256: null,
+    providerUrl: null, sourceReleaseId: null, sourceArtifactSha256: null,
   });
   assert.throws(() => extractSourceyOfferProvenance({ offer_id: "off_123" }, { artifact_sha256: "bad" }), /SHA-256/);
   assert.throws(() => extractSourceyOfferProvenance({ canonical_url: "http://evil.example/offer" }), /HTTPS/);
   assert.equal(extractSourceyOfferProvenance({}, { artifact_sha256: "A".repeat(64) }).sourceArtifactSha256, "a".repeat(64));
+  const live = extractSourceyOfferProvenance({
+    entity_id: "ent_123",
+    canonical_url: "https://sourcey.com/c/acme/offers/cloud-credit",
+    offer: {
+      offer_id: "off_123",
+      revision_digest: `sha256:${"d".repeat(64)}`,
+      access: { url: "https://provider.example.com/startups" },
+    },
+  }, {
+    release_id: `sha256:${"e".repeat(64)}`,
+    artifact_sha256: `sha256:${"f".repeat(64)}`,
+  });
+  assert.equal(live.sourceRecordId, "off_123");
+  assert.equal(live.sourceRecordRevision, `sha256:${"d".repeat(64)}`);
+  assert.equal(live.sourceRecordUrl, "https://sourcey.com/c/acme/offers/cloud-credit");
+  assert.equal(live.providerUrl, "https://provider.example.com/startups");
+  assert.equal(live.sourceReleaseId, `sha256:${"e".repeat(64)}`);
+  assert.equal(live.sourceArtifactSha256, "f".repeat(64));
 });
 test("preserves Sourcey's opaque change cursor without inventing pagination", () => {
   const cursor = "cursor+opaque/with==symbols";
