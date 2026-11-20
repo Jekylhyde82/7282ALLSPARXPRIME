@@ -78,8 +78,8 @@ Every collection operation must:
 
 Every candidate must retain, at minimum:
 
-- Stable candidate ID and schema version.
-- Source ID, source type, canonical URL, exact source location, and source revision/commit where available.
+- Stable candidate ID and schema version (current candidate evidence contract: schema v2).
+- Source ID, source type, canonical URL, exact source location, source-published licence, stable upstream record ID, immutable source revision/commit, release ID, upstream artifact digest, and the original provider URL as a separate field. Fields unavailable from a source remain explicitly unknown/null.
 - Retrieved-at timestamp, source-updated timestamp where available, and last official-provider verification timestamp.
 - Provider and programme names as published.
 - Original provider URL and the relationship between source URL and provider URL.
@@ -196,7 +196,8 @@ At the time of this document:
 - The source-specific startup-credits assessment exists as a separate proposed documentation change.
 - Existing SYPHON / ALLSPARX PRIME runtime and gateway work is tracked in separate pull requests and must be reconciled without discarding their history.
 - The repository's current default-branch Ask AI adapter is not evidence of an autonomous STARWIRE discovery service.
-- No live STARWIRE scheduler, multi-source collector, candidate database, AFI PRIME evaluator, UAIE PRIME approval service, or production acquisition-register write path is claimed by this document.
+- The candidate evidence policy is implemented as a pure schema-v2 validation/evaluation module, including source licence, record ID, revision, release, artifact digest and separate provider URL fields. This is not a durable database, operational AFI PRIME service, or register writer.
+- No live STARWIRE scheduler, multi-source collector, candidate database, operational AFI PRIME evaluator, UAIE PRIME approval service, or production acquisition-register write path is claimed by this document.
 - No provider credentials, cloud account settings, external write permissions, or production endpoint may be guessed or fabricated.
 
 **Release posture: NOT PRODUCTION READY until the acceptance gates above are implemented, tested, independently verified, configured in the target environment, and approved.**
