@@ -46,6 +46,16 @@ export interface SourceyOfferProvenance {
   providerUrl: string | null;
   sourceReleaseId: string | null;
   sourceArtifactSha256: string | null;
+  sourceTrust: {
+    freshness: string | null;
+    dispute: string | null;
+    vendorAttestationStatus: string | null;
+    entityIdentityAssuranceStatus: string | null;
+    offerTermsAssuranceStatus: string | null;
+    lifecycle: string | null;
+    basisEventIds: string[];
+    observationIds: string[];
+  };
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -53,6 +63,12 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const optionalText = (value: unknown, field: string): string | null => {
   if (value === undefined || value === null) return null;
   if (typeof value !== "string" || !value.trim()) throw new Error(`Sourcey ${field} must be non-empty text when present.`);
+  return value;
+};
+const optionalStringArray = (value: unknown, field: string): string[] => {
+  if (value === undefined || value === null) return [];
+  if (!Array.isArray(value) || !value.every(item => typeof item === "string" && item.trim()))
+    throw new Error(`Sourcey ${field} must be an array of non-empty strings when present.`);
   return value;
 };
 const pathId = (value: string, field: string): string => {
@@ -90,6 +106,11 @@ export function extractSourceyOfferProvenance(
   const canonicalUrl = optionalText(record.canonical_url ?? offer.canonical_url, "canonical_url");
   const access = isRecord(offer.access) ? offer.access : {};
   const providerUrl = optionalText(access.url, "offer access URL");
+  const offerProvenance = isRecord(offer.provenance) ? offer.provenance : {};
+  const entity = isRecord(record.entity) ? record.entity : {};
+  const identityAssurance = isRecord(entity.identity_assurance) ? entity.identity_assurance : {};
+  const termsAssurance = isRecord(offer.terms_assurance) ? offer.terms_assurance : {};
+  const vendorAttestation = isRecord(offerProvenance.vendor_attestation) ? offerProvenance.vendor_attestation : {};
   for (const [label, value] of [["canonical_url", canonicalUrl], ["offer access URL", providerUrl]] as const) {
     if (value === null) continue;
     let parsed: URL;
@@ -105,6 +126,16 @@ export function extractSourceyOfferProvenance(
     providerUrl,
     sourceReleaseId: optionalText(release.release_id ?? release.sourceyReleaseId ?? offer.release_id, "release_id"),
     sourceArtifactSha256: artifactSha256,
+    sourceTrust: {
+      freshness: optionalText(offerProvenance.freshness, "provenance freshness"),
+      dispute: optionalText(offerProvenance.dispute, "provenance dispute"),
+      vendorAttestationStatus: optionalText(vendorAttestation.status, "vendor attestation status"),
+      entityIdentityAssuranceStatus: optionalText(identityAssurance.status, "entity identity assurance status"),
+      offerTermsAssuranceStatus: optionalText(termsAssurance.status, "offer terms assurance status"),
+      lifecycle: optionalText(offer.lifecycle, "offer lifecycle"),
+      basisEventIds: optionalStringArray(offerProvenance.basis_event_ids, "basis_event_ids"),
+      observationIds: optionalStringArray(offerProvenance.observation_ids, "observation_ids"),
+    },
   };
 }
 
