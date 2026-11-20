@@ -90,8 +90,13 @@ test("preserves source-published assurance independently from official verificat
     entityIdentityAssuranceStatus: null, offerTermsAssuranceStatus: "not-checked",
     lifecycle: "active", basisEventIds: ["sha256:abc"], observationIds: ["sha256:def"],
   };
-  assert.deepEqual(validateCandidate(candidate({ sourceTrust: trust })), []);
-  assert.equal(candidate({ sourceTrust: trust }).officialVerification.status, "UNVERIFIED");
+  const unverified = {
+    ...candidate(),
+    sourceTrust: trust,
+    officialVerification: { status: "UNVERIFIED", verifiedAt: null, evidenceUrls: [] },
+  };
+  assert.deepEqual(validateCandidate(unverified), []);
+  assert.equal(unverified.officialVerification.status, "UNVERIFIED");
 });
 test("requires the exact SYPHON capture identity", () => {
   assert.ok(validateCandidate(candidate({ source: { ...candidate().source, captureId: "" } })).some(x => x.includes("capture ID")));
