@@ -16,6 +16,8 @@ export interface CandidateEvidence {
   source: {
     sourceId: string;
     sourceUrl: string;
+    /** Canonical URL of the exact source record or immutable source artifact. */
+    sourceRecordUrl: string | null;
     retrievedAt: string;
     contentSha256: string;
     termsApproved: boolean;
@@ -126,6 +128,13 @@ export function validateCandidate(candidate: CandidateEvidence): string[] {
   try { sourceUrl = new URL(candidate.source.sourceUrl); } catch { /* validated below */ }
   if (!sourceUrl || sourceUrl.protocol !== "https:" || sourceUrl.username || sourceUrl.password || sourceUrl.hash)
     errors.push("Source URL must be HTTPS and contain no credentials or fragment.");
+  if (candidate.source.sourceRecordUrl !== null) {
+    try {
+      const recordUrl = new URL(candidate.source.sourceRecordUrl);
+      if (recordUrl.protocol !== "https:" || recordUrl.username || recordUrl.password || recordUrl.hash)
+        errors.push("Source record URL must be HTTPS and contain no credentials or fragment.");
+    } catch { errors.push("Source record URL is invalid."); }
+  }
   if (!validTimestamp(candidate.source.retrievedAt)) errors.push("Source retrieval timestamp must be canonical ISO-8601 UTC.");
   if (!validDigest(candidate.source.contentSha256)) errors.push("Source content SHA-256 digest is invalid.");
   for (const [label, value] of [
