@@ -19,6 +19,37 @@ test("builds documented Sourcey read-only resource URLs", () => {
   assert.equal(search.searchParams.get("limit"), "25");
 });
 
+test("builds canonical entity, program, offer and evidence resource URLs", () => {
+  assert.equal(buildSourceyRequest({ kind: "entity", entityId: "ent_123" }).url, "https://api.sourcey.com/v1/entities/ent_123");
+  assert.equal(buildSourceyRequest({ kind: "entity-by-slug", slug: "atlassian" }).url, "https://api.sourcey.com/v1/entities/by-slug/atlassian");
+  assert.equal(buildSourceyRequest({ kind: "program", programId: "program_123" }).url, "https://api.sourcey.com/v1/programs/program_123");
+  assert.equal(buildSourceyRequest({ kind: "program-by-slug", entitySlug: "atlassian", programSlug: "startup-program" }).url, "https://api.sourcey.com/v1/programs/atlassian/startup-program");
+  assert.equal(buildSourceyRequest({ kind: "offer", offerId: "offer_123" }).url, "https://api.sourcey.com/v1/offers/offer_123");
+  assert.equal(buildSourceyRequest({ kind: "offer-by-slug", entitySlug: "atlassian", offerSlug: "atlassian-for-startups" }).url, "https://api.sourcey.com/v1/offers/atlassian/atlassian-for-startups");
+  assert.equal(buildSourceyRequest({ kind: "revision-provenance", revisionId: "rev_123" }).url, "https://api.sourcey.com/v1/revisions/rev_123/provenance");
+  assert.equal(buildSourceyRequest({ kind: "event", eventId: "evt_123" }).url, "https://api.sourcey.com/v1/events/evt_123");
+  assert.equal(buildSourceyRequest({ kind: "observation", observationId: "obs_123" }).url, "https://api.sourcey.com/v1/observations/obs_123");
+});
+test("rejects unsafe slugs and empty Sourcey record identifiers", () => {
+  assert.throws(() => buildSourceyRequest({ kind: "entity-by-slug", slug: "../admin" }), /valid slug/);
+  assert.throws(() => buildSourceyRequest({ kind: "offer", offerId: " " }), /printable characters/);
+});
+test("extracts explicit Sourcey offer and release provenance without fabricating missing fields", () => {
+  const digest = "c".repeat(64);
+  assert.deepEqual(extractSourceyOfferProvenance({
+    offer_id: "off_123", revision_digest: "rev_456",
+    canonical_url: "https://sourcey.com/c/acme/offers/acme-startup",
+  }, { release_id: "release_789", artifact_sha256: digest }), {
+    sourceRecordId: "off_123", sourceRecordRevision: "rev_456",
+    sourceRecordUrl: "https://sourcey.com/c/acme/offers/acme-startup",
+    sourceReleaseId: "release_789", sourceArtifactSha256: digest,
+  });
+  assert.deepEqual(extractSourceyOfferProvenance({ title: "Unversioned offer" }), {
+    sourceRecordId: null, sourceRecordRevision: null, sourceRecordUrl: null,
+    sourceReleaseId: null, sourceArtifactSha256: null,
+  });
+  assert.throws(() => extractSourceyOfferProvenance({ offer_id: "off_123" }, { artifact_sha256: "bad" }), /SHA-256/);
+});
 test("preserves Sourcey's opaque change cursor without inventing pagination", () => {
   const cursor = "cursor+opaque/with==symbols";
   const request = new URL(buildSourceyRequest({ kind: "changes", cursor }).url);
