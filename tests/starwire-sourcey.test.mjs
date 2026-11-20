@@ -71,6 +71,7 @@ test("extracts explicit Sourcey offer and release provenance without fabricating
       revision_digest: `sha256:${"d".repeat(64)}`,
       access: { url: "https://provider.example.com/startups" },
       lifecycle: "active",
+      terms_assurance: { status: "checked" },
       provenance: {
         freshness: "stale", dispute: "none",
         vendor_attestation: { status: "none" },
@@ -89,7 +90,7 @@ test("extracts explicit Sourcey offer and release provenance without fabricating
   assert.equal(live.sourceArtifactSha256, "f".repeat(64));
   assert.deepEqual(live.sourceTrust, {
     freshness: "stale", dispute: "none", vendorAttestationStatus: "none",
-    entityIdentityAssuranceStatus: "verified", offerTermsAssuranceStatus: null,
+    entityIdentityAssuranceStatus: "verified", offerTermsAssuranceStatus: "checked",
     lifecycle: "active", basisEventIds: ["sha256:event-001"], observationIds: [],
   });
 });
