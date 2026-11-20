@@ -43,6 +43,16 @@ const high = {
   operationalReliability: 4, evidenceQuality: 5, freshness: 5,
 };
 
+test("validator fails closed on malformed untrusted candidate shapes", () => {
+  assert.ok(validateCandidate(null).some(x => x.includes("Candidate must be an object")));
+  assert.ok(validateCandidate(candidate({ source: null })).some(x => x.includes("source provenance")));
+  assert.ok(validateCandidate(candidate({ eligibility: null })).some(x => x.includes("Eligibility must be an object")));
+  assert.ok(validateCandidate(candidate({ officialVerification: { status: "VERIFIED", verifiedAt: null, evidenceUrls: null } })).some(x => x.includes("evidence URLs must be an array")));
+});
+test("rejects invalid lifecycle states and malformed eligibility arrays", () => {
+  assert.ok(validateCandidate(candidate({ state: "ACQUIRED" })).some(x => x.includes("lifecycle state")));
+  assert.ok(validateCandidate(candidate({ eligibility: { status: "CONFIRMED", requirements: [" "], unknowns: [] } })).some(x => x.includes("non-empty text")));
+});
 test("valid candidate preserves Original Idea Value and source provenance", () => {
   assert.deepEqual(validateCandidate(candidate()), []);
 });
