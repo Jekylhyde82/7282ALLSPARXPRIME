@@ -72,6 +72,11 @@ test("maps immutable offer records to explicit candidate provenance", () => {
     sourceArtifactId: `git-blob-sha1:${"b".repeat(40)}`,
     sourceReleaseId: null,
     sourceArtifactSha256: null,
+    sourceTrust: {
+      freshness: null, dispute: null, vendorAttestationStatus: null,
+      entityIdentityAssuranceStatus: null, offerTermsAssuranceStatus: null,
+      lifecycle: null, basisEventIds: [], observationIds: [],
+    },
   });
   assert.throws(() => extractForOpenSourceOfferProvenance(record, "main"), /full commit SHA/);
   assert.throws(() => extractForOpenSourceOfferProvenance({ ...record, sha: "bad" }, commit), /validated immutable/);
