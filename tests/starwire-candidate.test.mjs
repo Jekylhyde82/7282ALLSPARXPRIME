@@ -15,6 +15,7 @@ const candidate = (overrides = {}) => ({
   state: "DISCOVERED",
   source: {
     sourceId: "source-001", sourceUrl: "https://example.org/offers",
+    sourceRecordUrl: "https://example.org/offers/offer-001",
     retrievedAt: "2026-11-20T00:00:00.000Z", contentSha256: "a".repeat(64),
     termsApproved: true,
     sourceLicense: "CC-BY-4.0", sourceRecordId: "offer-001",
@@ -59,7 +60,7 @@ test("valid candidate preserves Original Idea Value and source provenance", () =
 test("permits genuinely unavailable upstream identifiers only as explicit nulls", () => {
   const source = {
     ...candidate().source,
-    sourceLicense: null, sourceRecordId: null, sourceRecordRevision: null,
+    sourceRecordUrl: null, sourceLicense: null, sourceRecordId: null, sourceRecordRevision: null,
     sourceRevision: null, sourceArtifactId: null, sourceReleaseId: null,
     sourceArtifactSha256: null,
   };
@@ -67,6 +68,7 @@ test("permits genuinely unavailable upstream identifiers only as explicit nulls"
 });
 test("retains source licence, record, revision, release and provider provenance", () => {
   const value = candidate();
+  assert.equal(value.source.sourceRecordUrl, "https://example.org/offers/offer-001");
   assert.equal(value.source.sourceLicense, "CC-BY-4.0");
   assert.equal(value.source.sourceRecordId, "offer-001");
   assert.equal(value.source.sourceRecordRevision, "revision-digest-001");
@@ -75,6 +77,9 @@ test("retains source licence, record, revision, release and provider provenance"
   assert.equal(value.source.sourceReleaseId, "release-2026-11");
   assert.equal(value.source.sourceArtifactSha256, "b".repeat(64));
   assert.equal(value.providerUrl, "https://provider.example.org/programme");
+});
+test("rejects unsafe canonical source record URLs", () => {
+  assert.ok(validateCandidate(candidate({ source: { ...candidate().source, sourceRecordUrl: "http://example.org/record" } })).some(x => x.includes("Source record URL")));
 });
 test("rejects empty record revision and artifact identifiers", () => {
   assert.ok(validateCandidate(candidate({ source: { ...candidate().source, sourceRecordRevision: " " } })).some(x => x.includes("Source record revision")));
