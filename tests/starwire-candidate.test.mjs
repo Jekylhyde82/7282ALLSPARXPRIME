@@ -56,6 +56,15 @@ test("rejects invalid lifecycle states and malformed eligibility arrays", () => 
 test("valid candidate preserves Original Idea Value and source provenance", () => {
   assert.deepEqual(validateCandidate(candidate()), []);
 });
+test("permits genuinely unavailable upstream identifiers only as explicit nulls", () => {
+  const source = {
+    ...candidate().source,
+    sourceLicense: null, sourceRecordId: null, sourceRecordRevision: null,
+    sourceRevision: null, sourceArtifactId: null, sourceReleaseId: null,
+    sourceArtifactSha256: null,
+  };
+  assert.deepEqual(validateCandidate(candidate({ source })), []);
+});
 test("retains source licence, record, revision, release and provider provenance", () => {
   const value = candidate();
   assert.equal(value.source.sourceLicense, "CC-BY-4.0");
