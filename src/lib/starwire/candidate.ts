@@ -39,6 +39,17 @@ export interface CandidateEvidence {
   };
   /** Original provider/programme URL, distinct from the directory/API record URL. */
   providerUrl: string | null;
+  /** Source-published assurance labels; never substitute for UAIE verification. */
+  sourceTrust: {
+    freshness: string | null;
+    dispute: string | null;
+    vendorAttestationStatus: string | null;
+    entityIdentityAssuranceStatus: string | null;
+    offerTermsAssuranceStatus: string | null;
+    lifecycle: string | null;
+    basisEventIds: string[];
+    observationIds: string[];
+  };
   providerName: string;
   programmeName: string;
   advertisedBenefit: {
