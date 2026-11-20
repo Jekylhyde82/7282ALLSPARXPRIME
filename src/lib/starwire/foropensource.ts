@@ -36,6 +36,41 @@ export type ForOpenSourceCapture = SyphonCapture & {
   attribution: "foropensource";
 };
 
+export interface ForOpenSourceOfferProvenance {
+  sourceLicense: "CC-BY-4.0";
+  sourceRecordId: string;
+  sourceRecordRevision: null;
+  sourceRecordUrl: string;
+  sourceRevision: string;
+  /** Explicitly tagged as Git blob SHA-1, never confused with SHA-256. */
+  sourceArtifactId: string;
+  sourceReleaseId: null;
+  sourceArtifactSha256: null;
+}
+
+/** Map a validated immutable GitHub offer-index entry to candidate provenance. */
+export function extractForOpenSourceOfferProvenance(
+  offer: ForOpenSourceOfferFile,
+  commitSha: string,
+): ForOpenSourceOfferProvenance {
+  if (!SHA_PATTERN.test(commitSha)) throw new Error("Free for Open Source provenance requires a full commit SHA.");
+  if (!offer || typeof offer !== "object" ||
+      !/^[a-z0-9]+(?:-[a-z0-9]+)*\\.ya?ml$/i.test(offer.name) ||
+      offer.path !== `data/offers/${offer.name}` ||
+      !SHA_PATTERN.test(offer.sha))
+    throw new Error("Free for Open Source offer provenance requires a validated immutable offer-index entry.");
+  return {
+    sourceLicense: "CC-BY-4.0",
+    sourceRecordId: offer.path,
+    sourceRecordRevision: null,
+    sourceRecordUrl: `https://github.com/${REPOSITORY}/blob/${commitSha}/${offer.path}`,
+    sourceRevision: commitSha,
+    sourceArtifactId: `git-blob-sha1:${offer.sha}`,
+    sourceReleaseId: null,
+    sourceArtifactSha256: null,
+  };
+}
+
 const API_ORIGIN = "https://api.github.com";
 const RAW_ORIGIN = "https://raw.githubusercontent.com";
 const REPOSITORY = "natwar86/foropensource";
