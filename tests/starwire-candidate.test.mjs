@@ -14,7 +14,7 @@ const candidate = (overrides = {}) => ({
   schemaVersion: 2,
   state: "DISCOVERED",
   source: {
-    sourceId: "source-001", sourceUrl: "https://example.org/offers",
+    sourceId: "source-001", captureId: "capture-001", sourceUrl: "https://example.org/offers",
     sourceRecordUrl: "https://example.org/offers/offer-001",
     retrievedAt: "2026-11-20T00:00:00.000Z", contentSha256: "a".repeat(64),
     termsApproved: true,
@@ -25,6 +25,11 @@ const candidate = (overrides = {}) => ({
     sourceArtifactSha256: "b".repeat(64),
   },
   providerUrl: "https://provider.example.org/programme",
+  sourceTrust: {
+    freshness: null, dispute: null, vendorAttestationStatus: null,
+    entityIdentityAssuranceStatus: null, offerTermsAssuranceStatus: null,
+    lifecycle: null, basisEventIds: [], observationIds: [],
+  },
   providerName: "Example Provider",
   programmeName: "Builder Credits",
   advertisedBenefit: { claim: "Up to $500 credits", value: 500, unit: "USD credit", currency: "USD" },
@@ -68,6 +73,7 @@ test("permits genuinely unavailable upstream identifiers only as explicit nulls"
 });
 test("retains source licence, record, revision, release and provider provenance", () => {
   const value = candidate();
+  assert.equal(value.source.captureId, "capture-001");
   assert.equal(value.source.sourceRecordUrl, "https://example.org/offers/offer-001");
   assert.equal(value.source.sourceLicense, "CC-BY-4.0");
   assert.equal(value.source.sourceRecordId, "offer-001");
@@ -77,6 +83,18 @@ test("retains source licence, record, revision, release and provider provenance"
   assert.equal(value.source.sourceReleaseId, "release-2026-11");
   assert.equal(value.source.sourceArtifactSha256, "b".repeat(64));
   assert.equal(value.providerUrl, "https://provider.example.org/programme");
+});
+test("preserves source-published assurance independently from official verification", () => {
+  const trust = {
+    freshness: "stale", dispute: "none", vendorAttestationStatus: "none",
+    entityIdentityAssuranceStatus: null, offerTermsAssuranceStatus: "not-checked",
+    lifecycle: "active", basisEventIds: ["sha256:abc"], observationIds: ["sha256:def"],
+  };
+  assert.deepEqual(validateCandidate(candidate({ sourceTrust: trust })), []);
+  assert.equal(candidate({ sourceTrust: trust }).officialVerification.status, "UNVERIFIED");
+});
+test("requires the exact SYPHON capture identity", () => {
+  assert.ok(validateCandidate(candidate({ source: { ...candidate().source, captureId: "" } })).some(x => x.includes("capture ID")));
 });
 test("rejects unsafe canonical source record URLs", () => {
   assert.ok(validateCandidate(candidate({ source: { ...candidate().source, sourceRecordUrl: "http://example.org/record" } })).some(x => x.includes("Source record URL")));
