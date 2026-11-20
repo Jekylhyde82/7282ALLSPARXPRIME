@@ -91,6 +91,15 @@ test("AFI PRIME refuses incomplete verification or invalid scoring", () => {
   assert.equal(evaluateCandidate(unverified, high, "2026-11-20T00:10:00.000Z").recommendation, "INVESTIGATE");
   assert.throws(() => evaluateCandidate(candidate(), { ...high, freshness: 6 }, "2026-11-20T00:10:00.000Z"), /integer from 0 to 5/);
 });
+test("UAIE PRIME fails closed rather than throwing on malformed candidates", () => {
+  const nullResult = evaluateUaieGate(null, null);
+  assert.equal(nullResult.decision, "HOLD");
+  assert.equal(nullResult.registerWriteAuthorized, false);
+  const malformed = candidate({ officialVerification: { status: "VERIFIED", verifiedAt: null, evidenceUrls: null } });
+  const malformedResult = evaluateUaieGate(malformed, null);
+  assert.equal(malformedResult.decision, "HOLD");
+  assert.equal(malformedResult.registerWriteAuthorized, false);
+});
 test("UAIE PRIME holds candidates without independent evidence and AFI assessment", () => {
   const result = evaluateUaieGate(candidate(), null);
   assert.equal(result.decision, "HOLD");
