@@ -18,7 +18,9 @@ const candidate = (overrides = {}) => ({
     retrievedAt: "2026-11-20T00:00:00.000Z", contentSha256: "a".repeat(64),
     termsApproved: true,
     sourceLicense: "CC-BY-4.0", sourceRecordId: "offer-001",
-    sourceRevision: "a1b2c3d4", sourceReleaseId: "release-2026-11",
+    sourceRecordRevision: "revision-digest-001",
+    sourceRevision: "a1b2c3d4", sourceArtifactId: "git-blob-sha1-001",
+    sourceReleaseId: "release-2026-11",
     sourceArtifactSha256: "b".repeat(64),
   },
   providerUrl: "https://provider.example.org/programme",
@@ -48,10 +50,16 @@ test("retains source licence, record, revision, release and provider provenance"
   const value = candidate();
   assert.equal(value.source.sourceLicense, "CC-BY-4.0");
   assert.equal(value.source.sourceRecordId, "offer-001");
+  assert.equal(value.source.sourceRecordRevision, "revision-digest-001");
   assert.equal(value.source.sourceRevision, "a1b2c3d4");
+  assert.equal(value.source.sourceArtifactId, "git-blob-sha1-001");
   assert.equal(value.source.sourceReleaseId, "release-2026-11");
   assert.equal(value.source.sourceArtifactSha256, "b".repeat(64));
   assert.equal(value.providerUrl, "https://provider.example.org/programme");
+});
+test("rejects empty record revision and artifact identifiers", () => {
+  assert.ok(validateCandidate(candidate({ source: { ...candidate().source, sourceRecordRevision: " " } })).some(x => x.includes("Source record revision")));
+  assert.ok(validateCandidate(candidate({ source: { ...candidate().source, sourceArtifactId: " " } })).some(x => x.includes("Source artifact ID")));
 });
 test("rejects malformed artifact digest and unsafe provider URL", () => {
   assert.ok(validateCandidate(candidate({ source: { ...candidate().source, sourceArtifactSha256: "bad" } })).some(x => x.includes("artifact SHA-256")));
