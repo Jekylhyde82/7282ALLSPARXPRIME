@@ -233,7 +233,7 @@ export function evaluateUaieGate(
   if (candidate.eligibility.status === "INELIGIBLE") reasons.push("Candidate is explicitly ineligible.");
   if (candidate.officialVerification.status !== "VERIFIED") reasons.push("Official-provider verification is incomplete.");
   if (candidate.eligibility.status !== "CONFIRMED") reasons.push("Eligibility is not confirmed.");
-  if (candidate.officialVerification.evidenceUrls.length === 0) reasons.push("Official-provider evidence references are missing.");
+  if (!Array.isArray(candidate.officialVerification.evidenceUrls) || candidate.officialVerification.evidenceUrls.length === 0) reasons.push("Official-provider evidence references are missing.");
   if (!assessment || assessment.candidateId !== candidate.id) reasons.push("A matching AFI PRIME assessment is missing.");
   if (assessment && assessment.recommendation === "DEPRIORITIZE") reasons.push("AFI PRIME recommends deprioritization.");
   if (reasons.length) return {
