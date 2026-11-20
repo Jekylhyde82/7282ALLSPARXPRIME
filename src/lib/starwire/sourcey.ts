@@ -11,6 +11,16 @@ export type SourceyResource =
   | { kind: "status" }
   | { kind: "release" }
   | { kind: "catalog" }
+  | { kind: "entity"; entityId: string }
+  | { kind: "entity-by-slug"; slug: string }
+  | { kind: "program"; programId: string }
+  | { kind: "program-by-slug"; entitySlug: string; programSlug: string }
+  | { kind: "offer"; offerId: string }
+  | { kind: "offer-by-slug"; entitySlug: string; offerSlug: string }
+  | { kind: "provenance"; id: string }
+  | { kind: "revision-provenance"; revisionId: string }
+  | { kind: "event"; eventId: string }
+  | { kind: "observation"; observationId: string }
   | { kind: "search-offers"; query: string; limit?: number }
   | { kind: "changes"; cursor?: string };
 
@@ -29,6 +39,57 @@ export type SourceyCapture = SyphonCapture & {
   sourceArtifactDigest: string | null;
 };
 
+export interface SourceyOfferProvenance {
+  sourceRecordId: string | null;
+  sourceRecordRevision: string | null;
+  sourceRecordUrl: string | null;
+  sourceReleaseId: string | null;
+  sourceArtifactSha256: string | null;
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+const optionalText = (value: unknown, field: string): string | null => {
+  if (value === undefined || value === null) return null;
+  if (typeof value !== "string" || !value.trim()) throw new Error(`Sourcey ${field} must be non-empty text when present.`);
+  return value;
+};
+const pathId = (value: string, field: string): string => {
+  if (!value.trim() || value.length > 256 || /[\\u0000-\\u001f\\u007f]/.test(value))
+    throw new Error(`Sourcey ${field} must be 1–256 printable characters.`);
+  return encodeURIComponent(value);
+};
+const slugPath = (value: string, field: string): string => {
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(value))
+    throw new Error(`Sourcey ${field} must be a valid slug.`);
+  return encodeURIComponent(value);
+};
+
+/**
+ * Extracts only explicit upstream identifiers. Missing fields remain null;
+ * this function never synthesizes IDs, revision digests or canonical URLs.
+ */
+export function extractSourceyOfferProvenance(
+  offer: unknown,
+  releaseMetadata: unknown = null,
+): SourceyOfferProvenance {
+  if (!isRecord(offer)) throw new Error("Sourcey offer record must be an object.");
+  const release = isRecord(releaseMetadata) ? releaseMetadata : {};
+  const artifactSha256 = optionalText(
+    release.artifact_sha256 ?? offer.artifact_sha256,
+    "artifact_sha256",
+  );
+  if (artifactSha256 !== null && !/^[a-f0-9]{64}$/i.test(artifactSha256))
+    throw new Error("Sourcey artifact_sha256 must be a 64-character SHA-256 digest.");
+  return {
+    sourceRecordId: optionalText(offer.offer_id, "offer_id"),
+    sourceRecordRevision: optionalText(offer.revision_digest, "revision_digest"),
+    sourceRecordUrl: optionalText(offer.canonical_url, "canonical_url"),
+    sourceReleaseId: optionalText(release.release_id ?? offer.release_id, "release_id"),
+    sourceArtifactSha256: artifactSha256,
+  };
+}
+
 const API_ORIGIN = "https://api.sourcey.com";
 
 export function buildSourceyRequest(resource: SourceyResource): SourceyRequest {
@@ -42,6 +103,36 @@ export function buildSourceyRequest(resource: SourceyResource): SourceyRequest {
       break;
     case "catalog":
       url.pathname = "/v1/catalog";
+      break;
+    case "entity":
+      url.pathname = `/v1/entities/${pathId(resource.entityId, "entity ID")}`;
+      break;
+    case "entity-by-slug":
+      url.pathname = `/v1/entities/by-slug/${slugPath(resource.slug, "entity slug")}`;
+      break;
+    case "program":
+      url.pathname = `/v1/programs/${pathId(resource.programId, "program ID")}`;
+      break;
+    case "program-by-slug":
+      url.pathname = `/v1/programs/${slugPath(resource.entitySlug, "entity slug")}/${slugPath(resource.programSlug, "program slug")}`;
+      break;
+    case "offer":
+      url.pathname = `/v1/offers/${pathId(resource.offerId, "offer ID")}`;
+      break;
+    case "offer-by-slug":
+      url.pathname = `/v1/offers/${slugPath(resource.entitySlug, "entity slug")}/${slugPath(resource.offerSlug, "offer slug")}`;
+      break;
+    case "provenance":
+      url.pathname = `/v1/provenance/${pathId(resource.id, "provenance ID")}`;
+      break;
+    case "revision-provenance":
+      url.pathname = `/v1/revisions/${pathId(resource.revisionId, "revision ID")}/provenance`;
+      break;
+    case "event":
+      url.pathname = `/v1/events/${pathId(resource.eventId, "event ID")}`;
+      break;
+    case "observation":
+      url.pathname = `/v1/observations/${pathId(resource.observationId, "observation ID")}`;
       break;
     case "search-offers": {
       const query = resource.query.trim();
