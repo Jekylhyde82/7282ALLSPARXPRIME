@@ -11,7 +11,7 @@ export type EligibilityState = "UNKNOWN" | "CONFIRMED" | "INELIGIBLE";
 
 export interface CandidateEvidence {
   id: string;
-  schemaVersion: 1;
+  schemaVersion: 2;
   state: CandidateState;
   source: {
     sourceId: string;
@@ -19,7 +19,19 @@ export interface CandidateEvidence {
     retrievedAt: string;
     contentSha256: string;
     termsApproved: boolean;
+    /** SPDX identifier or source-published licence label; null means not yet established. */
+    sourceLicense: string | null;
+    /** Stable ID of the source's own record (e.g. Sourcey offer_id). */
+    sourceRecordId: string | null;
+    /** Immutable source revision, commit, or version identifier when available. */
+    sourceRevision: string | null;
+    /** Source release identifier when the upstream publishes releases. */
+    sourceReleaseId: string | null;
+    /** SHA-256 of the upstream release/artifact when independently supplied. */
+    sourceArtifactSha256: string | null;
   };
+  /** Original provider/programme URL, distinct from the directory/API record URL. */
+  providerUrl: string | null;
   providerName: string;
   programmeName: string;
   advertisedBenefit: {
@@ -83,7 +95,7 @@ const validDigest = (value: string): boolean => /^[a-f0-9]{64}$/.test(value);
 
 export function validateCandidate(candidate: CandidateEvidence): string[] {
   const errors: string[] = [];
-  if (candidate.schemaVersion !== 1) errors.push("Unsupported candidate schema version.");
+  if (candidate.schemaVersion !== 2) errors.push("Unsupported candidate schema version.");
   if (!requiredText(candidate.id)) errors.push("Candidate ID is required.");
   if (!requiredText(candidate.source.sourceId)) errors.push("Source ID is required.");
   let sourceUrl: URL | null = null;
@@ -92,6 +104,24 @@ export function validateCandidate(candidate: CandidateEvidence): string[] {
     errors.push("Source URL must be HTTPS and contain no credentials or fragment.");
   if (!validTimestamp(candidate.source.retrievedAt)) errors.push("Source retrieval timestamp must be canonical ISO-8601 UTC.");
   if (!validDigest(candidate.source.contentSha256)) errors.push("Source content SHA-256 digest is invalid.");
+  for (const [label, value] of [
+    ["Source licence", candidate.source.sourceLicense],
+    ["Source record ID", candidate.source.sourceRecordId],
+    ["Source revision", candidate.source.sourceRevision],
+    ["Source release ID", candidate.source.sourceReleaseId],
+  ] as const) {
+    if (value !== null && !requiredText(value)) errors.push(`${label} must be non-empty text or null.`);
+  }
+  if (candidate.source.sourceArtifactSha256 !== null &&
+      !validDigest(candidate.source.sourceArtifactSha256))
+    errors.push("Source artifact SHA-256 must be null or a valid lowercase SHA-256 digest.");
+  if (candidate.providerUrl !== null) {
+    try {
+      const providerUrl = new URL(candidate.providerUrl);
+      if (providerUrl.protocol !== "https:" || providerUrl.username || providerUrl.password || providerUrl.hash)
+        errors.push("Provider URL must be HTTPS and contain no credentials or fragment.");
+    } catch { errors.push("Provider URL is invalid."); }
+  }
   if (!requiredText(candidate.providerName)) errors.push("Provider name is required.");
   if (!requiredText(candidate.programmeName)) errors.push("Programme name is required.");
   if (!requiredText(candidate.advertisedBenefit.claim) || !requiredText(candidate.advertisedBenefit.unit))
