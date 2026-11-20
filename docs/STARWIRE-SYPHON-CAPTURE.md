@@ -65,11 +65,11 @@ The API and raw-content hosts require separate SYPHON source policies. The adapt
 
 The initial pure policy module is available at `src/lib/starwire/candidate.ts`.
 
-- `validateCandidate` checks required provenance, canonical timestamps, SHA-256 digest shape, HTTPS source/evidence URLs, advertised-claim fields, eligibility structure, and mandatory Original Idea Value.
+- `validateCandidate` enforces candidate schema v2: required capture provenance, canonical timestamps, source-content SHA-256, source licence, stable source record ID, immutable revision/commit, upstream release ID and artifact digest (nullable only when the source does not publish them), separate original provider URL, HTTPS evidence URLs, advertised-claim fields, eligibility structure, and mandatory Original Idea Value.
 - `evaluateCandidate` computes a reproducible, equally weighted nine-criterion AFI PRIME decision-support score. Each criterion is explicitly bounded from 0 to 5. Missing official verification, unconfirmed eligibility, or unapproved source terms prevent a `PRIORITIZE` recommendation.
 - `evaluateUaieGate` rejects contradictory official evidence, holds incomplete candidates, and only returns `ELIGIBLE_FOR_HUMAN_REVIEW` when the evidence and assessment gates pass. It always sets `humanApprovalRequired: true` and `registerWriteAuthorized: false`.
 
-The score is a transparent baseline, not an autonomous intelligence verdict. The weights require calibration against real outcomes and independent review. The module does not create durable audit records, authenticate approvers, implement a lifecycle state machine, or write to the acquisition register. No candidate can be approved, acquired, or integrated by these pure functions.
+Schema v2 prevents the source directory/API URL from being mistaken for the original provider URL and preserves source-specific identifiers such as Sourcey `offer_id` / `revision_digest`, Free for Open Source commit/blob references, release metadata, licence and artifact digest. Missing upstream metadata remains explicitly null rather than being fabricated. The score is a transparent baseline, not an autonomous intelligence verdict. The weights require calibration against real outcomes and independent review. The module does not create durable audit records, authenticate approvers, implement a lifecycle state machine, or write to the acquisition register. No candidate can be approved, acquired, or integrated by these pure functions.
 
 ## Tests and CI
 
