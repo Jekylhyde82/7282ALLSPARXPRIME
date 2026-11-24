@@ -24,8 +24,8 @@ test("rejects non-local HTTP endpoints before making a request", async () => {
   assert.equal(called, false);
 });
 test("rejects endpoint URL credentials and fragments", async () => {
-  await assert.rejects(runAllsparxPrimeTask("find credits", "https://user:pass@example.com/ai"), /must not contain URL credentials or a fragment/);
-  await assert.rejects(runAllsparxPrimeTask("find credits", "https://example.com/ai#token"), /must not contain URL credentials or a fragment/);
+  await assert.rejects(runAllsparxPrimeTask("find credits", "https://user:pass@example.com/ai"), /must not contain credentials or a fragment/);
+  await assert.rejects(runAllsparxPrimeTask("find credits", "https://example.com/ai#token"), /must not contain credentials or a fragment/);
 });
 test("sends one POST, rejects redirects, and accepts valid bounded JSON", async () => {
   let captured;
@@ -33,11 +33,56 @@ test("sends one POST, rejects redirects, and accepts valid bounded JSON", async 
   const result = await runAllsparxPrimeTask("find credits", "https://example.com/ai");
   assert.equal(captured.method, "POST");
   assert.equal(captured.redirect, "error");
-  assert.deepEqual(JSON.parse(captured.body), { prompt: "find credits" });
+  assert.deepEqual(JSON.parse(captured.body), {
+    prompt: "find credits", task: "startup-deal-recommendation", provider: "auto", contractVersion: 1,
+  });
   assert.equal(result.summary, "Found.");
   assert.deepEqual(result.programs, [{ title: "Starter" }]);
   assert.equal(result.evidence.verified, false);
 });
+test("records the actual provider reported by the gateway", async () => {
+  globalThis.fetch = async () => jsonResponse({ summary: "Routed.", programs: [], provider: "anthropic" });
+  const result = await runAllsparxPrimeTask("find credits", "https://gateway.example/v1/ask", "auto");
+  assert.equal(result.evidence.provider, "anthropic");
+  assert.equal(result.evidence.requestedProvider, "auto");
+});
+
+test("rejects an unknown provider in the gateway response", async () => {
+  globalThis.fetch = async () => jsonResponse({ summary: "Routed.", programs: [], provider: "unknown-vendor" });
+  await assert.rejects(runAllsparxPrimeTask("find credits", "https://gateway.example/v1/ask"), /invalid response format/);
+});
+
+test("sends an explicit provider preference without silently changing it", async () => {
+  let payload;
+  globalThis.fetch = async (_url, options) => { payload = JSON.parse(options.body); return jsonResponse({ summary: "Selected.", provider: "google" }); };
+  const result = await runAllsparxPrimeTask("find credits", "https://gateway.example/v1/ask", "google");
+  assert.equal(payload.provider, "google");
+  assert.equal(result.evidence.requestedProvider, "google");
+});
+
+test("rejects a gateway that silently substitutes a different provider", async () => {
+  globalThis.fetch = async () => jsonResponse({ summary: "Wrong provider.", programs: [], provider: "anthropic" });
+  await assert.rejects(
+    runAllsparxPrimeTask("find credits", "https://gateway.example/v1/ask", "google"),
+    /did not honor the explicitly selected provider/,
+  );
+});
+
+test("requires actual provider identity for explicit provider selection", async () => {
+  globalThis.fetch = async () => jsonResponse({ summary: "Provider omitted.", programs: [] });
+  await assert.rejects(
+    runAllsparxPrimeTask("find credits", "https://gateway.example/v1/ask", "google"),
+    /did not honor the explicitly selected provider/,
+  );
+});
+
+test("rejects unsupported provider preferences before making a request", async () => {
+  let called = false;
+  globalThis.fetch = async () => { called = true; return jsonResponse({ summary: "unexpected" }); };
+  await assert.rejects(runAllsparxPrimeTask("find credits", "https://gateway.example/v1/ask", "mystery"), /Unsupported AI provider preference/);
+  assert.equal(called, false);
+});
+
 test("rejects a response with a non-JSON content type", async () => {
   globalThis.fetch = async () => new Response("not json", { headers: { "content-type": "text/plain" } });
   await assert.rejects(runAllsparxPrimeTask("find credits", "https://example.com/ai"), /did not return JSON/);
@@ -76,7 +121,7 @@ test("allows localhost HTTP for development", async () => {
 test("does not expose provider-supplied error details", async () => {
   globalThis.fetch = async () => jsonResponse({ message: "internal-token=secret" }, { status: 400 });
   await assert.rejects(runAllsparxPrimeTask("find credits", "https://example.com/ai"), (error) => {
-    assert.equal(error.message, "The AI service could not complete this request.");
+    assert.equal(error.message, "The ALLSPARX gateway could not complete this request.");
     assert.equal(error.message.includes("secret"), false);
     return true;
   });

@@ -115,13 +115,14 @@ export default function AssistantClient({
     setMatchedPrograms([]);
 
     try {
-      const aiEndpoint = import.meta.env.PUBLIC_AI_CHAT_ENDPOINT;
+      const aiEndpoint = import.meta.env.PUBLIC_ALLSPARX_GATEWAY_URL;
+      const providerPreference = import.meta.env.PUBLIC_ALLSPARX_PROVIDER || "auto";
       if (!aiEndpoint) {
         throw new Error(
-          "Ask AI is not configured for this deployment. Set PUBLIC_AI_CHAT_ENDPOINT to the approved AI service endpoint, then rebuild the site.",
+          "ALLSPARX PRIME is not configured for this deployment. Set PUBLIC_ALLSPARX_GATEWAY_URL to the secured gateway URL, then rebuild the site.",
         );
       }
-      const apiResponse = await runAllsparxPrimeTask(inputPrompt, aiEndpoint);
+      const apiResponse = await runAllsparxPrimeTask(inputPrompt, aiEndpoint, providerPreference as "auto" | "openai" | "anthropic" | "google" | "ollama");
 
       setSummary(apiResponse.summary);
       setRuntimeEvidence(apiResponse.evidence);

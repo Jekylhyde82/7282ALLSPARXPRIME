@@ -76,11 +76,13 @@ This starts the development server at `http://localhost:4321` (or another availa
 
 ### ALLSPARX PRIME / SYPHON runtime configuration
 
-The Ask AI interface uses the local SYPHON adapter at `src/lib/allsparxPrime/runtime.ts`. It preserves the existing provider request contract (`POST` with `{ "prompt": "..." }`) and expects a JSON response containing a string `summary` and an optional `programs` array of objects with string `title` values.
+The Ask AI interface uses the browser-safe SYPHON adapter at `src/lib/allsparxPrime/runtime.ts` to call a vendor-neutral, server-side gateway. Configure `PUBLIC_ALLSPARX_GATEWAY_URL` to the approved HTTPS gateway URL and optionally `PUBLIC_ALLSPARX_PROVIDER` to `auto`, `openai`, `anthropic`, `google`, or `ollama`.
 
-Configure `PUBLIC_AI_CHAT_ENDPOINT` in the build environment to the approved, reachable HTTP(S) endpoint before building or deploying. The application deliberately does not fall back to `localhost`, which would point visitors at their own devices. Because `PUBLIC_` variables are bundled into browser code, never put API keys, bearer tokens, or other credentials in this variable. If the provider requires secrets, route requests through an authenticated server-side proxy and keep credentials in server-only environment variables.
+Automatic provider routing is a gateway policy (OpenAI → Anthropic → Google → Ollama); explicit provider selection is strict and the gateway must report the actual provider used. The browser validates the response contract and rejects a missing or substituted provider when selection is explicit.
 
-The UI reports provider-response validation separately from independent task verification. A valid JSON response is not proof of recommendation accuracy, successful outcomes, or durable audit storage. Remote ALLSPARX PRIME connectivity remains unverified until a real endpoint is configured and tested.
+The browser must never contain provider API keys. `PUBLIC_*` values are bundled into browser code and are not secrets. Before public exposure, the server-side gateway must enforce authentication/abuse controls, origin allowlisting, rate limits, provider spend limits, and secret rotation. CORS alone is not authentication.
+
+The repository contains the provider registry, browser gateway contract, bounded response handling, routing/runtime tests, and a manual live-gateway smoke-test workflow. It does not by itself provide the server-side gateway, vendor adapters, provider credentials, live provider connectivity, or production deployment. A passing mocked test is not live verification; the live gateway check is a separate gate. Do not configure a public endpoint until the gateway security controls are implemented and independently verified.
 
 ## Building for Production
 
