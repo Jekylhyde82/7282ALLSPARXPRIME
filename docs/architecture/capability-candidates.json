@@ -3499,9 +3499,9 @@
       "verification": {
         "last_checked_at": "2026-11-24",
         "license": {
-          "spdx_id": null,
-          "source_url": null,
-          "status": "Requires component/model-level verification"
+          "spdx_id": "Apache-2.0",
+          "source_url": "https://github.com/QwenLM/Qwen3-VL/blob/main/LICENSE",
+          "status": "Repository code licence verified; verify exact model artefact terms before deployment"
         },
         "latest_release": null,
         "latest_release_date": null,
@@ -3540,6 +3540,12 @@
           "source_type": "Official upstream repository",
           "checked_at": "2026-11-24",
           "note": "Model and checkpoint licence terms must be checked per exact release; hardware footprint varies sharply by size."
+        },
+        {
+          "source_url": "https://github.com/QwenLM/Qwen3-VL",
+          "source_type": "Official upstream licence or project documentation",
+          "checked_at": "2026-11-24",
+          "note": "Upstream repository identifies Apache-2.0; README describes visual agent, spatial grounding, video understanding and OCR capabilities."
         }
       ],
       "risks": [
@@ -3582,8 +3588,8 @@
         "last_checked_at": "2026-11-24",
         "license": {
           "spdx_id": null,
-          "source_url": null,
-          "status": "Requires component/model-level verification"
+          "source_url": "https://github.com/facebookresearch/perception_models",
+          "status": "Mixed: PE code/model materials Apache-2.0; PLM research materials under FAIR Noncommercial Research License"
         },
         "latest_release": null,
         "latest_release_date": null,
@@ -3622,10 +3628,23 @@
           "source_type": "Official upstream repository",
           "checked_at": "2026-11-24",
           "note": "Repository exposes separate PE and PLM model licence files; assess each checkpoint and dataset independently."
+        },
+        {
+          "source_url": "https://github.com/facebookresearch/perception_models/blob/main/LICENSE.PE",
+          "source_type": "Official upstream licence or project documentation",
+          "checked_at": "2026-11-24",
+          "note": "PE licence is Apache-2.0."
+        },
+        {
+          "source_url": "https://github.com/facebookresearch/perception_models/blob/main/LICENSE.PLM",
+          "source_type": "Official upstream licence or project documentation",
+          "checked_at": "2026-11-24",
+          "note": "PLM materials are under FAIR Noncommercial Research License, limiting use to noncommercial research."
         }
       ],
       "risks": [
-        "Repository exposes separate PE and PLM model licence files; assess each checkpoint and dataset independently."
+        "Repository exposes separate PE and PLM model licence files; assess each checkpoint and dataset independently.",
+        "PLM research materials are restricted to noncommercial research use; do not assume commercial eligibility. PE and PLM must be treated as separately licensed candidates/checkpoints."
       ],
       "open_questions": [
         "Verify exact licence for code, model weights, datasets and third-party components",
@@ -3927,9 +3946,9 @@
       "verification": {
         "last_checked_at": "2026-11-24",
         "license": {
-          "spdx_id": null,
-          "source_url": null,
-          "status": "Requires component/model-level verification"
+          "spdx_id": "Apache-2.0",
+          "source_url": "https://github.com/dapr/dapr-agents/blob/main/LICENSE",
+          "status": "Repository licence verified"
         },
         "latest_release": null,
         "latest_release_date": null,
@@ -3968,6 +3987,12 @@
           "source_type": "Official upstream repository",
           "checked_at": "2026-11-24",
           "note": "Requires evaluation of Dapr control-plane/sidecar footprint and version maturity; verify exact release and licence."
+        },
+        {
+          "source_url": "https://github.com/dapr/dapr-agents",
+          "source_type": "Official upstream licence or project documentation",
+          "checked_at": "2026-11-24",
+          "note": "Upstream repository identifies Apache-2.0 and describes durable workflows, state, pub/sub and MCP tool discovery; requires Dapr CLI/sidecar and Python >=3.11."
         }
       ],
       "risks": [
@@ -4016,7 +4041,7 @@
         "latest_release": null,
         "latest_release_date": null,
         "last_commit_date": null,
-        "maintenance_status": "Not yet independently assessed",
+        "maintenance_status": "Heavy development; upstream warns of breaking changes before stable release",
         "security_status": "Not yet independently assessed",
         "platform_support": "Repository/docs indicate intended platforms; target-device compatibility unverified",
         "hardware_requirements": "Unknown; benchmark required",
@@ -4050,10 +4075,17 @@
           "source_type": "Official upstream repository",
           "checked_at": "2026-11-24",
           "note": "Upstream warns that the project and APIs are in heavy development and may change; not a stable production assumption."
+        },
+        {
+          "source_url": "https://github.com/google/ax",
+          "source_type": "Official upstream licence or project documentation",
+          "checked_at": "2026-11-24",
+          "note": "Upstream explicitly labels AX and several features as heavy development and warns of breaking changes."
         }
       ],
       "risks": [
-        "Upstream warns that the project and APIs are in heavy development and may change; not a stable production assumption."
+        "Upstream warns that the project and APIs are in heavy development and may change; not a stable production assumption.",
+        "Upstream README explicitly warns the project is in heavy development with likely major breaking changes before stable release."
       ],
       "open_questions": [
         "Verify exact licence for code, model weights, datasets and third-party components",
