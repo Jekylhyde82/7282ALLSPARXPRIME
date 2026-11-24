@@ -1,0 +1,129 @@
+# ALLSPARX PRIME Cloudflare Gateway
+
+This directory contains the isolated Cloudflare Worker API boundary for the browser-based ALLSPARX PRIME assistant. It does not replace the Astro static-site deployment.
+
+## Provider models
+
+The Worker requires explicit model IDs in the server-side `OPENAI_MODEL`, `ANTHROPIC_MODEL`, and `GOOGLE_MODEL` variables. No model-name defaults are embedded in code: select IDs supported by the corresponding provider account/API, then validate them with the live smoke test before enabling traffic. Ollama remains in the shared provider preference vocabulary but is intentionally unavailable through this public Cloudflare Worker; a local Ollama process is not a trusted remote provider endpoint. An explicit Ollama request fails closed as unavailable.
+
+## Request path
+
+- Browser: HTTPS POST to `/v1/ask`, with a one-time Cloudflare Turnstile token and request ID.
+- Worker: exact origin allowlist, bounded JSON input, Turnstile Siteverify hostname validation, per-IP Durable Object rate limit, provider allowlist, monthly admission reservation, bounded provider output, durable evidence append, and normalized JSON response.
+- Evidence: a separate monthly Durable Object ledger stores request IDs, lifecycle events, anonymous origin, deployment provenance, task identifier, provider outcome, and an HMAC-SHA-256 fingerprint of the prompt using the separate `EVIDENCE_HMAC_KEY` secret. Raw prompts and provider credentials are never written to the ledger. Each event links to the prior event hash; the internal verification endpoint recomputes the chain.
+- Provider credentials: Worker secrets only. Never place provider secrets in Astro `PUBLIC_*` variables or browser bundles.
+
+## Required configuration
+
+Worker vars are declared in `wrangler.toml`. The configuration sets `ENVIRONMENT=production` and binds Cloudflare Worker version metadata as `CF_VERSION_METADATA`; the ledger records the deployed Worker version ID as provenance when running on Cloudflare. Before deployment, configure:
+
+- `TURNSTILE_SECRET_KEY` — Cloudflare Turnstile secret.
+- `EVIDENCE_HMAC_KEY` — high-entropy secret used to HMAC prompt fingerprints; do not reuse a provider key.
+- `EVIDENCE_EXPORT_TOKEN` — dedicated high-entropy bearer token (minimum 32 characters) protecting the monthly export route; do not reuse any other credential.
+- At least one complete provider pair: `OPENAI_API_KEY` + `OPENAI_MODEL`, `ANTHROPIC_API_KEY` + `ANTHROPIC_MODEL`, or `GOOGLE_API_KEY` + `GOOGLE_MODEL`. Model IDs are server-side Worker variables, not secrets; API keys remain Worker secrets. A provider missing either value is treated as unconfigured.
+
+Set secrets using the Cloudflare account that owns the Worker:
+
+```sh
+npx wrangler@4 login
+npx wrangler@4 secret put TURNSTILE_SECRET_KEY --config workers/allsparx-gateway/wrangler.toml
+npx wrangler@4 secret put EVIDENCE_HMAC_KEY --config workers/allsparx-gateway/wrangler.toml
+npx wrangler@4 secret put EVIDENCE_EXPORT_TOKEN --config workers/allsparx-gateway/wrangler.toml
+npx wrangler@4 secret put OPENAI_API_KEY --config workers/allsparx-gateway/wrangler.toml
+npx wrangler@4 secret put ANTHROPIC_API_KEY --config workers/allsparx-gateway/wrangler.toml
+npx wrangler@4 secret put GOOGLE_API_KEY --config workers/allsparx-gateway/wrangler.toml
+# Optional additional providers:
+npx wrangler@4 secret put ANTHROPIC_API_KEY --config workers/allsparx-gateway/wrangler.toml
+npx wrangler@4 secret put GOOGLE_API_KEY --config workers/allsparx-gateway/wrangler.toml
+```
+
+Set the model IDs as Worker variables using `wrangler.toml` or the Cloudflare dashboard (for example, `OPENAI_MODEL`, `ANTHROPIC_MODEL`, `GOOGLE_MODEL`). Keep API keys in Worker secrets. Create a Turnstile widget restricted to the production site hostnames. Configure the Astro build environment with:
+
+- `PUBLIC_ALLSPARX_GATEWAY_URL=https://allsparx-prime-gateway.<account-subdomain>.workers.dev/v1/ask`
+- `PUBLIC_ALLSPARX_TURNSTILE_SITE_KEY=<Turnstile site key>`
+- `PUBLIC_ALLSPARX_PROVIDER=auto` (or an explicitly configured provider)
+
+The site key and gateway URL are public. The Turnstile secret and provider keys are not. The evidence Durable Object is created by the v2 Wrangler migration and is required for request execution; if evidence storage is unavailable, the gateway fails closed.
+
+## Deploy and verify
+
+```sh
+npx wrangler@4 deploy --dry-run --config workers/allsparx-gateway/wrangler.toml
+npx wrangler@4 deploy --config workers/allsparx-gateway/wrangler.toml
+```
+
+The internal evidence Durable Object supports `POST /append`, `GET /verify`, and `GET /export`; these Durable Object paths are not exposed as public Worker routes. Verification and export reads are paginated (maximum 100 records per request); continuation cursors are checked against the actual preceding stored record. The Worker exposes `GET /internal/evidence/export?month=YYYY-MM` only with the dedicated `EVIDENCE_EXPORT_TOKEN` bearer secret. It reads and validates the complete monthly chain from sequence 1 and returns an `allsparx-evidence-export-v1` bundle. It fails closed on invalid pages, head changes, gaps, oversized exports, or missing configuration. Exports are capped at 5,000 records and 8 MiB. The route has no browser CORS allowance; additionally restrict it at the Cloudflare edge where the deployment topology supports it. Hash chaining detects accidental or partial record alteration, but it is not a substitute for an independently controlled external checkpoint, WORM retention, or signed audit export. The `GET /healthz` endpoint is a liveness check only; it does not prove provider credentials, Durable Objects, Turnstile, or provider connectivity are ready. Live verification must separately test approved and rejected origins, challenge failure, invalid input, rate limiting, budget exhaustion, a real provider response, response headers, and absence of secret leakage. The manual GitHub Actions workflow `SYPHON live gateway verification` sends one real `/v1/ask` request and requires repository Actions secrets `ALLSPARX_GATEWAY_URL`, `ALLSPARX_SMOKE_ORIGIN`, and `ALLSPARX_SMOKE_TURNSTILE_TOKEN`. The origin must exactly match an allowed HTTPS site origin. The Turnstile token is short-lived and single-use: refresh that secret immediately before manually dispatching the workflow; never commit it, put it in workflow inputs, or print it in logs. The workflow fails closed when any input is missing or malformed, and it does not deploy or change Worker configuration. A successful run verifies one live request only; it does not replace the broader negative-path, recovery, billing, or independent-ledger checks.
+
+## Evidence admission scope
+
+The evidence ledger records requests only after they pass origin admission, rate limiting, Turnstile verification, bounded JSON parsing, request-contract validation, request-ID validation, and provider-configuration checks. Rejections before that admission boundary (including disallowed origins, rate limits, challenge failures, malformed or oversized input, invalid request identifiers, and unavailable provider configuration) are deliberately not represented as ledger events in this version. A missing ledger event therefore does **not** prove that no request or rejection occurred. Use Cloudflare edge/security logs and platform observability for pre-admission rejection evidence until a separately reviewed, privacy-minimizing rejection-event pipeline is implemented. Do not treat this ledger as a complete security-event or intrusion-detection log.
+
+## Evidence ledger limitations
+
+The ledger is durable within Cloudflare Durable Object storage and records append-only hash-linked events. Offline Ed25519 checkpoint signing and verification utilities are now implemented, but an independently administered signer is not yet operational. The system does not yet provide cross-account immutable retention, external timestamping, an exercised retention/backup policy, or a production independent-verification service outside the Cloudflare trust boundary. Request identity is anonymous origin context, not authenticated end-user identity. The prompt is represented by a keyed HMAC-SHA-256 fingerprint; raw prompt content is deliberately excluded.
+
+## Evidence export and offline verification
+
+Generate a monthly export using the protected route and a separately provisioned bearer token. Keep the token out of shell history, source control, workflow inputs, and logs:
+
+```sh
+curl --fail --silent --show-error -H "Authorization: Bearer $EVIDENCE_EXPORT_TOKEN" "https://<gateway-host>/internal/evidence/export?month=2026-10" --output evidence-export.json
+```
+
+The Worker validates each page and includes checkpoint-shaped metadata for operator convenience. That embedded checkpoint is **not trusted** by the offline verifier; obtain the sequence and hash independently. The repository includes `scripts/verify-evidence-export.mjs`, a Node.js offline verifier for a complete monthly export in the `allsparx-evidence-export-v1` format. It recomputes every record hash in sequence, checks each previous-hash link, rejects unexpected record fields and gaps, validates the same lifecycle, actor, provenance, identifier, provider, and outcome constraints as the gateway ledger, and compares the final hash and sequence with a checkpoint supplied separately by the operator. Semantic checks are applied even when a record's hash is internally consistent.
+
+Example:
+
+```sh
+node scripts/verify-evidence-export.mjs ./evidence-export.json <trusted-sequence> <trusted-sha256>
+```
+
+The sequence and SHA-256 checkpoint must be obtained through a separately controlled channel (for example, an independently administered signed checkpoint process). Do not copy the checkpoint from the export being verified: the verifier intentionally ignores any checkpoint embedded in that file. Protect the checkpoint's provenance and custody. Export records must preserve the ledger's serialized property order because the current chain hashes the exact JSON serialization of each stored record payload; reformatting or reordering keys changes the digest. The protected Worker route implements export generation; it does not independently establish checkpoint trust.
+
+**Scope limitation:** the offline verifier does not fetch, sign, or retain exports, and it does not establish who issued a checkpoint. The Worker route generates a bounded bundle but does not sign its checkpoint or provide independent custody. A complete export must contain records from sequence 1 through the checkpoint sequence for one ledger month. Until the bearer token is securely provisioned, a live export is exercised, and independently controlled signed checkpoints plus immutable retention are established, this is an implemented export-generation path—not a live independent audit or production evidence-retention control.
+
+
+## Independent Ed25519 checkpoint signing
+
+The repository provides offline tooling in `scripts/evidence-checkpoint.mjs`, `scripts/sign-evidence-checkpoint.mjs`, and `scripts/verify-evidence-checkpoint.mjs`. The tools are implemented and regression-tested in CI; operational signer custody and independent checkpoint publication remain unconfigured. It uses Ed25519 and a signed, canonical JSON payload. The signed checkpoint binds the ledger month, sequence, final event hash, issue time, algorithm, and SHA-256 digest of the preceding month's signed checkpoint.
+
+Generate a dedicated key pair on an independently administered signing workstation. Keep the private key offline or in a separately controlled signing service; never commit it, upload it to the Worker, or place it in a browser or ordinary CI secret. Pin and distribute the public key fingerprint through an independent channel.
+
+```sh
+umask 077
+openssl genpkey -algorithm ED25519 -out allsparx-evidence-ed25519-private.pem
+openssl pkey -in allsparx-evidence-ed25519-private.pem -pubout -out allsparx-evidence-ed25519-public.pem
+```
+
+After obtaining the expected ledger sequence and hash through a separately controlled source, sign a verified export:
+
+```sh
+node scripts/sign-evidence-checkpoint.mjs evidence-export.json <trusted-sequence> <trusted-sha256> GENESIS allsparx-evidence-ed25519-private.pem checkpoint-2026-10.json
+```
+
+For later checkpoints, replace `GENESIS` with the SHA-256 digest of the previous signed checkpoint file. Verify the signature using the independently pinned public key and the expected prior-checkpoint digest:
+
+```sh
+node scripts/verify-evidence-checkpoint.mjs checkpoint-2026-10.json allsparx-evidence-ed25519-public.pem GENESIS
+```
+
+The verifier returns the signed checkpoint's digest; retain that digest independently and supply it as the expected predecessor when verifying the next checkpoint. The first checkpoint's public-key fingerprint and genesis decision must be trusted out of band. A valid signature proves that the holder of the corresponding private key signed the checkpoint; it does not prove that the signer selected a truthful ledger head. The signer must independently establish the expected sequence/hash before signing. Protect private-key custody, signer access, key rotation, revocation, checkpoint distribution, and immutable retention as separate operational controls.
+
+The scripts and tests implement local signing and verification. They do **not** provision a signer, pin a production public key, create immutable external retention, timestamp the checkpoint independently, or prove live ledger export. Those operational controls remain release blockers.
+
+## Admission-budget limitation
+
+`MAX_REQUEST_COST_MICROS` and `MONTHLY_SPEND_LIMIT_MICROS` currently implement fixed per-request admission reservations in integer units. They are **not** provider invoice metering, actual token-cost settlement, or a guaranteed USD hard cap. Reservations are intentionally not refunded. Before treating this as a production financial spend control, implement provider usage extraction, a reviewed price schedule, actual-cost settlement, and reconciliation against provider billing.
+
+## Deployment-readiness gate
+
+The evidence-based release checklist is maintained at [`docs/ALLSPARX-DEPLOYMENT-READINESS.md`](../../docs/ALLSPARX-DEPLOYMENT-READINESS.md). Its current decision is **NO-GO**: CI baseline checks pass, but export generation, independently administered checkpoints and immutable retention, backup/restore exercises, authenticated actor identity decisions, provider usage settlement, configured live provider tests, live endpoint negative-path verification, and independent security approval remain outstanding. Do not merge or deploy until the applicable blocking items have evidence and explicit approval.
+
+## Local checks
+
+```sh
+pnpm test:syphon
+pnpm check
+pnpm build
+npx --yes wrangler@4 deploy --dry-run --config workers/allsparx-gateway/wrangler.toml
+```
