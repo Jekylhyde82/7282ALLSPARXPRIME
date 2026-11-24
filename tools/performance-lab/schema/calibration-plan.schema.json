@@ -1,0 +1,256 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Jekylhyde82/7282ALLSPARXPRIME/blob/main/tools/performance-lab/schema/calibration-plan.schema.json",
+  "title": "GENESIS Performance Lab Human-Approved Calibration Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "benchmark_id",
+    "plan_version",
+    "protocol_version",
+    "candidate_revision",
+    "rubric_sha256",
+    "frozen_at",
+    "experimental_output_accessed",
+    "calibration_dataset",
+    "evaluators",
+    "thresholds",
+    "reviewer_approvals"
+  ],
+  "properties": {
+    "benchmark_id": {
+      "const": "GENESIS-PERFORMANCE-LAB-001"
+    },
+    "plan_version": {
+      "const": "1.0"
+    },
+    "protocol_version": {
+      "const": "1.5"
+    },
+    "candidate_revision": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "rubric_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "frozen_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$"
+    },
+    "experimental_output_accessed": {
+      "const": false
+    },
+    "calibration_dataset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reference",
+        "sha256",
+        "sample_size",
+        "cases_covered",
+        "seeded_critical_failure_count",
+        "human_adjudicated"
+      ],
+      "properties": {
+        "reference": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "sample_size": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cases_covered": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "P01",
+              "P02",
+              "P03",
+              "P04",
+              "P05"
+            ]
+          }
+        },
+        "seeded_critical_failure_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "human_adjudicated": {
+          "const": true
+        }
+      }
+    },
+    "evaluators": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scorer",
+        "adversarial_reviewer"
+      ],
+      "properties": {
+        "scorer": {
+          "$ref": "#/$defs/evaluator"
+        },
+        "adversarial_reviewer": {
+          "$ref": "#/$defs/evaluator"
+        }
+      }
+    },
+    "thresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minimum_exact_agreement",
+        "per_dimension_agreement_metric",
+        "minimum_per_dimension_agreement",
+        "minimum_quadratic_weighted_kappa",
+        "kappa_not_calculable_rule",
+        "minimum_critical_failure_sensitivity",
+        "maximum_critical_failure_false_positive_rate",
+        "material_disagreement_definition",
+        "missing_response_rule",
+        "fresh_set_recalibration_rule"
+      ],
+      "properties": {
+        "minimum_exact_agreement": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "per_dimension_agreement_metric": {
+          "type": "string",
+          "minLength": 1
+        },
+        "minimum_per_dimension_agreement": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "minimum_quadratic_weighted_kappa": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "kappa_not_calculable_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "minimum_critical_failure_sensitivity": {
+          "const": 1
+        },
+        "maximum_critical_failure_false_positive_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "material_disagreement_definition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "missing_response_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fresh_set_recalibration_rule": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "reviewer_approvals": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reviewer_id",
+          "qualification_basis",
+          "independent",
+          "decision",
+          "approved_at",
+          "signed_statement_reference",
+          "signing_key_sha256"
+        ],
+        "properties": {
+          "reviewer_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "qualification_basis": {
+            "type": "string",
+            "minLength": 1
+          },
+          "independent": {
+            "const": true
+          },
+          "decision": {
+            "const": "APPROVE"
+          },
+          "approved_at": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$"
+          },
+          "signed_statement_reference": {
+            "type": "string",
+            "minLength": 1
+          },
+          "signing_key_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "evaluator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evaluator_id",
+        "provider",
+        "model",
+        "version",
+        "instruction_sha256",
+        "configuration_reference"
+      ],
+      "properties": {
+        "evaluator_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "instruction_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "configuration_reference": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,472 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Jekylhyde82/7282ALLSPARXPRIME/blob/main/tools/performance-lab/schema/run-record.schema.json",
+  "title": "Genesis Performance Lab Run Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "benchmark_id",
+    "run_id",
+    "case_id",
+    "repetition",
+    "condition",
+    "subject",
+    "prompt_sha256",
+    "response",
+    "scores",
+    "critical_failures",
+    "evidence",
+    "assessor",
+    "limitations",
+    "verification_status",
+    "created_at",
+    "adversarial_review",
+    "assessment",
+    "trial_execution"
+  ],
+  "properties": {
+    "benchmark_id": {
+      "const": "GENESIS-PERFORMANCE-LAB-001"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 8
+    },
+    "case_id": {
+      "type": "string",
+      "enum": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05"
+      ]
+    },
+    "repetition": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3
+    },
+    "condition": {
+      "type": "string",
+      "enum": [
+        "baseline",
+        "architecture_assisted"
+      ]
+    },
+    "subject": {
+      "type": "string",
+      "minLength": 1
+    },
+    "prompt_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "response": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "accuracy",
+        "reasoning",
+        "evidence",
+        "calibration",
+        "capability",
+        "reliability",
+        "safety",
+        "synergy"
+      ],
+      "properties": {
+        "accuracy": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "reasoning": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "evidence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "calibration": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "capability": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "reliability": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "safety": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "synergy": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        }
+      }
+    },
+    "critical_failures": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "reference"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "assessor": {
+      "type": "object",
+      "required": [
+        "assessor_id",
+        "blinded_condition",
+        "independent"
+      ],
+      "properties": {
+        "assessor_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "blinded_condition": {
+          "type": "boolean"
+        },
+        "independent": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "verification_status": {
+      "const": "NOT_VERIFIED"
+    },
+    "created_at": {
+      "type": "string",
+      "minLength": 20,
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$"
+    },
+    "adversarial_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reviewer_id",
+        "blinded_condition",
+        "independent",
+        "checks"
+      ],
+      "properties": {
+        "reviewer_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "blinded_condition": {
+          "type": "boolean"
+        },
+        "independent": {
+          "type": "boolean"
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "check_id",
+              "outcome",
+              "finding"
+            ],
+            "properties": {
+              "check_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "PASS",
+                  "FAIL",
+                  "NOT_ASSESSED"
+                ]
+              },
+              "finding": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "scorer",
+        "adversarial_reviewer",
+        "rationales"
+      ],
+      "properties": {
+        "protocol_version": {
+          "const": "1.0"
+        },
+        "scorer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "evaluator_id",
+            "provider",
+            "model",
+            "version",
+            "instruction_sha256",
+            "calibration_status",
+            "calibration_reference",
+            "calibration_sha256"
+          ],
+          "properties": {
+            "evaluator_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "provider": {
+              "type": "string",
+              "minLength": 1
+            },
+            "model": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "instruction_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "calibration_status": {
+              "const": "PASS"
+            },
+            "calibration_reference": {
+              "type": "string",
+              "minLength": 1
+            },
+            "calibration_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "adversarial_reviewer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "evaluator_id",
+            "provider",
+            "model",
+            "version",
+            "instruction_sha256",
+            "calibration_status",
+            "calibration_reference",
+            "calibration_sha256"
+          ],
+          "properties": {
+            "evaluator_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "provider": {
+              "type": "string",
+              "minLength": 1
+            },
+            "model": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "instruction_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "calibration_status": {
+              "const": "PASS"
+            },
+            "calibration_reference": {
+              "type": "string",
+              "minLength": 1
+            },
+            "calibration_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "rationales": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "accuracy",
+            "reasoning",
+            "evidence",
+            "calibration",
+            "capability",
+            "reliability",
+            "safety",
+            "synergy"
+          ],
+          "properties": {
+            "accuracy": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reasoning": {
+              "type": "string",
+              "minLength": 1
+            },
+            "evidence": {
+              "type": "string",
+              "minLength": 1
+            },
+            "calibration": {
+              "type": "string",
+              "minLength": 1
+            },
+            "capability": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reliability": {
+              "type": "string",
+              "minLength": 1
+            },
+            "safety": {
+              "type": "string",
+              "minLength": 1
+            },
+            "synergy": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "trial_execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trial_id",
+        "blind_label",
+        "unpersonalized_confirmed",
+        "context_type",
+        "context_reference",
+        "captured_at",
+        "model_label",
+        "settings",
+        "tools_used",
+        "capture_reference",
+        "canonical_prompt_sha256",
+        "raw_response_sha256"
+      ],
+      "properties": {
+        "trial_id": {
+          "type": "string",
+          "pattern": "^TRIAL-[0-9]{3}$"
+        },
+        "blind_label": {
+          "type": "string",
+          "pattern": "^BLIND-[0-9]{3}$"
+        },
+        "unpersonalized_confirmed": {
+          "const": true
+        },
+        "context_reference": {
+          "type": "string",
+          "minLength": 1
+        },
+        "captured_at": {
+          "type": "string",
+          "minLength": 20,
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$"
+        },
+        "canonical_prompt_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "raw_response_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "architecture_instruction_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "context_type": {
+          "const": "Unpersonalized Temporary Chat"
+        },
+        "model_label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "settings": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tools_used": {
+          "type": "string",
+          "minLength": 1
+        },
+        "capture_reference": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
