@@ -1,0 +1,1146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://universal-engine.invalid/schemas/intrinsic-contracts.schema.json",
+  "title": "Universal Engine / Engineer Intrinsic Contracts",
+  "description": "Vendor-neutral, versioned contracts for tasks, capabilities, agents, tools, evidence, memory, perception, isolation, workflows and evaluation. Replace the placeholder schema host before publishing a stable external schema.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/taskContract"
+    },
+    {
+      "$ref": "#/$defs/capabilityManifest"
+    },
+    {
+      "$ref": "#/$defs/agentManifest"
+    },
+    {
+      "$ref": "#/$defs/toolContract"
+    },
+    {
+      "$ref": "#/$defs/evidenceEnvelope"
+    },
+    {
+      "$ref": "#/$defs/memoryRecord"
+    },
+    {
+      "$ref": "#/$defs/perceptionRecord"
+    },
+    {
+      "$ref": "#/$defs/isolationProfile"
+    },
+    {
+      "$ref": "#/$defs/workflowCheckpoint"
+    },
+    {
+      "$ref": "#/$defs/evaluationRecord"
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "risk": {
+      "enum": [
+        "low",
+        "moderate",
+        "high",
+        "critical",
+        "unknown"
+      ]
+    },
+    "approval": {
+      "type": "object",
+      "required": [
+        "required",
+        "status"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "status": {
+          "enum": [
+            "not_required",
+            "pending",
+            "approved",
+            "rejected",
+            "expired",
+            "revoked"
+          ]
+        },
+        "approver": {
+          "type": "string"
+        },
+        "approved_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "evidence_ref": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "taskContract": {
+      "type": "object",
+      "required": [
+        "contract_type",
+        "schema_version",
+        "task_id",
+        "principal_id",
+        "goal",
+        "acceptance_criteria",
+        "risk_class",
+        "created_at",
+        "permissions"
+      ],
+      "properties": {
+        "contract_type": {
+          "const": "task"
+        },
+        "schema_version": {
+          "$ref": "#/$defs/version"
+        },
+        "task_id": {
+          "$ref": "#/$defs/id"
+        },
+        "principal_id": {
+          "$ref": "#/$defs/id"
+        },
+        "goal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "acceptance_criteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "risk_class": {
+          "$ref": "#/$defs/risk"
+        },
+        "created_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "deadline": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "budget": {
+          "type": "object",
+          "properties": {
+            "currency": {
+              "type": "string"
+            },
+            "amount": {
+              "type": "number",
+              "minimum": 0
+            },
+            "tokens": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "wall_time_seconds": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "data_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "observe",
+              "recommend",
+              "prepare",
+              "execute_bounded",
+              "execute_consequential"
+            ]
+          }
+        },
+        "approval": {
+          "$ref": "#/$defs/approval"
+        }
+      },
+      "additionalProperties": false
+    },
+    "capabilityManifest": {
+      "type": "object",
+      "required": [
+        "contract_type",
+        "schema_version",
+        "capability_id",
+        "name",
+        "version",
+        "interface",
+        "permissions",
+        "trust_state",
+        "evidence_refs"
+      ],
+      "properties": {
+        "contract_type": {
+          "const": "capability"
+        },
+        "schema_version": {
+          "$ref": "#/$defs/version"
+        },
+        "capability_id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "$ref": "#/$defs/version"
+        },
+        "description": {
+          "type": "string"
+        },
+        "interface": {
+          "type": "object",
+          "required": [
+            "input_schema",
+            "output_schema"
+          ],
+          "properties": {
+            "input_schema": {
+              "type": "object"
+            },
+            "output_schema": {
+              "type": "object"
+            },
+            "protocols": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "trust_state": {
+          "enum": [
+            "unassessed",
+            "discovered",
+            "verified",
+            "approved",
+            "suspended",
+            "retired"
+          ]
+        },
+        "resource_profile": {
+          "type": "object",
+          "properties": {
+            "cpu": {
+              "type": "string"
+            },
+            "memory_mb": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "gpu": {
+              "type": "string"
+            },
+            "storage_mb": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "network": {
+              "enum": [
+                "none",
+                "restricted",
+                "allowlisted",
+                "unrestricted"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "licence": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "models": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "datasets": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "terms_url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "review_state": {
+              "enum": [
+                "unknown",
+                "in_review",
+                "verified",
+                "restricted",
+                "rejected"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "agentManifest": {
+      "type": "object",
+      "required": [
+        "contract_type",
+        "schema_version",
+        "agent_id",
+        "principal_id",
+        "capabilities",
+        "autonomy_tier",
+        "delegation",
+        "budget",
+        "revocation_state"
+      ],
+      "properties": {
+        "contract_type": {
+          "const": "agent"
+        },
+        "schema_version": {
+          "$ref": "#/$defs/version"
+        },
+        "agent_id": {
+          "$ref": "#/$defs/id"
+        },
+        "principal_id": {
+          "$ref": "#/$defs/id"
+        },
+        "parent_agent_id": {
+          "type": "string"
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "autonomy_tier": {
+          "enum": [
+            "observe",
+            "recommend",
+            "prepare",
+            "execute_bounded",
+            "execute_consequential"
+          ]
+        },
+        "delegation": {
+          "type": "object",
+          "required": [
+            "scope",
+            "expires_at"
+          ],
+          "properties": {
+            "scope": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "data_scope": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "expires_at": {
+              "$ref": "#/$defs/timestamp"
+            },
+            "can_delegate": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "budget": {
+          "type": "object",
+          "properties": {
+            "currency": {
+              "type": "string"
+            },
+            "amount": {
+              "type": "number",
+              "minimum": 0
+            },
+            "tokens": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "wall_time_seconds": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "revocation_state": {
+          "enum": [
+            "active",
+            "revoked",
+            "expired",
+            "suspended"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "toolContract": {
+      "type": "object",
+      "required": [
+        "contract_type",
+        "schema_version",
+        "tool_id",
+        "input_schema",
+        "output_schema",
+        "side_effect_class",
+        "idempotency",
+        "approval"
+      ],
+      "properties": {
+        "contract_type": {
+          "const": "tool"
+        },
+        "schema_version": {
+          "$ref": "#/$defs/version"
+        },
+        "tool_id": {
+          "$ref": "#/$defs/id"
+        },
+        "input_schema": {
+          "type": "object"
+        },
+        "output_schema": {
+          "type": "object"
+        },
+        "side_effect_class": {
+          "enum": [
+            "read_only",
+            "reversible",
+            "externally_visible",
+            "irreversible",
+            "financial",
+            "physical_world"
+          ]
+        },
+        "idempotency": {
+          "type": "object",
+          "required": [
+            "required"
+          ],
+          "properties": {
+            "required": {
+              "type": "boolean"
+            },
+            "key_field": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "timeout_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "retry_policy": {
+          "type": "object",
+          "properties": {
+            "max_attempts": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "retryable_errors": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "approval": {
+          "$ref": "#/$defs/approval"
+        },
+        "rollback_or_compensation": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "evidenceEnvelope": {
+      "type": "object",
+      "required": [
+        "contract_type",
+        "schema_version",
+        "evidence_id",
+        "source",
+        "observed_at",
+        "integrity",
+        "verification_state"
+      ],
+      "properties": {
+        "contract_type": {
+          "const": "evidence"
+        },
+        "schema_version": {
+          "$ref": "#/$defs/version"
+        },
+        "evidence_id": {
+          "$ref": "#/$defs/id"
+        },
+        "source": {
+          "type": "string",
+          "format": "uri"
+        },
+        "observed_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "collector": {
+          "type": "string"
+        },
+        "transformation_history": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "integrity": {
+          "type": "object",
+          "required": [
+            "algorithm",
+            "digest"
+          ],
+          "properties": {
+            "algorithm": {
+              "type": "string"
+            },
+            "digest": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "verification_state": {
+          "enum": [
+            "unverified",
+            "corroborated",
+            "independently_verified",
+            "disputed",
+            "rejected"
+          ]
+        },
+        "reviewer": {
+          "type": "string"
+        },
+        "sensitivity": {
+          "enum": [
+            "public",
+            "internal",
+            "confidential",
+            "restricted"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "memoryRecord": {
+      "type": "object",
+      "required": [
+        "contract_type",
+        "schema_version",
+        "memory_id",
+        "memory_type",
+        "content_ref",
+        "source_evidence",
+        "created_at",
+        "scope",
+        "sensitivity",
+        "retention"
+      ],
+      "properties": {
+        "contract_type": {
+          "const": "memory"
+        },
+        "schema_version": {
+          "$ref": "#/$defs/version"
+        },
+        "memory_id": {
+          "$ref": "#/$defs/id"
+        },
+        "memory_type": {
+          "enum": [
+            "working",
+            "episodic",
+            "semantic",
+            "procedural",
+            "temporal"
+          ]
+        },
+        "entity_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "content_ref": {
+          "type": "string"
+        },
+        "source_evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "created_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "valid_from": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "valid_until": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sensitivity": {
+          "enum": [
+            "public",
+            "internal",
+            "confidential",
+            "restricted"
+          ]
+        },
+        "retention": {
+          "type": "string"
+        },
+        "correction_state": {
+          "enum": [
+            "current",
+            "superseded",
+            "disputed",
+            "deleted"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "perceptionRecord": {
+      "type": "object",
+      "required": [
+        "contract_type",
+        "schema_version",
+        "perception_id",
+        "source_ref",
+        "captured_at",
+        "coordinate_frame",
+        "model_ref",
+        "observations",
+        "uncertainty"
+      ],
+      "properties": {
+        "contract_type": {
+          "const": "perception"
+        },
+        "schema_version": {
+          "$ref": "#/$defs/version"
+        },
+        "perception_id": {
+          "$ref": "#/$defs/id"
+        },
+        "source_ref": {
+          "type": "string"
+        },
+        "captured_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "frame_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "dimensions": {
+          "type": "object",
+          "required": [
+            "width",
+            "height"
+          ],
+          "properties": {
+            "width": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "coordinate_frame": {
+          "type": "string"
+        },
+        "model_ref": {
+          "type": "string"
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "kind",
+              "label",
+              "confidence"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "text",
+                  "object",
+                  "region",
+                  "mask",
+                  "track",
+                  "relation",
+                  "event",
+                  "ui_element",
+                  "spatial_measurement"
+                ]
+              },
+              "label": {
+                "type": "string"
+              },
+              "confidence": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "geometry": {
+                "type": "object"
+              },
+              "attributes": {
+                "type": "object"
+              },
+              "track_id": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "uncertainty": {
+          "type": "object",
+          "required": [
+            "calibrated",
+            "notes"
+          ],
+          "properties": {
+            "calibrated": {
+              "type": "boolean"
+            },
+            "notes": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "sensitivity": {
+          "enum": [
+            "public",
+            "internal",
+            "confidential",
+            "restricted"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "isolationProfile": {
+      "type": "object",
+      "required": [
+        "contract_type",
+        "schema_version",
+        "profile_id",
+        "workload_identity",
+        "filesystem",
+        "network",
+        "process",
+        "secrets",
+        "resource_limits",
+        "lifetime"
+      ],
+      "properties": {
+        "contract_type": {
+          "const": "isolation_profile"
+        },
+        "schema_version": {
+          "$ref": "#/$defs/version"
+        },
+        "profile_id": {
+          "$ref": "#/$defs/id"
+        },
+        "workload_identity": {
+          "type": "string"
+        },
+        "filesystem": {
+          "type": "object",
+          "properties": {
+            "read_only_root": {
+              "type": "boolean"
+            },
+            "read_paths": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "write_paths": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "network": {
+          "type": "object",
+          "required": [
+            "egress"
+          ],
+          "properties": {
+            "egress": {
+              "enum": [
+                "deny_all",
+                "allowlist",
+                "restricted",
+                "unrestricted"
+              ]
+            },
+            "allowlist": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "process": {
+          "type": "object",
+          "properties": {
+            "privileged": {
+              "type": "boolean"
+            },
+            "syscalls_profile": {
+              "type": "string"
+            },
+            "namespace_profile": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "secrets": {
+          "type": "object",
+          "properties": {
+            "injected_refs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "ttl_seconds": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "resource_limits": {
+          "type": "object",
+          "properties": {
+            "cpu_millicores": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "memory_mb": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "pids": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "wall_time_seconds": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "lifetime": {
+          "enum": [
+            "ephemeral",
+            "task_scoped",
+            "persistent_approved"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "workflowCheckpoint": {
+      "type": "object",
+      "required": [
+        "contract_type",
+        "schema_version",
+        "workflow_id",
+        "workflow_version",
+        "checkpoint_id",
+        "state",
+        "completed_steps",
+        "pending_actions",
+        "updated_at"
+      ],
+      "properties": {
+        "contract_type": {
+          "const": "workflow_checkpoint"
+        },
+        "schema_version": {
+          "$ref": "#/$defs/version"
+        },
+        "workflow_id": {
+          "$ref": "#/$defs/id"
+        },
+        "workflow_version": {
+          "$ref": "#/$defs/version"
+        },
+        "checkpoint_id": {
+          "$ref": "#/$defs/id"
+        },
+        "state": {
+          "enum": [
+            "queued",
+            "running",
+            "waiting_approval",
+            "paused",
+            "compensating",
+            "completed",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "completed_steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "pending_actions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "approval_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "idempotency_keys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "retry_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "compensation_state": {
+          "enum": [
+            "none",
+            "pending",
+            "running",
+            "completed",
+            "failed"
+          ]
+        },
+        "updated_at": {
+          "$ref": "#/$defs/timestamp"
+        }
+      },
+      "additionalProperties": false
+    },
+    "evaluationRecord": {
+      "type": "object",
+      "required": [
+        "contract_type",
+        "schema_version",
+        "evaluation_id",
+        "workload_id",
+        "candidate_refs",
+        "environment",
+        "run_count",
+        "verifier",
+        "metrics",
+        "result_state"
+      ],
+      "properties": {
+        "contract_type": {
+          "const": "evaluation"
+        },
+        "schema_version": {
+          "$ref": "#/$defs/version"
+        },
+        "evaluation_id": {
+          "$ref": "#/$defs/id"
+        },
+        "workload_id": {
+          "type": "string"
+        },
+        "candidate_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "environment": {
+          "type": "object",
+          "required": [
+            "hardware",
+            "software",
+            "permissions",
+            "resource_limits"
+          ],
+          "properties": {
+            "hardware": {
+              "type": "string"
+            },
+            "software": {
+              "type": "string"
+            },
+            "permissions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "resource_limits": {
+              "type": "object"
+            }
+          },
+          "additionalProperties": false
+        },
+        "model_ref": {
+          "type": "string"
+        },
+        "prompt_version": {
+          "type": "string"
+        },
+        "dataset_ref": {
+          "type": "string"
+        },
+        "seed": {
+          "type": "integer"
+        },
+        "run_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "verifier": {
+          "type": "string"
+        },
+        "metrics": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "raw_results_ref": {
+          "type": "string"
+        },
+        "result_state": {
+          "enum": [
+            "planned",
+            "running",
+            "passed",
+            "failed",
+            "inconclusive"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
