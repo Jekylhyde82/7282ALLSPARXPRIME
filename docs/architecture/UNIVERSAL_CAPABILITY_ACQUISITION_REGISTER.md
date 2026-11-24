@@ -457,3 +457,32 @@ The architecture should test these as separate responsibilities before consideri
 ### 13.3 Discovery decision
 
 No new candidate has been scored or approved. The next evaluation tranche should prioritise (a) Qwen3-VL versus PE/PLM versus WeVisOne-VL on a common VISION workload, (b) GLEE versus SAM 2 for object/video tasks, and (c) Conductor versus Temporal versus Restate for durable workflow semantics. Keep all candidates replaceable behind capability interfaces.
+
+
+## 14. Architecture assimilation and capability composition
+
+The 54 discovered candidates are now mapped into a technology-neutral integration architecture. The canonical synthesis is maintained in:
+
+- [Intrinsic Capability Integration Blueprint](INTRINSIC_CAPABILITY_INTEGRATION_BLUEPRINT.md)
+- [Machine-readable candidate catalogue](capability-candidates.json)
+
+The JSON catalogue now records 16 capability groupings and candidate-to-candidate relationships. Relationship semantics are deliberately cautious:
+
+- **complements** = plausible components that may cooperate across different responsibilities;
+- **overlaps** = adjacent or substitutable capability scope;
+- **alternatives** = candidates to compare for the same responsibility.
+
+These are architecture-level hypotheses, not verified dependencies or approvals. The blueprint defines the capability planes, internal contracts, authority model, deployment profiles, benchmark programme, integration sequence and unresolved completion requirements.
+
+### 14.1 Integration discipline
+
+Do not integrate all 54 projects. Assimilate their useful capabilities into intrinsic contracts and select only the implementations that demonstrate the best fit. Maintain competing implementations as replaceable alternatives where they provide measurable resilience or meaningful choice. Avoid duplicate orchestration authorities, memory stores, gateways and sandbox layers without a documented reason.
+
+### 14.2 Current status
+
+- Candidate identities: 54; permanent IDs unique.
+- Candidate relationships: mapped into 16 provisional capability groups.
+- Architecture synthesis: proposed; awaiting mapping against canonical 9 Major Divisions, 90 systems and 184 Architecture Registers.
+- Candidate licence, security, maintenance and platform verification: incomplete.
+- Benchmarks: not run; no winners declared.
+- Installation, execution, production integration and spending: not approved.
