@@ -43,8 +43,8 @@
     "independent_verification_required": true,
     "no_single_component_self_certifies": true
   },
-  "catalogue_state": "Expanded discovery inventory; 43 candidate identities registered. Discovery pointers are not verification; no candidate is approved.",
-  "next_candidate_sequence": 44,
+  "catalogue_state": "Expanded discovery inventory; 45 candidate identities registered. Discovery pointers are not verification; no candidate is approved.",
+  "next_candidate_sequence": 46,
   "candidates": [
     {
       "candidate_id": "UE-CAP-000001",
@@ -3297,6 +3297,178 @@
         "Assess threat model, privilege boundaries and isolation claims",
         "Verify target platforms, dependencies and operating footprint",
         "Benchmark on the intended deployment class"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000044",
+      "name": "OmniParser",
+      "category": "screen_visual_grounding",
+      "canonical_identity": {
+        "repository_url": "https://github.com/microsoft/OmniParser",
+        "official_docs_url": "https://microsoft.github.io/OmniParser/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Parse screenshots into structured UI elements, detect interactable regions and ground visual actions",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Primary project repositories and official project documentation; discovery only"
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/microsoft/OmniParser",
+          "observed_at": "2026-11-24",
+          "type": "primary_discovery_source",
+          "claim_scope": "The project describes the candidate capability; licence, maintenance, performance and security still require independent verification"
+        },
+        {
+          "url": "https://microsoft.github.io/OmniParser/",
+          "observed_at": "2026-11-24",
+          "type": "primary_discovery_source",
+          "claim_scope": "The project describes the candidate capability; licence, maintenance, performance and security still require independent verification"
+        }
+      ],
+      "risks": [],
+      "open_questions": [
+        "Verify repository and model-weight licences independently",
+        "Check current release and maintenance state",
+        "Review model size, compute requirements and platform support",
+        "Test robustness, grounding errors and confidence calibration",
+        "Benchmark representative real-world tasks and failure cases"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000045",
+      "name": "Segment Anything 2 (SAM 2)",
+      "category": "visual_segmentation_tracking",
+      "canonical_identity": {
+        "repository_url": "https://github.com/facebookresearch/sam2",
+        "official_docs_url": "https://ai.meta.com/research/sam2/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Promptable segmentation of objects across images and video with temporal tracking",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Primary project repositories and official project documentation; discovery only"
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/facebookresearch/sam2",
+          "observed_at": "2026-11-24",
+          "type": "primary_discovery_source",
+          "claim_scope": "The project describes the candidate capability; licence, maintenance, performance and security still require independent verification"
+        },
+        {
+          "url": "https://ai.meta.com/research/sam2/",
+          "observed_at": "2026-11-24",
+          "type": "primary_discovery_source",
+          "claim_scope": "The project describes the candidate capability; licence, maintenance, performance and security still require independent verification"
+        }
+      ],
+      "risks": [],
+      "open_questions": [
+        "Verify repository and model-weight licences independently",
+        "Check current release and maintenance state",
+        "Review model size, compute requirements and platform support",
+        "Test robustness, grounding errors and confidence calibration",
+        "Benchmark representative real-world tasks and failure cases"
       ],
       "decision": {
         "status": "Pending",
