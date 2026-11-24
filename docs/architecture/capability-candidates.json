@@ -96,8 +96,20 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
-        "overlaps": [],
+        "complements": [
+          "UE-CAP-000034",
+          "UE-CAP-000035",
+          "UE-CAP-000036",
+          "UE-CAP-000051",
+          "UE-CAP-000028",
+          "UE-CAP-000002",
+          "UE-CAP-000052"
+        ],
+        "overlaps": [
+          "UE-CAP-000034",
+          "UE-CAP-000035",
+          "UE-CAP-000036"
+        ],
         "conflicts": [],
         "alternatives": []
       },
@@ -169,10 +181,20 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000003",
+          "UE-CAP-000050",
+          "UE-CAP-000051",
+          "UE-CAP-000028",
+          "UE-CAP-000001",
+          "UE-CAP-000052"
+        ],
         "overlaps": [],
         "conflicts": [],
-        "alternatives": []
+        "alternatives": [
+          "UE-CAP-000003",
+          "UE-CAP-000050"
+        ]
       },
       "evidence": [],
       "risks": [],
@@ -242,10 +264,17 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000002",
+          "UE-CAP-000050",
+          "UE-CAP-000051"
+        ],
         "overlaps": [],
         "conflicts": [],
-        "alternatives": []
+        "alternatives": [
+          "UE-CAP-000002",
+          "UE-CAP-000050"
+        ]
       },
       "evidence": [],
       "risks": [],
@@ -315,7 +344,12 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000005",
+          "UE-CAP-000006",
+          "UE-CAP-000029",
+          "UE-CAP-000046"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -388,7 +422,12 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000004",
+          "UE-CAP-000006",
+          "UE-CAP-000029",
+          "UE-CAP-000046"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -461,7 +500,12 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000004",
+          "UE-CAP-000005",
+          "UE-CAP-000029",
+          "UE-CAP-000046"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -534,7 +578,11 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000008",
+          "UE-CAP-000009",
+          "UE-CAP-000037"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -607,7 +655,11 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000007",
+          "UE-CAP-000009",
+          "UE-CAP-000037"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -680,7 +732,11 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000007",
+          "UE-CAP-000008",
+          "UE-CAP-000037"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -753,7 +809,11 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000011",
+          "UE-CAP-000012",
+          "UE-CAP-000027"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -826,7 +886,11 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000010",
+          "UE-CAP-000012",
+          "UE-CAP-000027"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -899,7 +963,11 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000010",
+          "UE-CAP-000011",
+          "UE-CAP-000027"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -972,7 +1040,11 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000014",
+          "UE-CAP-000015",
+          "UE-CAP-000043"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -1045,7 +1117,11 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000013",
+          "UE-CAP-000015",
+          "UE-CAP-000043"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -1118,7 +1194,11 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000013",
+          "UE-CAP-000014",
+          "UE-CAP-000043"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -1191,7 +1271,11 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000030",
+          "UE-CAP-000033",
+          "UE-CAP-000038"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -1264,7 +1348,15 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000032",
+          "UE-CAP-000033",
+          "UE-CAP-000039",
+          "UE-CAP-000040",
+          "UE-CAP-000041",
+          "UE-CAP-000042",
+          "UE-CAP-000053"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -1337,7 +1429,12 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000019",
+          "UE-CAP-000020",
+          "UE-CAP-000021",
+          "UE-CAP-000022"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -1410,7 +1507,12 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000018",
+          "UE-CAP-000020",
+          "UE-CAP-000021",
+          "UE-CAP-000022"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -1483,7 +1585,12 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000018",
+          "UE-CAP-000019",
+          "UE-CAP-000021",
+          "UE-CAP-000022"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -1556,7 +1663,12 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000018",
+          "UE-CAP-000019",
+          "UE-CAP-000020",
+          "UE-CAP-000022"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -1629,7 +1741,12 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000018",
+          "UE-CAP-000019",
+          "UE-CAP-000020",
+          "UE-CAP-000021"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -1702,7 +1819,10 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000044",
+          "UE-CAP-000046"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -1775,7 +1895,10 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000025",
+          "UE-CAP-000026"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -1848,7 +1971,10 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000024",
+          "UE-CAP-000026"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -1921,7 +2047,14 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000031",
+          "UE-CAP-000046",
+          "UE-CAP-000049",
+          "UE-CAP-000054",
+          "UE-CAP-000024",
+          "UE-CAP-000025"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -1994,7 +2127,11 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000010",
+          "UE-CAP-000011",
+          "UE-CAP-000012"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -2067,7 +2204,12 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000001",
+          "UE-CAP-000002",
+          "UE-CAP-000051",
+          "UE-CAP-000052"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -2140,7 +2282,12 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000004",
+          "UE-CAP-000005",
+          "UE-CAP-000006",
+          "UE-CAP-000046"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -2213,7 +2360,11 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000016",
+          "UE-CAP-000033",
+          "UE-CAP-000038"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -2286,7 +2437,16 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000044",
+          "UE-CAP-000045",
+          "UE-CAP-000046",
+          "UE-CAP-000047",
+          "UE-CAP-000048",
+          "UE-CAP-000049",
+          "UE-CAP-000054",
+          "UE-CAP-000026"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -2373,10 +2533,26 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000017",
+          "UE-CAP-000033",
+          "UE-CAP-000039",
+          "UE-CAP-000040",
+          "UE-CAP-000041",
+          "UE-CAP-000042",
+          "UE-CAP-000053",
+          "UE-CAP-000052"
+        ],
         "overlaps": [],
         "conflicts": [],
-        "alternatives": []
+        "alternatives": [
+          "UE-CAP-000033",
+          "UE-CAP-000039",
+          "UE-CAP-000040",
+          "UE-CAP-000041",
+          "UE-CAP-000042",
+          "UE-CAP-000053"
+        ]
       },
       "evidence": [
         {
@@ -2454,10 +2630,28 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000016",
+          "UE-CAP-000030",
+          "UE-CAP-000038",
+          "UE-CAP-000017",
+          "UE-CAP-000032",
+          "UE-CAP-000039",
+          "UE-CAP-000040",
+          "UE-CAP-000041",
+          "UE-CAP-000042",
+          "UE-CAP-000053"
+        ],
         "overlaps": [],
         "conflicts": [],
-        "alternatives": []
+        "alternatives": [
+          "UE-CAP-000032",
+          "UE-CAP-000039",
+          "UE-CAP-000040",
+          "UE-CAP-000041",
+          "UE-CAP-000042",
+          "UE-CAP-000053"
+        ]
       },
       "evidence": [
         {
@@ -2535,8 +2729,17 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
-        "overlaps": [],
+        "complements": [
+          "UE-CAP-000001",
+          "UE-CAP-000035",
+          "UE-CAP-000036",
+          "UE-CAP-000051"
+        ],
+        "overlaps": [
+          "UE-CAP-000001",
+          "UE-CAP-000035",
+          "UE-CAP-000036"
+        ],
         "conflicts": [],
         "alternatives": []
       },
@@ -2616,8 +2819,17 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
-        "overlaps": [],
+        "complements": [
+          "UE-CAP-000001",
+          "UE-CAP-000034",
+          "UE-CAP-000036",
+          "UE-CAP-000051"
+        ],
+        "overlaps": [
+          "UE-CAP-000001",
+          "UE-CAP-000034",
+          "UE-CAP-000036"
+        ],
         "conflicts": [],
         "alternatives": []
       },
@@ -2697,8 +2909,17 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
-        "overlaps": [],
+        "complements": [
+          "UE-CAP-000001",
+          "UE-CAP-000034",
+          "UE-CAP-000035",
+          "UE-CAP-000051"
+        ],
+        "overlaps": [
+          "UE-CAP-000001",
+          "UE-CAP-000034",
+          "UE-CAP-000035"
+        ],
         "conflicts": [],
         "alternatives": []
       },
@@ -2784,7 +3005,11 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000007",
+          "UE-CAP-000008",
+          "UE-CAP-000009"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -2865,7 +3090,11 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000016",
+          "UE-CAP-000030",
+          "UE-CAP-000033"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -2946,7 +3175,15 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000017",
+          "UE-CAP-000032",
+          "UE-CAP-000033",
+          "UE-CAP-000040",
+          "UE-CAP-000041",
+          "UE-CAP-000042",
+          "UE-CAP-000053"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -3033,7 +3270,15 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000017",
+          "UE-CAP-000032",
+          "UE-CAP-000033",
+          "UE-CAP-000039",
+          "UE-CAP-000041",
+          "UE-CAP-000042",
+          "UE-CAP-000053"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -3114,7 +3359,16 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000017",
+          "UE-CAP-000032",
+          "UE-CAP-000033",
+          "UE-CAP-000039",
+          "UE-CAP-000040",
+          "UE-CAP-000042",
+          "UE-CAP-000053",
+          "UE-CAP-000052"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -3195,7 +3449,15 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000017",
+          "UE-CAP-000032",
+          "UE-CAP-000033",
+          "UE-CAP-000039",
+          "UE-CAP-000040",
+          "UE-CAP-000041",
+          "UE-CAP-000053"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -3276,7 +3538,11 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000013",
+          "UE-CAP-000014",
+          "UE-CAP-000015"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -3357,7 +3623,16 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000031",
+          "UE-CAP-000045",
+          "UE-CAP-000046",
+          "UE-CAP-000047",
+          "UE-CAP-000048",
+          "UE-CAP-000049",
+          "UE-CAP-000054",
+          "UE-CAP-000023"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -3443,10 +3718,21 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000031",
+          "UE-CAP-000044",
+          "UE-CAP-000046",
+          "UE-CAP-000047",
+          "UE-CAP-000048",
+          "UE-CAP-000049",
+          "UE-CAP-000054"
+        ],
         "overlaps": [],
         "conflicts": [],
-        "alternatives": []
+        "alternatives": [
+          "UE-CAP-000048",
+          "UE-CAP-000049"
+        ]
       },
       "evidence": [
         {
@@ -3529,7 +3815,21 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000004",
+          "UE-CAP-000005",
+          "UE-CAP-000006",
+          "UE-CAP-000029",
+          "UE-CAP-000031",
+          "UE-CAP-000044",
+          "UE-CAP-000045",
+          "UE-CAP-000047",
+          "UE-CAP-000048",
+          "UE-CAP-000049",
+          "UE-CAP-000054",
+          "UE-CAP-000026",
+          "UE-CAP-000023"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -3617,7 +3917,15 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000031",
+          "UE-CAP-000044",
+          "UE-CAP-000045",
+          "UE-CAP-000046",
+          "UE-CAP-000048",
+          "UE-CAP-000049",
+          "UE-CAP-000054"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -3712,10 +4020,21 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000031",
+          "UE-CAP-000044",
+          "UE-CAP-000045",
+          "UE-CAP-000046",
+          "UE-CAP-000047",
+          "UE-CAP-000049",
+          "UE-CAP-000054"
+        ],
         "overlaps": [],
         "conflicts": [],
-        "alternatives": []
+        "alternatives": [
+          "UE-CAP-000045",
+          "UE-CAP-000049"
+        ]
       },
       "evidence": [
         {
@@ -3800,10 +4119,22 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000031",
+          "UE-CAP-000044",
+          "UE-CAP-000045",
+          "UE-CAP-000046",
+          "UE-CAP-000047",
+          "UE-CAP-000048",
+          "UE-CAP-000054",
+          "UE-CAP-000026"
+        ],
         "overlaps": [],
         "conflicts": [],
-        "alternatives": []
+        "alternatives": [
+          "UE-CAP-000045",
+          "UE-CAP-000048"
+        ]
       },
       "evidence": [
         {
@@ -3888,10 +4219,17 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000002",
+          "UE-CAP-000003",
+          "UE-CAP-000051"
+        ],
         "overlaps": [],
         "conflicts": [],
-        "alternatives": []
+        "alternatives": [
+          "UE-CAP-000002",
+          "UE-CAP-000003"
+        ]
       },
       "evidence": [
         {
@@ -3976,7 +4314,17 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000001",
+          "UE-CAP-000034",
+          "UE-CAP-000035",
+          "UE-CAP-000036",
+          "UE-CAP-000002",
+          "UE-CAP-000003",
+          "UE-CAP-000050",
+          "UE-CAP-000028",
+          "UE-CAP-000052"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -4064,7 +4412,15 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000028",
+          "UE-CAP-000001",
+          "UE-CAP-000002",
+          "UE-CAP-000051",
+          "UE-CAP-000041",
+          "UE-CAP-000053",
+          "UE-CAP-000032"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -4153,10 +4509,27 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000017",
+          "UE-CAP-000032",
+          "UE-CAP-000033",
+          "UE-CAP-000039",
+          "UE-CAP-000040",
+          "UE-CAP-000041",
+          "UE-CAP-000042",
+          "UE-CAP-000052"
+        ],
         "overlaps": [],
         "conflicts": [],
-        "alternatives": []
+        "alternatives": [
+          "UE-CAP-000017",
+          "UE-CAP-000032",
+          "UE-CAP-000033",
+          "UE-CAP-000039",
+          "UE-CAP-000040",
+          "UE-CAP-000041",
+          "UE-CAP-000042"
+        ]
       },
       "evidence": [
         {
@@ -4242,7 +4615,16 @@
       },
       "relationships": {
         "dependencies": [],
-        "complements": [],
+        "complements": [
+          "UE-CAP-000031",
+          "UE-CAP-000044",
+          "UE-CAP-000045",
+          "UE-CAP-000046",
+          "UE-CAP-000047",
+          "UE-CAP-000048",
+          "UE-CAP-000049",
+          "UE-CAP-000026"
+        ],
         "overlaps": [],
         "conflicts": [],
         "alternatives": []
@@ -4280,5 +4662,131 @@
         "decision_record": null
       }
     }
-  ]
+  ],
+  "integration_model": {
+    "status": "Architecture synthesis proposed; no implementation approvals",
+    "blueprint_path": "docs/architecture/INTRINSIC_CAPABILITY_INTEGRATION_BLUEPRINT.md",
+    "relationship_semantics": "complements identifies plausible composition; overlaps identifies adjacent or substitutable scope; alternatives identifies candidates to compare for the same responsibility. These are hypotheses for evaluation, not verified runtime dependencies.",
+    "capability_groups": {
+      "workflow_orchestration": [
+        "UE-CAP-000001",
+        "UE-CAP-000034",
+        "UE-CAP-000035",
+        "UE-CAP-000036",
+        "UE-CAP-000051"
+      ],
+      "durable_workflow": [
+        "UE-CAP-000002",
+        "UE-CAP-000003",
+        "UE-CAP-000050",
+        "UE-CAP-000051"
+      ],
+      "agent_engineering": [
+        "UE-CAP-000013",
+        "UE-CAP-000014",
+        "UE-CAP-000015",
+        "UE-CAP-000043"
+      ],
+      "model_runtime": [
+        "UE-CAP-000004",
+        "UE-CAP-000005",
+        "UE-CAP-000006",
+        "UE-CAP-000029",
+        "UE-CAP-000046"
+      ],
+      "memory_retrieval": [
+        "UE-CAP-000007",
+        "UE-CAP-000008",
+        "UE-CAP-000009",
+        "UE-CAP-000037"
+      ],
+      "vision_general": [
+        "UE-CAP-000031",
+        "UE-CAP-000044",
+        "UE-CAP-000045",
+        "UE-CAP-000046",
+        "UE-CAP-000047",
+        "UE-CAP-000048",
+        "UE-CAP-000049",
+        "UE-CAP-000054"
+      ],
+      "vision_ocr": [
+        "UE-CAP-000026",
+        "UE-CAP-000031",
+        "UE-CAP-000046",
+        "UE-CAP-000049",
+        "UE-CAP-000054"
+      ],
+      "vision_tracking": [
+        "UE-CAP-000045",
+        "UE-CAP-000048",
+        "UE-CAP-000049",
+        "UE-CAP-000046"
+      ],
+      "screen_automation": [
+        "UE-CAP-000023",
+        "UE-CAP-000044",
+        "UE-CAP-000046"
+      ],
+      "data_acquisition": [
+        "UE-CAP-000024",
+        "UE-CAP-000025",
+        "UE-CAP-000026"
+      ],
+      "policy_governance": [
+        "UE-CAP-000016",
+        "UE-CAP-000030",
+        "UE-CAP-000033",
+        "UE-CAP-000038"
+      ],
+      "sandboxing": [
+        "UE-CAP-000017",
+        "UE-CAP-000032",
+        "UE-CAP-000033",
+        "UE-CAP-000039",
+        "UE-CAP-000040",
+        "UE-CAP-000041",
+        "UE-CAP-000042",
+        "UE-CAP-000053"
+      ],
+      "supply_chain": [
+        "UE-CAP-000018",
+        "UE-CAP-000019",
+        "UE-CAP-000020",
+        "UE-CAP-000021",
+        "UE-CAP-000022"
+      ],
+      "observability_evaluation": [
+        "UE-CAP-000010",
+        "UE-CAP-000011",
+        "UE-CAP-000012",
+        "UE-CAP-000027"
+      ],
+      "messaging": [
+        "UE-CAP-000028",
+        "UE-CAP-000001",
+        "UE-CAP-000002",
+        "UE-CAP-000051",
+        "UE-CAP-000052"
+      ],
+      "cluster_runtime": [
+        "UE-CAP-000041",
+        "UE-CAP-000052",
+        "UE-CAP-000053",
+        "UE-CAP-000032"
+      ]
+    },
+    "integration_invariants": [
+      "stable capability contracts",
+      "replaceable implementations",
+      "least privilege and attenuated delegation",
+      "policy enforcement at action boundaries",
+      "independent verification",
+      "provenance and audit",
+      "local/offline and cloud deployment profiles",
+      "graceful degradation",
+      "no discovery-to-approval shortcut"
+    ],
+    "note": "Candidate relationships are architecture-level hypotheses pending repository, API, licence, security and benchmark verification."
+  }
 }
