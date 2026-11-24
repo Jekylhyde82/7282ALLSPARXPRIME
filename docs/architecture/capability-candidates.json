@@ -3663,9 +3663,9 @@
       "verification": {
         "last_checked_at": "2026-11-24",
         "license": {
-          "spdx_id": null,
-          "source_url": null,
-          "status": "Requires component/model-level verification"
+          "spdx_id": "MIT",
+          "source_url": "https://github.com/FoundationVision/GLEE",
+          "status": "Code licence verified; weights/components require separate review"
         },
         "latest_release": null,
         "latest_release_date": null,
@@ -3704,6 +3704,12 @@
           "source_type": "Official upstream repository",
           "checked_at": "2026-11-24",
           "note": "Project README indicates MIT code licence; confirm each released checkpoint, dependencies and evaluation-code completeness."
+        },
+        {
+          "source_url": "https://github.com/FoundationVision/GLEE",
+          "source_type": "Official upstream licence/security/project documentation",
+          "checked_at": "2026-11-24",
+          "note": "Repository metadata/README indicates MIT; checkpoint and third-party component terms still require review."
         }
       ],
       "risks": [
@@ -3745,9 +3751,9 @@
       "verification": {
         "last_checked_at": "2026-11-24",
         "license": {
-          "spdx_id": null,
-          "source_url": null,
-          "status": "Requires component/model-level verification"
+          "spdx_id": "Apache-2.0",
+          "source_url": "https://github.com/Tencent/WeVisOne-VL/blob/main/LICENSE",
+          "status": "Code licence verified; weights/components require separate review"
         },
         "latest_release": null,
         "latest_release_date": null,
@@ -3786,6 +3792,12 @@
           "source_type": "Official upstream repository",
           "checked_at": "2026-11-24",
           "note": "Tencent-authored repository code states Apache-2.0; third-party components and model-weight terms require separate review. Project is very recent."
+        },
+        {
+          "source_url": "https://github.com/Tencent/WeVisOne-VL",
+          "source_type": "Official upstream licence/security/project documentation",
+          "checked_at": "2026-11-24",
+          "note": "Tencent-authored code is Apache-2.0; third-party components retain original licences; separately verify released weights."
         }
       ],
       "risks": [
@@ -3827,9 +3839,9 @@
       "verification": {
         "last_checked_at": "2026-11-24",
         "license": {
-          "spdx_id": null,
-          "source_url": null,
-          "status": "Requires component/model-level verification"
+          "spdx_id": "Apache-2.0",
+          "source_url": "https://github.com/conductor-oss/conductor",
+          "status": "Code licence verified; weights/components require separate review"
         },
         "latest_release": null,
         "latest_release_date": null,
@@ -3868,6 +3880,12 @@
           "source_type": "Official upstream repository",
           "checked_at": "2026-11-24",
           "note": "Repository identifies Apache-2.0; compare operational footprint and semantics against Temporal, Restate and LangGraph."
+        },
+        {
+          "source_url": "https://github.com/conductor-oss/conductor",
+          "source_type": "Official upstream licence/security/project documentation",
+          "checked_at": "2026-11-24",
+          "note": "Upstream identifies Apache-2.0 and durable workflow/agent execution; validate server prerequisites and operational cost."
         }
       ],
       "risks": [
@@ -4074,14 +4092,14 @@
         "last_checked_at": "2026-11-24",
         "license": {
           "spdx_id": null,
-          "source_url": null,
-          "status": "Requires component/model-level verification"
+          "source_url": "https://github.com/agent-substrate/substrate/security",
+          "status": "Not established"
         },
         "latest_release": null,
         "latest_release_date": null,
         "last_commit_date": null,
         "maintenance_status": "Not yet independently assessed",
-        "security_status": "Not yet independently assessed",
+        "security_status": "Preview-stage security process; best-effort response, no SLOs or stable releases",
         "platform_support": "Repository/docs indicate intended platforms; target-device compatibility unverified",
         "hardware_requirements": "Unknown; benchmark required",
         "terms_and_data_handling": "Review provider, model, dataset, telemetry and third-party component terms before use."
@@ -4114,10 +4132,17 @@
           "source_type": "Official upstream repository",
           "checked_at": "2026-11-24",
           "note": "Project-reported isolation and density claims require independent threat-model review and reproducible benchmarks; verify licence and maturity."
+        },
+        {
+          "source_url": "https://github.com/agent-substrate/substrate",
+          "source_type": "Official upstream licence/security/project documentation",
+          "checked_at": "2026-11-24",
+          "note": "Preview-stage security policy: best-effort triage, no fix SLOs, no stable releases; early threat model warns little security hardening. Treat as research candidate only."
         }
       ],
       "risks": [
-        "Project-reported isolation and density claims require independent threat-model review and reproducible benchmarks; verify licence and maturity."
+        "Project-reported isolation and density claims require independent threat-model review and reproducible benchmarks; verify licence and maturity.",
+        "Upstream security policy confirms preview status and best-effort vulnerability handling; do not use as a production trust boundary."
       ],
       "open_questions": [
         "Verify exact licence for code, model weights, datasets and third-party components",
@@ -4155,9 +4180,9 @@
       "verification": {
         "last_checked_at": "2026-11-24",
         "license": {
-          "spdx_id": null,
-          "source_url": null,
-          "status": "Requires component/model-level verification"
+          "spdx_id": "MIT",
+          "source_url": "https://github.com/LibreYOLO/libreyolo/blob/release/LICENSE",
+          "status": "Code licence verified; weights/components require separate review"
         },
         "latest_release": null,
         "latest_release_date": null,
@@ -4196,6 +4221,12 @@
           "source_type": "Official upstream repository",
           "checked_at": "2026-11-24",
           "note": "Repository states MIT code licence but explicitly requires per-model Hugging Face weight licence checks; broad adapter surface needs validation."
+        },
+        {
+          "source_url": "https://github.com/LibreYOLO/libreyolo",
+          "source_type": "Official upstream licence/security/project documentation",
+          "checked_at": "2026-11-24",
+          "note": "Code is MIT; upstream explicitly says pretrained weights carry per-model licences, some non-commercial/restricted; third-party notices also apply."
         }
       ],
       "risks": [
