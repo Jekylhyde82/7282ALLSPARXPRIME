@@ -1,0 +1,21 @@
+{
+  "record_version": "1.0.0",
+  "record_id": "00000000-0000-4000-8000-000000000001",
+  "sequence": 1,
+  "capability_id": "allsparx.example.text-normalizer",
+  "capability_version": "0.1.0",
+  "package_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "event_type": "discovered",
+  "occurred_at": "2026-10-30T03:00:00Z",
+  "actor": {
+    "type": "system",
+    "id": "allsparx-capability-intake"
+  },
+  "decision": {
+    "outcome": "recorded",
+    "reason_code": "DISCOVERY_METADATA_RECORDED"
+  },
+  "policy_version": "capability-policy-1.0.0",
+  "previous_record_digest": null,
+  "record_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+}
