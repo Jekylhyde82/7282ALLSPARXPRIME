@@ -224,3 +224,19 @@ These are explicit open requirements—not reasons to narrow the vision.
 - Architecture completeness: **Not yet demonstrated**.
 
 The next governing action is to validate the logical responsibility mapping against the canonical Universal Engine / Engineer registers, then build the contracts and independent test harness. The architecture remains open to newly discovered dimensions and capabilities through the established lifecycle: Discovered → Proposed → Under Evaluation → Approved → Integrated / Rejected / Retired.
+
+
+## 12. Executable contract and register validation assets
+
+The architecture is now backed by initial machine-readable and executable artefacts:
+
+- `schemas/intrinsic-contracts.schema.json` — Draft 2020-12 JSON Schema definitions for Task, Capability, Agent, Tool, Evidence, Memory, Perception, Isolation Profile, Workflow Checkpoint and Evaluation records.
+- `tools/validate_capability_register.py` — dependency-free integrity validator for candidate IDs, score dimensions/ranges, relationship references, lifecycle values, decision flags, licence-state presence, next-ID sequence and capability-group references.
+
+Run the register validator from the repository root:
+
+```bash
+python tools/validate_capability_register.py docs/architecture/capability-candidates.json
+```
+
+The schema's placeholder `$id` host must be replaced with the project's canonical schema namespace before external publication. Schema conformance is not security validation; production implementations still require semantic validation, authentication, authorization, audit, data protection and adversarial testing.
