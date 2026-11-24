@@ -43,8 +43,8 @@
     "independent_verification_required": true,
     "no_single_component_self_certifies": true
   },
-  "catalogue_state": "Expanded discovery inventory; 45 candidate identities registered. Discovery pointers are not verification; no candidate is approved.",
-  "next_candidate_sequence": 46,
+  "catalogue_state": "Expanded discovery inventory; 54 candidate identities registered. Discovery pointers are not verification; no candidate is approved.",
+  "next_candidate_sequence": 55,
   "candidates": [
     {
       "candidate_id": "UE-CAP-000001",
@@ -3469,6 +3469,744 @@
         "Review model size, compute requirements and platform support",
         "Test robustness, grounding errors and confidence calibration",
         "Benchmark representative real-world tasks and failure cases"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000046",
+      "name": "Qwen3-VL",
+      "category": "multimodal_vision_language",
+      "canonical_identity": {
+        "repository_url": "https://github.com/QwenLM/Qwen3-VL",
+        "official_docs_url": "https://github.com/QwenLM/Qwen3-VL",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "General multimodal perception and reasoning across images, video, spatial grounding, OCR and GUI/mobile-agent tasks",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Second-pass primary-source discovery; official upstream repository/docs recorded; discovery is not verification."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Requires component/model-level verification"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Not yet independently assessed",
+        "security_status": "Not yet independently assessed",
+        "platform_support": "Repository/docs indicate intended platforms; target-device compatibility unverified",
+        "hardware_requirements": "Unknown; benchmark required",
+        "terms_and_data_handling": "Review provider, model, dataset, telemetry and third-party component terms before use."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Discovery-level only",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "source_url": "https://github.com/QwenLM/Qwen3-VL",
+          "source_type": "Official upstream repository",
+          "checked_at": "2026-11-24",
+          "note": "Model and checkpoint licence terms must be checked per exact release; hardware footprint varies sharply by size."
+        }
+      ],
+      "risks": [
+        "Model and checkpoint licence terms must be checked per exact release; hardware footprint varies sharply by size."
+      ],
+      "open_questions": [
+        "Verify exact licence for code, model weights, datasets and third-party components",
+        "Inspect release history, commit activity, maintainers and security advisories",
+        "Measure resource footprint on intended deployment hardware",
+        "Map transitive dependencies, overlaps and integration boundary",
+        "Benchmark with fixed workloads and independent outcome verification"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000047",
+      "name": "Perception Models (PE / PLM)",
+      "category": "multimodal_perception",
+      "canonical_identity": {
+        "repository_url": "https://github.com/facebookresearch/perception_models",
+        "official_docs_url": "https://github.com/facebookresearch/perception_models",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Image, video and audio encoders plus vision-language decoding and spatial perception",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Second-pass primary-source discovery; official upstream repository/docs recorded; discovery is not verification."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Requires component/model-level verification"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Not yet independently assessed",
+        "security_status": "Not yet independently assessed",
+        "platform_support": "Repository/docs indicate intended platforms; target-device compatibility unverified",
+        "hardware_requirements": "Unknown; benchmark required",
+        "terms_and_data_handling": "Review provider, model, dataset, telemetry and third-party component terms before use."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Discovery-level only",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "source_url": "https://github.com/facebookresearch/perception_models",
+          "source_type": "Official upstream repository",
+          "checked_at": "2026-11-24",
+          "note": "Repository exposes separate PE and PLM model licence files; assess each checkpoint and dataset independently."
+        }
+      ],
+      "risks": [
+        "Repository exposes separate PE and PLM model licence files; assess each checkpoint and dataset independently."
+      ],
+      "open_questions": [
+        "Verify exact licence for code, model weights, datasets and third-party components",
+        "Inspect release history, commit activity, maintainers and security advisories",
+        "Measure resource footprint on intended deployment hardware",
+        "Map transitive dependencies, overlaps and integration boundary",
+        "Benchmark with fixed workloads and independent outcome verification"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000048",
+      "name": "GLEE",
+      "category": "visual_object_perception",
+      "canonical_identity": {
+        "repository_url": "https://github.com/FoundationVision/GLEE",
+        "official_docs_url": "https://glee-vision.github.io/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "General object foundation model spanning detection, grounding, segmentation and image/video tracking",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Second-pass primary-source discovery; official upstream repository/docs recorded; discovery is not verification."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Requires component/model-level verification"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Not yet independently assessed",
+        "security_status": "Not yet independently assessed",
+        "platform_support": "Repository/docs indicate intended platforms; target-device compatibility unverified",
+        "hardware_requirements": "Unknown; benchmark required",
+        "terms_and_data_handling": "Review provider, model, dataset, telemetry and third-party component terms before use."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Discovery-level only",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "source_url": "https://github.com/FoundationVision/GLEE",
+          "source_type": "Official upstream repository",
+          "checked_at": "2026-11-24",
+          "note": "Project README indicates MIT code licence; confirm each released checkpoint, dependencies and evaluation-code completeness."
+        }
+      ],
+      "risks": [
+        "Project README indicates MIT code licence; confirm each released checkpoint, dependencies and evaluation-code completeness."
+      ],
+      "open_questions": [
+        "Verify exact licence for code, model weights, datasets and third-party components",
+        "Inspect release history, commit activity, maintainers and security advisories",
+        "Measure resource footprint on intended deployment hardware",
+        "Map transitive dependencies, overlaps and integration boundary",
+        "Benchmark with fixed workloads and independent outcome verification"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000049",
+      "name": "WeVisOne-VL",
+      "category": "unified_visual_perception",
+      "canonical_identity": {
+        "repository_url": "https://github.com/Tencent/WeVisOne-VL",
+        "official_docs_url": "https://github.com/Tencent/WeVisOne-VL",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Unified object-level and pixel-level perception: detection, referring, counting, pointing, OCR, segmentation and matting",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Second-pass primary-source discovery; official upstream repository/docs recorded; discovery is not verification."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Requires component/model-level verification"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Not yet independently assessed",
+        "security_status": "Not yet independently assessed",
+        "platform_support": "Repository/docs indicate intended platforms; target-device compatibility unverified",
+        "hardware_requirements": "Unknown; benchmark required",
+        "terms_and_data_handling": "Review provider, model, dataset, telemetry and third-party component terms before use."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Discovery-level only",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "source_url": "https://github.com/Tencent/WeVisOne-VL",
+          "source_type": "Official upstream repository",
+          "checked_at": "2026-11-24",
+          "note": "Tencent-authored repository code states Apache-2.0; third-party components and model-weight terms require separate review. Project is very recent."
+        }
+      ],
+      "risks": [
+        "Tencent-authored repository code states Apache-2.0; third-party components and model-weight terms require separate review. Project is very recent."
+      ],
+      "open_questions": [
+        "Verify exact licence for code, model weights, datasets and third-party components",
+        "Inspect release history, commit activity, maintainers and security advisories",
+        "Measure resource footprint on intended deployment hardware",
+        "Map transitive dependencies, overlaps and integration boundary",
+        "Benchmark with fixed workloads and independent outcome verification"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000050",
+      "name": "Conductor OSS",
+      "category": "durable_workflows",
+      "canonical_identity": {
+        "repository_url": "https://github.com/conductor-oss/conductor",
+        "official_docs_url": "https://docs.conductor-oss.org/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Durable, inspectable workflow execution for long-running services and AI agents, including retries, approvals, pause/resume and recovery",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Second-pass primary-source discovery; official upstream repository/docs recorded; discovery is not verification."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Requires component/model-level verification"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Not yet independently assessed",
+        "security_status": "Not yet independently assessed",
+        "platform_support": "Repository/docs indicate intended platforms; target-device compatibility unverified",
+        "hardware_requirements": "Unknown; benchmark required",
+        "terms_and_data_handling": "Review provider, model, dataset, telemetry and third-party component terms before use."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Discovery-level only",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "source_url": "https://github.com/conductor-oss/conductor",
+          "source_type": "Official upstream repository",
+          "checked_at": "2026-11-24",
+          "note": "Repository identifies Apache-2.0; compare operational footprint and semantics against Temporal, Restate and LangGraph."
+        }
+      ],
+      "risks": [
+        "Repository identifies Apache-2.0; compare operational footprint and semantics against Temporal, Restate and LangGraph."
+      ],
+      "open_questions": [
+        "Verify exact licence for code, model weights, datasets and third-party components",
+        "Inspect release history, commit activity, maintainers and security advisories",
+        "Measure resource footprint on intended deployment hardware",
+        "Map transitive dependencies, overlaps and integration boundary",
+        "Benchmark with fixed workloads and independent outcome verification"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000051",
+      "name": "Dapr Agents",
+      "category": "distributed_agent_runtime",
+      "canonical_identity": {
+        "repository_url": "https://github.com/dapr/dapr-agents",
+        "official_docs_url": "https://docs.dapr.io/developing-ai/dapr-agents/dapr-agents-introduction/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Distributed agent framework using Dapr workflows, identity, state, messaging and recovery",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Second-pass primary-source discovery; official upstream repository/docs recorded; discovery is not verification."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Requires component/model-level verification"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Not yet independently assessed",
+        "security_status": "Not yet independently assessed",
+        "platform_support": "Repository/docs indicate intended platforms; target-device compatibility unverified",
+        "hardware_requirements": "Unknown; benchmark required",
+        "terms_and_data_handling": "Review provider, model, dataset, telemetry and third-party component terms before use."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Discovery-level only",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "source_url": "https://github.com/dapr/dapr-agents",
+          "source_type": "Official upstream repository",
+          "checked_at": "2026-11-24",
+          "note": "Requires evaluation of Dapr control-plane/sidecar footprint and version maturity; verify exact release and licence."
+        }
+      ],
+      "risks": [
+        "Requires evaluation of Dapr control-plane/sidecar footprint and version maturity; verify exact release and licence."
+      ],
+      "open_questions": [
+        "Verify exact licence for code, model weights, datasets and third-party components",
+        "Inspect release history, commit activity, maintainers and security advisories",
+        "Measure resource footprint on intended deployment hardware",
+        "Map transitive dependencies, overlaps and integration boundary",
+        "Benchmark with fixed workloads and independent outcome verification"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000052",
+      "name": "Google AX",
+      "category": "agent_cluster_orchestration",
+      "canonical_identity": {
+        "repository_url": "https://github.com/google/ax",
+        "official_docs_url": "https://github.com/google/ax",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Declarative orchestration and sandboxed scheduling for large fleets of agent workloads on Kubernetes",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Second-pass primary-source discovery; official upstream repository/docs recorded; discovery is not verification."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Requires component/model-level verification"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Not yet independently assessed",
+        "security_status": "Not yet independently assessed",
+        "platform_support": "Repository/docs indicate intended platforms; target-device compatibility unverified",
+        "hardware_requirements": "Unknown; benchmark required",
+        "terms_and_data_handling": "Review provider, model, dataset, telemetry and third-party component terms before use."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Discovery-level only",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "source_url": "https://github.com/google/ax",
+          "source_type": "Official upstream repository",
+          "checked_at": "2026-11-24",
+          "note": "Upstream warns that the project and APIs are in heavy development and may change; not a stable production assumption."
+        }
+      ],
+      "risks": [
+        "Upstream warns that the project and APIs are in heavy development and may change; not a stable production assumption."
+      ],
+      "open_questions": [
+        "Verify exact licence for code, model weights, datasets and third-party components",
+        "Inspect release history, commit activity, maintainers and security advisories",
+        "Measure resource footprint on intended deployment hardware",
+        "Map transitive dependencies, overlaps and integration boundary",
+        "Benchmark with fixed workloads and independent outcome verification"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000053",
+      "name": "Agent Substrate",
+      "category": "agent_execution_infrastructure",
+      "canonical_identity": {
+        "repository_url": "https://github.com/agent-substrate/substrate",
+        "official_docs_url": "https://github.com/agent-substrate/substrate",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Zero-trust substrate for isolated, stateful agent workloads with identity, storage, network mediation and suspend/resume",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Second-pass primary-source discovery; official upstream repository/docs recorded; discovery is not verification."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Requires component/model-level verification"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Not yet independently assessed",
+        "security_status": "Not yet independently assessed",
+        "platform_support": "Repository/docs indicate intended platforms; target-device compatibility unverified",
+        "hardware_requirements": "Unknown; benchmark required",
+        "terms_and_data_handling": "Review provider, model, dataset, telemetry and third-party component terms before use."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Discovery-level only",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "source_url": "https://github.com/agent-substrate/substrate",
+          "source_type": "Official upstream repository",
+          "checked_at": "2026-11-24",
+          "note": "Project-reported isolation and density claims require independent threat-model review and reproducible benchmarks; verify licence and maturity."
+        }
+      ],
+      "risks": [
+        "Project-reported isolation and density claims require independent threat-model review and reproducible benchmarks; verify licence and maturity."
+      ],
+      "open_questions": [
+        "Verify exact licence for code, model weights, datasets and third-party components",
+        "Inspect release history, commit activity, maintainers and security advisories",
+        "Measure resource footprint on intended deployment hardware",
+        "Map transitive dependencies, overlaps and integration boundary",
+        "Benchmark with fixed workloads and independent outcome verification"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000054",
+      "name": "LibreYOLO",
+      "category": "vision_model_runtime",
+      "canonical_identity": {
+        "repository_url": "https://github.com/LibreYOLO/libreyolo",
+        "official_docs_url": "https://github.com/LibreYOLO/libreyolo",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Unified computer-vision inference interface spanning detection, OCR, depth, open-vocabulary models and multiple export backends",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Second-pass primary-source discovery; official upstream repository/docs recorded; discovery is not verification."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Requires component/model-level verification"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Not yet independently assessed",
+        "security_status": "Not yet independently assessed",
+        "platform_support": "Repository/docs indicate intended platforms; target-device compatibility unverified",
+        "hardware_requirements": "Unknown; benchmark required",
+        "terms_and_data_handling": "Review provider, model, dataset, telemetry and third-party component terms before use."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Discovery-level only",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "source_url": "https://github.com/LibreYOLO/libreyolo",
+          "source_type": "Official upstream repository",
+          "checked_at": "2026-11-24",
+          "note": "Repository states MIT code licence but explicitly requires per-model Hugging Face weight licence checks; broad adapter surface needs validation."
+        }
+      ],
+      "risks": [
+        "Repository states MIT code licence but explicitly requires per-model Hugging Face weight licence checks; broad adapter surface needs validation."
+      ],
+      "open_questions": [
+        "Verify exact licence for code, model weights, datasets and third-party components",
+        "Inspect release history, commit activity, maintainers and security advisories",
+        "Measure resource footprint on intended deployment hardware",
+        "Map transitive dependencies, overlaps and integration boundary",
+        "Benchmark with fixed workloads and independent outcome verification"
       ],
       "decision": {
         "status": "Pending",
