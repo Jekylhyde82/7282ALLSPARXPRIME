@@ -189,3 +189,97 @@ The current repository tree does not expose the complete canonical nine-division
 **Governing invariant:** preserve full discovery breadth; promote capabilities only through evidence, security, licence, verification and governance gates.
 
 **Build for capability today. Design for possibilities tomorrow. Engineer for evolution indefinitely.**
+
+## 10. Sourcey whole-repository audit — first batch findings
+
+**Pinned upstream snapshot:** `sourcey/startup-credits`, branch `main`, commit `bd6a4fda0b5c35dd23069c86a7568ea91fe1c3e9`. The recursive tree was complete (`truncated=false)): 638 files, comprising 623 Entity YAML records in 193 two-character shard directories and 15 repository-control/documentation files.
+
+**Important boundary correction:** this repository is a thin public YAML catalogue and contribution/governance repository. It does not contain the hosted Sourcey REST API, MCP server, public JSON datasets, signed change-feed service, or product backend. Those are separately linked product surfaces and require independent contract, privacy, security, availability and revision-semantics audits. Do not describe them as code installed from this Git repository.
+
+### 10.1 Complete tree inventory
+
+The 15 non-Entity files comprise:
+- `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, `LICENSE`, `DATA-LICENSE.md`;
+- `.github/workflows/validate.yml` and `.github/pull_request_template.md`;
+- two structured issue templates for missing records and company icons;
+- catalog-verifier `package.json`, lockfile and `.gitignore`;
+- verifier SHA-256 pin;
+- root-set JSON and root-set digest.
+
+The `AGENTS.md` repository boundary explicitly defines this as a public YAML contribution repository and prohibits adding executable application code, packages, scripts, tests, fixtures, schemas, generated snapshots and internal evidence/trust operations. Therefore, the absence of an in-repository runtime is an intentional architectural boundary, not a missing feature to fill by blindly importing code.
+
+### 10.2 Capabilities extracted from repository materials
+
+| Material | Confirmed capability/pattern | STARWIRE disposition |
+|---|---|---|
+| 623 Entity YAML records | Structured provider catalogue, domains, profile, source references, programmes, offers, benefits, eligibility, lifecycle, roles and access | Lossless data ingestion |
+| README | Data-model example, public interface pointers, attribution and source-grounding principles | Adapter contract documentation |
+| AGENTS | Explicit repository scope and content restrictions | Enforced source boundary |
+| CONTRIBUTING | Stable ID/path rules, source identity, canonical-source policy, offer separation, field constraints, DCO and validation/admission distinctions | Identity, quality and governance patterns |
+| DATA-LICENSE | CC BY 4.0 catalogue-facts licence | Data attribution control |
+| LICENSE | MIT for repository documentation/metadata | Separate licence treatment |
+| GitHub validation workflow | PR validation delegates to an exact commit-pinned external workflow | CI supply-chain pattern; not a runtime component |
+| Verifier package/lockfile and SHA-256 pin | Minimal pinned verifier dependency declaration and artifact-integrity reference | External verifier dependency audit |
+| Root-set JSON/digest | Explicit trust-root input and digest | Trust-root provenance pattern; semantics require separate review |
+| Missing-record issue template | Structured intake, canonical first-party source requirement, duplicate awareness | Discovery intake workflow |
+| Company-icon issue template | Asset request, rights declaration, moderation/publication boundary | Rights-aware asset pipeline |
+| PR template | Contribution review checklist | Human review workflow |
+
+### 10.3 Data-model patterns confirmed by record inspection
+
+- Stable opaque Entity, Programme and Offer IDs; slug aliases; identity-derived file paths; no ID reuse.
+- Source identity is a distinct opaque ID linked to a public URL; it is not merely a URL hash.
+- Factual claims require public evidence from the party controlling the fact; aggregator listings are not treated as authoritative provider terms.
+- Programmes and offers are distinct. Standalone offers can exist without a programme; materially different economics, eligibility, duration, access or terms require distinct Offer records.
+- Benefits support monetary and non-monetary values, currency minor units, exact/up-to qualifiers and durations.
+- Eligibility supports nested `all`, `any`, `not`, typed predicates and manual criteria.
+- Terms authority and access operator are explicit roles; access method, availability and application URL are separate.
+- Lifecycle status/effective time are distinct from retrieval time and source revision.
+- Community-submitted evidence is not automatically vendor-signed. Company authority and exact-record approval are separate processes.
+- Validation, evidence admission, vendor authority, human verification and publication/merge are separate gates.
+- Correction and lifecycle history are retained; stale records are corrected or ended rather than silently erased.
+- Catalogue facts, documentation, third-party marks and icons have separate rights considerations.
+
+### 10.4 Representative records inspected
+
+- Anthropic: paused cohort; one-time USD 1,000 API credit; one year of Team service with seat and new-customer conditions; partner-stack value qualified as dependent on redeemed offers; manual startup eligibility. Useful test fixture for paused status, conditional value and manual criteria.
+- Aiven: distinct programme and offer; up-to USD 100,000 credit with 12-month duration; multiple non-cash benefits; nested all/not/any eligibility predicates; external-verification manual criterion. Useful fixture for compound eligibility and mixed benefits.
+- Youverify: standalone offer without a programme; up-to monetary credit, free service and non-cash support; vendor-discretion manual eligibility.
+- Z.ai: explicit programme-to-offer link, alias, non-monetary token-quantity benefit and manual vendor review.
+- Zoom: programme/offer linkage, one-year service benefit, referral availability and mixed predicate/manual eligibility.
+
+These are representative examples only. They do not establish that all 623 records are current or independently verified.
+
+### 10.5 New STARWIRE capabilities required
+
+1. **Immutable repository inventory:** commit/tree IDs, completeness flag, per-file path/blob SHA/size/type and audit coverage.
+2. **Lossless YAML ingestion:** retain raw bytes, source blob SHA, unknown fields/extensions, parse errors and normalized projection.
+3. **Entity identity resolution:** canonical IDs, aliases, domains and path identity without collapsing distinct entities.
+4. **Offer relationship graph:** Entity → Programme → Offer → Benefit and Offer → Source/Evidence, while supporting standalone offers.
+5. **Typed eligibility engine:** nested all/any/not and typed predicates with true/false/unknown outcomes; manual checks remain unknown until evidence is supplied.
+6. **Evidence authority classification:** first-party canonical source, channel operator, aggregator, community assertion and unsupported source.
+7. **Revision-scoped approval ledger:** bind observation, admission, provider authority and independent verification to exact record revisions.
+8. **Contribution/admission workflow:** separate submission, structural validation, evidence admission, authority, human review, merge and publication.
+9. **Rights-aware asset pipeline:** byte-level asset capture, origin, rights declaration, review and publication approval.
+10. **Lifecycle/correction monitor:** detect changed, paused, stale, expired, withdrawn and corrected records without erasing historical assertions.
+11. **Verifier supply-chain monitor:** track external workflow commit, package/lockfile, verifier digest and trust-root digest.
+12. **Coverage monitor:** distinguish tree inventory coverage from semantic per-record audit coverage.
+
+### 10.6 Provisional register mapping
+
+| Capability | Existing responsibility boundary | Register action |
+|---|---|---|
+| Snapshot inventory, adapters, ingestion | STARWIRE discovery/source acquisition | Cross-reference existing STARWIRE systems when authoritative registers are located |
+| Evidence capture and source authority | SYPHON | Cross-reference evidence responsibilities |
+| Entity identity and offer graph | Knowledge/identity architecture | Map to canonical knowledge and identity responsibilities |
+| Typed eligibility and matching | Intelligence/evaluation | Map to matching and evaluation responsibilities |
+| Revision-scoped approvals and rights policy | UAIE PRIME / governance / security | Preserve independent authority |
+| Candidate decisions and lifecycle outcomes | Universal Capability Acquisition Register | Record provenance, approvals and realised outcomes |
+
+These are responsibility mappings, not fabricated register IDs. The canonical nine-division/90-system/184-architecture files are not present in the inspected repository tree.
+
+### 10.7 Audit coverage and next batch
+
+The recursive tree inventory is complete. The 15 repository-control/documentation files have been identified; the core boundary, licence, contribution, workflow and representative record materials have been inspected. Five representative Entity records were read at field level. The other 618 Entity YAML records are inventoried by path/blob identity but have not yet each received semantic field-level review. Hosted API, MCP, JSON datasets, change feed and external verifier implementation remain separate audit targets.
+
+Next Sourcey batch: process Entity YAML records in bounded parallel chunks to extract schema variants, field coverage, eligibility operators, benefit types, lifecycle states, source-domain patterns, anomalies and duplicate candidates. Record exact per-file coverage and preserve every blob SHA. Do not claim full semantic audit until all 623 records have been processed.
