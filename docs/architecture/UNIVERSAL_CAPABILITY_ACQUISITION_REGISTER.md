@@ -422,7 +422,7 @@ The following candidates were added as **UE-CAP-000046–UE-CAP-000054**. These 
 | ID | Candidate | Potential contribution | Critical qualification |
 |---|---|---|---|
 | UE-CAP-000046 | Qwen3-VL | Broad vision-language reasoning, video, OCR, spatial grounding and GUI/mobile-agent perception | Model size and hardware demands vary substantially; verify exact checkpoint licence and deployment feasibility. |
-| UE-CAP-000047 | Perception Models (PE / PLM) | Dedicated image, video and audio perception encoders, spatial features and VLM decoding | PE and PLM expose separate model licence files; evaluate each checkpoint and dataset independently. |
+| UE-CAP-000047 | Perception Models (PE / PLM) | Dedicated image, video and audio perception encoders, spatial features and VLM decoding | PE is Apache-2.0; PLM materials use FAIR Noncommercial Research License. Treat them separately; PLM is not cleared for commercial use. |
 | UE-CAP-000048 | GLEE | General object perception across detection, grounding, segmentation and video tracking | MIT code is indicated upstream; verify checkpoint terms and note incomplete evaluation tooling may affect reproducibility. |
 | UE-CAP-000049 | WeVisOne-VL | Unified object-level and pixel-level perception, including detection, OCR, pointing, segmentation and matting | Tencent-authored code states Apache-2.0; third-party components and weights need separate review. Very recent project; independently reproduce claims. |
 | UE-CAP-000050 | Conductor OSS | Durable, inspectable workflows for long-running agent tasks, approvals, retries and recovery | Apache-2.0 is stated upstream; compare runtime and operational burden with Temporal, Restate and LangGraph. |
