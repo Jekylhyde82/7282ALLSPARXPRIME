@@ -240,3 +240,63 @@ python tools/validate_capability_register.py docs/architecture/capability-candid
 ```
 
 The schema's placeholder `$id` host must be replaced with the project's canonical schema namespace before external publication. Schema conformance is not security validation; production implementations still require semantic validation, authentication, authorization, audit, data protection and adversarial testing.
+
+
+## 13. Third deep-dive assimilation — registry, identity, model routing and proof
+
+The 2026-11-25 research tranche added 16 candidates (UE-CAP-000055–UE-CAP-000070) and refined the integration architecture.
+
+### 13.1 Capability registry becomes a governed control-plane function
+
+Use the Apicurio Registry candidate (055) to evaluate versioned agent cards, MCP tools/servers, prompt templates, model schemas, compatibility checks and discovery. The Engine's canonical capability ontology remains authoritative; the registry is an implementation option. A capability record must bind schema/version, owner, permissions, dependency graph, trust state, evidence, compatibility and lifecycle. Experimental registry features must remain disabled until their security and compatibility gates pass.
+
+Plasm (070) is an emerging typed capability graph/wire-mapping candidate. Its small project footprint and BUSL-1.1 trace-sink component make it research-only until independently assessed.
+
+### 13.2 Split identity, relationship authorization, policy and enforcement
+
+Evaluate:
+- SPIRE (057) for attested workload identity and short-lived SPIFFE credentials;
+- OpenFGA (056) for relationship-based authorization and delegated principal/resource relationships;
+- Cedar (058) or OPA (016) as a policy evaluation layer;
+- Octelium (069) as a broader zero-trust access/gateway candidate, with cluster AGPLv3 and client/SDK Apache-2.0.
+
+These responsibilities must remain distinct. Identity proves which workload is speaking; relationship authorization resolves who may access which resource; policy evaluates contextual constraints; enforcement points actually deny or permit the operation. Select one canonical policy authority per deployment profile and test confused-deputy, privilege escalation, revocation and delegation attenuation.
+
+### 13.3 Durable execution alternatives
+
+Cadence (059) and Kestra (060) join Temporal (002), Restate (003) and Conductor (050) in the comparison set. Do not fuse them as simultaneous state authorities. Compare replay/determinism, idempotency, event handling, retries, compensation, pause/resume, human approval, schema migration, failure recovery and operating footprint on identical workloads.
+
+### 13.4 Model routing and serving are separate layers
+
+Evaluate vLLM Semantic Router (063) as policy-driven semantic selection/fusion across models and compute locations. Evaluate SGLang (064) as an inference-serving alternative alongside vLLM and llama.cpp. The Engine's model gateway contract must separate provider compatibility, credentials/budgets, semantic routing and backend inference serving.
+
+### 13.5 Memory and VISION become evidence-preserving systems
+
+Cognee (061) is a candidate graph/vector/code memory implementation. OpenVLHarness (062) is a candidate visual tool-use integration pattern. VISION must preserve image/frame provenance, crops, OCR, grounding boxes, masks, depth arrays, tracks, coordinate frames, uncertainty and derived spatial calculations as addressable evidence. A model's narrative description alone is not a sufficient perception record.
+
+### 13.6 Evaluation and sandbox evidence
+
+Inspect AI (065) and Harbor (066) are complementary evaluation harness candidates. Use Inspect for composable evaluation/scoring and Harbor for reproducible agent/environment experiments. Deterministic task-specific oracles and independent reviewers remain mandatory.
+
+Tracekit Box (067) is a research candidate for host-mediated microVM gates and offline-verifiable signed run bundles. Its v0 omissions (including no Firecracker jailer, remote signer, snapshots/restore or GPU) prevent production trust. Tarit (068) is a KVM microVM checkpoint/fork alternative, with AGPL and x86_64/KVM constraints. Neither is a pre-approved security boundary.
+
+### 13.7 Continuous capability evolution
+
+The resulting lifecycle is:
+
+1. Discover candidate or capability gap.
+2. Resolve canonical identity and provenance.
+3. Verify code, model, dataset and transitive licences.
+4. Generate SBOM and inspect vulnerabilities, maintainer health and release history.
+5. Check API/schema compatibility and dependency graph.
+6. Build in an isolated, least-privilege environment.
+7. Run functional, security, resource and regression suites.
+8. Benchmark against the current implementation using identical workloads.
+9. Obtain independent review and explicit integration approval.
+10. Stage rollout with telemetry, rollback and revocation ready.
+11. Monitor drift, advisories, upstream changes and value.
+12. Retire or replace implementations without deleting capability identity or evidence lineage.
+
+No automatic update may move directly from discovery to production. New releases are proposals until compatibility, security, performance and value are demonstrated.
+
+Full candidate analysis and caveats: [Three Deep-Dive Capability Research](../research/THREE_DEEP_DIVE_CAPABILITY_RESEARCH_2026-11-25.md).
