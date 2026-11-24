@@ -43,8 +43,8 @@
     "independent_verification_required": true,
     "no_single_component_self_certifies": true
   },
-  "catalogue_state": "Initial candidate set; no candidate has been licence-, security-, maintenance-, compatibility- or benchmark-verified by this catalogue",
-  "next_candidate_sequence": 31,
+  "catalogue_state": "Expanded discovery inventory; 43 candidate identities registered. Discovery pointers are not verification; no candidate is approved.",
+  "next_candidate_sequence": 44,
   "candidates": [
     {
       "candidate_id": "UE-CAP-000001",
@@ -2226,6 +2226,1077 @@
         "Review security advisories and dependency exposure",
         "Verify platform and hardware support",
         "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000031",
+      "name": "PaddleOCR",
+      "category": "vision_ocr_document_understanding",
+      "canonical_identity": {
+        "repository_url": "https://github.com/PaddlePaddle/PaddleOCR",
+        "official_docs_url": "https://www.paddleocr.ai/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "OCR, document layout and structured visual-text extraction",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Expanded discovery from current public project indexes and repository searches; source pointers retained; not a verification result"
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/PaddlePaddle/PaddleOCR",
+          "observed_at": "2026-11-24",
+          "type": "discovery_pointer",
+          "claim_scope": "Candidate discovery only; verify against primary source before scoring"
+        },
+        {
+          "url": "https://swhl.github.io/PaddleOCR/latest/en/",
+          "observed_at": "2026-11-24",
+          "type": "discovery_pointer",
+          "claim_scope": "Candidate discovery only; verify against primary source before scoring"
+        }
+      ],
+      "risks": [],
+      "open_questions": [
+        "Verify repository identity and maintainer ownership",
+        "Verify exact SPDX licence and model/data/asset licences",
+        "Check release history, recent commits, issues and security advisories",
+        "Assess threat model, privilege boundaries and isolation claims",
+        "Verify target platforms, dependencies and operating footprint",
+        "Benchmark on the intended deployment class"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000032",
+      "name": "OpenSandbox",
+      "category": "agent_execution_isolation",
+      "canonical_identity": {
+        "repository_url": "https://github.com/opensandbox-group/OpenSandbox",
+        "official_docs_url": "https://github.com/opensandbox-group/OpenSandbox",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Self-hosted sandbox runtime for agent code, browser and desktop environments",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Expanded discovery from current public project indexes and repository searches; source pointers retained; not a verification result"
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/opensandbox-group/OpenSandbox",
+          "observed_at": "2026-11-24",
+          "type": "discovery_pointer",
+          "claim_scope": "Candidate discovery only; verify against primary source before scoring"
+        }
+      ],
+      "risks": [],
+      "open_questions": [
+        "Verify repository identity and maintainer ownership",
+        "Verify exact SPDX licence and model/data/asset licences",
+        "Check release history, recent commits, issues and security advisories",
+        "Assess threat model, privilege boundaries and isolation claims",
+        "Verify target platforms, dependencies and operating footprint",
+        "Benchmark on the intended deployment class"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000033",
+      "name": "NVIDIA OpenShell",
+      "category": "agent_policy_sandbox",
+      "canonical_identity": {
+        "repository_url": "https://github.com/NVIDIA/OpenShell",
+        "official_docs_url": "https://github.com/NVIDIA/OpenShell",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Policy-governed runtime with sandbox lifecycle and controlled egress for autonomous agents",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Expanded discovery from current public project indexes and repository searches; source pointers retained; not a verification result"
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/NVIDIA/OpenShell",
+          "observed_at": "2026-11-24",
+          "type": "discovery_pointer",
+          "claim_scope": "Candidate discovery only; verify against primary source before scoring"
+        }
+      ],
+      "risks": [],
+      "open_questions": [
+        "Verify repository identity and maintainer ownership",
+        "Verify exact SPDX licence and model/data/asset licences",
+        "Check release history, recent commits, issues and security advisories",
+        "Assess threat model, privilege boundaries and isolation claims",
+        "Verify target platforms, dependencies and operating footprint",
+        "Benchmark on the intended deployment class"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000034",
+      "name": "AgentScope",
+      "category": "agent_orchestration",
+      "canonical_identity": {
+        "repository_url": "https://github.com/agentscope-ai/agentscope",
+        "official_docs_url": "https://agentscope.io/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Event-driven agent framework with human-in-the-loop and deployment options",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Expanded discovery from current public project indexes and repository searches; source pointers retained; not a verification result"
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/backblaze-labs/awesome-agent-infrastructure",
+          "observed_at": "2026-11-24",
+          "type": "discovery_pointer",
+          "claim_scope": "Candidate discovery only; verify against primary source before scoring"
+        }
+      ],
+      "risks": [],
+      "open_questions": [
+        "Verify repository identity and maintainer ownership",
+        "Verify exact SPDX licence and model/data/asset licences",
+        "Check release history, recent commits, issues and security advisories",
+        "Assess threat model, privilege boundaries and isolation claims",
+        "Verify target platforms, dependencies and operating footprint",
+        "Benchmark on the intended deployment class"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000035",
+      "name": "Mastra",
+      "category": "typescript_agent_orchestration",
+      "canonical_identity": {
+        "repository_url": "https://github.com/mastra-ai/mastra",
+        "official_docs_url": "https://mastra.ai/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "TypeScript-first agent, workflow, memory and evaluation framework",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Expanded discovery from current public project indexes and repository searches; source pointers retained; not a verification result"
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "url": "https://vdf.ai/blog/best-ai-agent-frameworks/",
+          "observed_at": "2026-11-24",
+          "type": "discovery_pointer",
+          "claim_scope": "Candidate discovery only; verify against primary source before scoring"
+        }
+      ],
+      "risks": [],
+      "open_questions": [
+        "Verify repository identity and maintainer ownership",
+        "Verify exact SPDX licence and model/data/asset licences",
+        "Check release history, recent commits, issues and security advisories",
+        "Assess threat model, privilege boundaries and isolation claims",
+        "Verify target platforms, dependencies and operating footprint",
+        "Benchmark on the intended deployment class"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000036",
+      "name": "Strands Agents",
+      "category": "agent_orchestration",
+      "canonical_identity": {
+        "repository_url": "https://github.com/strands-agents/sdk-python",
+        "official_docs_url": "https://strandsagents.com/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Model-driven agent SDK with Python and TypeScript support",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Expanded discovery from current public project indexes and repository searches; source pointers retained; not a verification result"
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "url": "https://vdf.ai/blog/best-ai-agent-frameworks/",
+          "observed_at": "2026-11-24",
+          "type": "discovery_pointer",
+          "claim_scope": "Candidate discovery only; verify against primary source before scoring"
+        },
+        {
+          "url": "https://github.com/backblaze-labs/awesome-agent-infrastructure",
+          "observed_at": "2026-11-24",
+          "type": "discovery_pointer",
+          "claim_scope": "Candidate discovery only; verify against primary source before scoring"
+        }
+      ],
+      "risks": [],
+      "open_questions": [
+        "Verify repository identity and maintainer ownership",
+        "Verify exact SPDX licence and model/data/asset licences",
+        "Check release history, recent commits, issues and security advisories",
+        "Assess threat model, privilege boundaries and isolation claims",
+        "Verify target platforms, dependencies and operating footprint",
+        "Benchmark on the intended deployment class"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000037",
+      "name": "OpenViking",
+      "category": "context_memory_database",
+      "canonical_identity": {
+        "repository_url": "https://github.com/volcengine/OpenViking",
+        "official_docs_url": "https://github.com/volcengine/OpenViking",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Context database approach for agent memory, knowledge and skills",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Expanded discovery from current public project indexes and repository searches; source pointers retained; not a verification result"
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/Supersynergy/awesome-ai-agents-2026",
+          "observed_at": "2026-11-24",
+          "type": "discovery_pointer",
+          "claim_scope": "Candidate discovery only; verify against primary source before scoring"
+        }
+      ],
+      "risks": [],
+      "open_questions": [
+        "Verify repository identity and maintainer ownership",
+        "Verify exact SPDX licence and model/data/asset licences",
+        "Check release history, recent commits, issues and security advisories",
+        "Assess threat model, privilege boundaries and isolation claims",
+        "Verify target platforms, dependencies and operating footprint",
+        "Benchmark on the intended deployment class"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000038",
+      "name": "Archestra",
+      "category": "agent_gateway_governance",
+      "canonical_identity": {
+        "repository_url": "https://github.com/archestra-ai/archestra",
+        "official_docs_url": "https://archestra.ai/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Agent and MCP gateway, registry, orchestration and governance candidate",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Expanded discovery from current public project indexes and repository searches; source pointers retained; not a verification result"
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/Supersynergy/awesome-ai-agents-2026",
+          "observed_at": "2026-11-24",
+          "type": "discovery_pointer",
+          "claim_scope": "Candidate discovery only; verify against primary source before scoring"
+        }
+      ],
+      "risks": [],
+      "open_questions": [
+        "Verify repository identity and maintainer ownership",
+        "Verify exact SPDX licence and model/data/asset licences",
+        "Check release history, recent commits, issues and security advisories",
+        "Assess threat model, privilege boundaries and isolation claims",
+        "Verify target platforms, dependencies and operating footprint",
+        "Benchmark on the intended deployment class"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000039",
+      "name": "E2B",
+      "category": "cloud_agent_sandboxes",
+      "canonical_identity": {
+        "repository_url": "https://github.com/e2b-dev/E2B",
+        "official_docs_url": "https://e2b.dev/docs",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Agent-facing cloud sandbox and code execution infrastructure",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Expanded discovery from current public project indexes and repository searches; source pointers retained; not a verification result"
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/arach/awesome-agent-sandboxes",
+          "observed_at": "2026-11-24",
+          "type": "discovery_pointer",
+          "claim_scope": "Candidate discovery only; verify against primary source before scoring"
+        },
+        {
+          "url": "https://github.com/aloth/awesome-ai-agents",
+          "observed_at": "2026-11-24",
+          "type": "discovery_pointer",
+          "claim_scope": "Candidate discovery only; verify against primary source before scoring"
+        }
+      ],
+      "risks": [],
+      "open_questions": [
+        "Verify repository identity and maintainer ownership",
+        "Verify exact SPDX licence and model/data/asset licences",
+        "Check release history, recent commits, issues and security advisories",
+        "Assess threat model, privilege boundaries and isolation claims",
+        "Verify target platforms, dependencies and operating footprint",
+        "Benchmark on the intended deployment class"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000040",
+      "name": "microsandbox",
+      "category": "local_microvm_sandbox",
+      "canonical_identity": {
+        "repository_url": "https://github.com/zerocore-ai/microsandbox",
+        "official_docs_url": "https://github.com/zerocore-ai/microsandbox",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Embeddable microVM sandbox candidate for local-first execution",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Expanded discovery from current public project indexes and repository searches; source pointers retained; not a verification result"
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/arach/awesome-agent-sandboxes",
+          "observed_at": "2026-11-24",
+          "type": "discovery_pointer",
+          "claim_scope": "Candidate discovery only; verify against primary source before scoring"
+        }
+      ],
+      "risks": [],
+      "open_questions": [
+        "Verify repository identity and maintainer ownership",
+        "Verify exact SPDX licence and model/data/asset licences",
+        "Check release history, recent commits, issues and security advisories",
+        "Assess threat model, privilege boundaries and isolation claims",
+        "Verify target platforms, dependencies and operating footprint",
+        "Benchmark on the intended deployment class"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000041",
+      "name": "Kubernetes Agent Sandbox",
+      "category": "kubernetes_agent_isolation",
+      "canonical_identity": {
+        "repository_url": "https://github.com/kubernetes-sigs/agent-sandbox",
+        "official_docs_url": "https://github.com/kubernetes-sigs/agent-sandbox",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Kubernetes API and lifecycle primitives for isolated agent workloads",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Expanded discovery from current public project indexes and repository searches; source pointers retained; not a verification result"
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/arach/awesome-agent-sandboxes",
+          "observed_at": "2026-11-24",
+          "type": "discovery_pointer",
+          "claim_scope": "Candidate discovery only; verify against primary source before scoring"
+        }
+      ],
+      "risks": [],
+      "open_questions": [
+        "Verify repository identity and maintainer ownership",
+        "Verify exact SPDX licence and model/data/asset licences",
+        "Check release history, recent commits, issues and security advisories",
+        "Assess threat model, privilege boundaries and isolation claims",
+        "Verify target platforms, dependencies and operating footprint",
+        "Benchmark on the intended deployment class"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000042",
+      "name": "NVX",
+      "category": "microvm_execution_isolation",
+      "canonical_identity": {
+        "repository_url": "https://github.com/microsoft/nvx",
+        "official_docs_url": "https://github.com/microsoft/nvx",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Research-stage lightweight microVM sandbox candidate; maturity and host constraints require verification",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Expanded discovery from current public project indexes and repository searches; source pointers retained; not a verification result"
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "url": "https://orble.tech/sandboxes",
+          "observed_at": "2026-11-24",
+          "type": "discovery_pointer",
+          "claim_scope": "Candidate discovery only; verify against primary source before scoring"
+        }
+      ],
+      "risks": [],
+      "open_questions": [
+        "Verify repository identity and maintainer ownership",
+        "Verify exact SPDX licence and model/data/asset licences",
+        "Check release history, recent commits, issues and security advisories",
+        "Assess threat model, privilege boundaries and isolation claims",
+        "Verify target platforms, dependencies and operating footprint",
+        "Benchmark on the intended deployment class"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000043",
+      "name": "DeerFlow",
+      "category": "long_horizon_agent_harness",
+      "canonical_identity": {
+        "repository_url": "https://github.com/bytedance/deer-flow",
+        "official_docs_url": "https://github.com/bytedance/deer-flow",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Long-horizon multi-agent harness combining subagents, memory, sandboxes and skills",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Expanded discovery from current public project indexes and repository searches; source pointers retained; not a verification result"
+      },
+      "verification": {
+        "last_checked_at": "2026-11-24",
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/backblaze-labs/awesome-agent-infrastructure",
+          "observed_at": "2026-11-24",
+          "type": "discovery_pointer",
+          "claim_scope": "Candidate discovery only; verify against primary source before scoring"
+        }
+      ],
+      "risks": [],
+      "open_questions": [
+        "Verify repository identity and maintainer ownership",
+        "Verify exact SPDX licence and model/data/asset licences",
+        "Check release history, recent commits, issues and security advisories",
+        "Assess threat model, privilege boundaries and isolation claims",
+        "Verify target platforms, dependencies and operating footprint",
+        "Benchmark on the intended deployment class"
       ],
       "decision": {
         "status": "Pending",
