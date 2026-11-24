@@ -413,3 +413,47 @@ Two additional candidates have been assigned permanent identities in the machine
 Primary discovery sources: [OmniParser repository](https://github.com/microsoft/OmniParser), [OmniParser project page](https://microsoft.github.io/OmniParser/), [SAM 2 repository](https://github.com/facebookresearch/sam2), and [Meta SAM 2 project page](https://ai.meta.com/research/sam2/).
 
 The VISION capability must therefore be evaluated as a pipeline of distinct but composable skills: image/video input; screen parsing; OCR; object detection and segmentation; tracking across time; spatial and scene understanding; multimodal reasoning; confidence and uncertainty estimation; and temporal memory. No single model is assumed to provide all of these.
+
+
+## 13. Second-pass discovery — visual intelligence and durable agent infrastructure
+
+The following candidates were added as **UE-CAP-000046–UE-CAP-000054**. These are discovery records, not endorsements or integration approvals. Model weights, datasets, third-party dependencies and hosted services require separate licence and terms review.
+
+| ID | Candidate | Potential contribution | Critical qualification |
+|---|---|---|---|
+| UE-CAP-000046 | Qwen3-VL | Broad vision-language reasoning, video, OCR, spatial grounding and GUI/mobile-agent perception | Model size and hardware demands vary substantially; verify exact checkpoint licence and deployment feasibility. |
+| UE-CAP-000047 | Perception Models (PE / PLM) | Dedicated image, video and audio perception encoders, spatial features and VLM decoding | PE and PLM expose separate model licence files; evaluate each checkpoint and dataset independently. |
+| UE-CAP-000048 | GLEE | General object perception across detection, grounding, segmentation and video tracking | MIT code is indicated upstream; verify checkpoint terms and note incomplete evaluation tooling may affect reproducibility. |
+| UE-CAP-000049 | WeVisOne-VL | Unified object-level and pixel-level perception, including detection, OCR, pointing, segmentation and matting | Tencent-authored code states Apache-2.0; third-party components and weights need separate review. Very recent project; independently reproduce claims. |
+| UE-CAP-000050 | Conductor OSS | Durable, inspectable workflows for long-running agent tasks, approvals, retries and recovery | Apache-2.0 is stated upstream; compare runtime and operational burden with Temporal, Restate and LangGraph. |
+| UE-CAP-000051 | Dapr Agents | Distributed agent execution using workflow durability, identity, state and messaging | Assess Dapr's sidecar/control-plane footprint, API maturity and exact release/licence. |
+| UE-CAP-000052 | Google AX | Declarative orchestration and sandbox scheduling for large agent fleets on Kubernetes | Upstream explicitly warns of heavy development and possible breaking changes; experimental, not a production default. |
+| UE-CAP-000053 | Agent Substrate | Isolated stateful agent runtime with identity, network mediation and suspend/resume | Threat model, security guarantees, density claims, licence and maturity require independent verification. |
+| UE-CAP-000054 | LibreYOLO | Common computer-vision interface across detection, OCR, depth, open-vocabulary models and export backends | Code is stated as MIT; each model's weights have their own licence. Broad model-adapter claims need task-by-task validation. |
+
+### 13.1 VISION architecture implications
+
+Do not select a single “vision model” and declare VISION complete. The new candidates point to complementary layers:
+
+1. **General multimodal reasoning:** Qwen3-VL or PE/PLM can be evaluated for image/video/audio interpretation and grounded reasoning.
+2. **Object-centric perception:** GLEE and WeVisOne-VL offer detection, referring/localisation and segmentation capabilities.
+3. **Specialised perception primitives:** OCR, screen parsing, depth, segmentation and tracking remain independently testable components; LibreYOLO may provide a common inference surface, not a substitute for validating each model.
+4. **Temporal and spatial continuity:** evaluate whether perception outputs can be tracked across frames, anchored to stable coordinates, timestamped, and reconciled with memory.
+5. **Action grounding:** visual recognition must be separated from permission to act. A model's GUI-agent capability is not an authorisation mechanism.
+
+A VISION benchmark must independently score text extraction, object localisation, absent-object rejection, segmentation quality, tracking identity continuity, spatial relations, temporal event ordering, uncertainty calibration, and screen-element grounding. Include difficult lighting, occlusion, blur, small text, dynamic layouts and adversarial UI content.
+
+### 13.2 Durable execution and agent infrastructure implications
+
+Conductor, Dapr Agents, Google AX and Agent Substrate are not interchangeable:
+
+- **Workflow durability:** persist task state and recover after failures.
+- **Agent framework:** define reasoning loops, tools and multi-agent collaboration.
+- **Cluster orchestration:** schedule and manage many isolated agent workloads.
+- **Execution substrate:** enforce isolation, identity, storage and network boundaries.
+
+The architecture should test these as separate responsibilities before considering a combination. A durable workflow engine does not itself make untrusted code safe; a sandbox does not itself provide correct planning or reliable task completion.
+
+### 13.3 Discovery decision
+
+No new candidate has been scored or approved. The next evaluation tranche should prioritise (a) Qwen3-VL versus PE/PLM versus WeVisOne-VL on a common VISION workload, (b) GLEE versus SAM 2 for object/video tasks, and (c) Conductor versus Temporal versus Restate for durable workflow semantics. Keep all candidates replaceable behind capability interfaces.
