@@ -349,3 +349,53 @@ This register is complete as an **initial inventory baseline** only. It is not c
 - Independent verification evidence is attached.
 
 **The goal is not to install everything. The goal is to discover everything useful, understand it, prove its value, and integrate only what makes the Universal Engine stronger.**
+
+
+## 12. Expanded discovery — 24 November 2026
+
+The machine-readable catalogue at `docs/architecture/capability-candidates.json` is the identity source of record. It now contains 43 immutable candidate IDs. The following 13 additions were registered as **Discovered**, not approved:
+
+| Candidate ID | Candidate | Potential contribution | Initial caution |
+|---|---|---|---|
+| UE-CAP-000031 | [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) | VISION: OCR, document layout and structured visual-text extraction | Benchmark mobile/server model tiers, languages, layout fidelity and model licences separately. |
+| UE-CAP-000032 | [OpenSandbox](https://github.com/opensandbox-group/OpenSandbox) | Isolated execution environments for agents, browsers and desktops | Validate backend isolation, Kubernetes/Docker requirements and operational overhead. |
+| UE-CAP-000033 | [NVIDIA OpenShell](https://github.com/NVIDIA/OpenShell) | Policy-governed sandbox lifecycle, filesystem and egress controls | Independently test fail-closed behaviour, policy bypass resistance and host compatibility. |
+| UE-CAP-000034 | [AgentScope](https://github.com/agentscope-ai/agentscope) | Event-driven agent orchestration and human-in-the-loop workflows | Compare state, recovery, tracing and deployment overhead with LangGraph and alternatives. |
+| UE-CAP-000035 | [Mastra](https://github.com/mastra-ai/mastra) | TypeScript-first agents, workflows, memory and evaluation | Assess enterprise-licensed subdirectories, runtime dependencies and persistence model. |
+| UE-CAP-000036 | [Strands Agents](https://github.com/strands-agents/sdk-python) | Model-driven agent loop and tool orchestration | Check provider coupling, approval semantics, trace export and SDK parity. |
+| UE-CAP-000037 | [OpenViking](https://github.com/volcengine/OpenViking) | Context database for memory, knowledge and reusable skills | Validate maturity, data model, provenance, retrieval quality and migration path. |
+| UE-CAP-000038 | [Archestra](https://github.com/archestra-ai/archestra) | Agent/MCP gateway, registry and governance | Inspect trust boundaries, identity, policy enforcement and deployment footprint. |
+| UE-CAP-000039 | [E2B](https://github.com/e2b-dev/E2B) | Agent-facing cloud sandbox and code-execution infrastructure | Distinguish open-source components from hosted service, self-hosting burden and cost. |
+| UE-CAP-000040 | [microsandbox](https://github.com/zerocore-ai/microsandbox) | Local-first embeddable microVM isolation | Verify supported host hypervisors, architecture coverage and security model. |
+| UE-CAP-000041 | [Kubernetes Agent Sandbox](https://github.com/kubernetes-sigs/agent-sandbox) | Kubernetes-native lifecycle primitives for agent sandboxes | Kubernetes-centric; likely execution-plane infrastructure, not phone-side software. |
+| UE-CAP-000042 | [NVX](https://github.com/microsoft/nvx) | Lightweight microVM isolation research candidate | Research/pre-release maturity and host limitations must be treated as significant uncertainty. |
+| UE-CAP-000043 | [DeerFlow](https://github.com/bytedance/deer-flow) | Long-horizon agent harness with subagents, memory, sandboxes and skills | Evaluate as an integrated harness, not automatically as a replacement for modular core services. |
+
+### Discovery evidence and interpretation
+
+- The [Backblaze agent-infrastructure index](https://github.com/backblaze-labs/awesome-agent-infrastructure) is a discovery map across agent frameworks, memory, sandboxes, protocols, observability and evaluation; it is not a quality certification.
+- The [OpenHands Agent Canvas README](https://github.com/OpenHands/OpenHands/blob/main/README.md) describes a self-hosted control centre that can connect to multiple local, remote and cloud agent backends. This makes it a candidate control-plane integration to assess, not proof that all agents are safe or interchangeable.
+- The [PaddleOCR repository](https://github.com/PaddlePaddle/PaddleOCR) reports Apache-2.0 for the repository and describes OCR/document extraction across 100+ languages. Model weights, datasets, third-party components and deployment-specific terms still require their own licence review. Its model-size tiers make it particularly worth testing for VISION, but mobile feasibility is not yet established.
+- The [OpenSandbox project](https://github.com/opensandbox-group/OpenSandbox) describes isolated environments for code, commands, files, browsers and desktops, with Docker and Kubernetes deployment paths. Its own performance figures are project-reported and must be independently reproduced.
+- The [NVIDIA OpenShell project](https://github.com/NVIDIA/OpenShell) describes policy-enforced filesystem and network controls and credential brokering. These are claims to threat-model and test, not assumed security guarantees.
+- The [agent-sandbox landscape](https://github.com/arach/awesome-agent-sandboxes) flags an important maintenance trap: the legacy Daytona core repository is reported as no longer maintained since June 2026. Do not score the old repository as a current maintained self-hosted runtime without identifying the current product/source boundary.
+- The [2026 agent-framework comparison](https://vdf.ai/blog/best-ai-agent-frameworks/) is useful for candidate discovery and feature comparison, but its licence/release claims must be confirmed directly in each upstream repository and release history.
+
+### Provisional high-value evaluation lanes
+
+These are evaluation priorities, not winners or integration approvals:
+
+1. **VISION:** PaddleOCR alongside general multimodal vision, OCR, screen grounding, object detection and temporal video perception. Separate text extraction from scene understanding and spatial reasoning.
+2. **Governed execution:** OpenSandbox, OpenShell, gVisor, Firecracker/Kata and microsandbox. Compare threat models and isolation boundaries; do not stack runtimes without a reason.
+3. **Orchestration:** LangGraph, AgentScope, Mastra, Strands and the existing PydanticAI/Agno candidates. Compare identical workflows, failure recovery, approvals and observability.
+4. **Long-horizon work:** DeerFlow, OpenHands and durable workflow engines such as Temporal/Restate. Distinguish an agent harness from a durable execution substrate.
+5. **Context and memory:** OpenViking, Graphiti, Qdrant, Letta and LlamaIndex. Compare provenance, temporal updates, contradiction handling, retrieval accuracy and exportability.
+6. **Control and governance:** Archestra and OpenShell alongside OPA, MCP gateways, workload identity and OpenTelemetry.
+
+### Candidate identity and maintenance safeguards
+
+- IDs UE-CAP-000001 through UE-CAP-000043 are permanent register identities; IDs are never recycled.
+- A project rename does not change its ID. A fork receives a new ID and lineage reference. A successor or replacement receives a new ID; the predecessor remains recorded.
+- Repository identity, package identity, model-weight licence and service terms are separate evidence fields.
+- Community-maintained indexes are discovery accelerators only. They cannot establish licence compliance, security, current maintenance, or suitability.
+- Candidate scores remain null until supported by evidence. Popularity, star counts and vendor claims are not substitutes for repeatable tests.
