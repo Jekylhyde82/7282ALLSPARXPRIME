@@ -486,3 +486,35 @@ Do not integrate all 54 projects. Assimilate their useful capabilities into intr
 - Candidate licence, security, maintenance and platform verification: incomplete.
 - Benchmarks: not run; no winners declared.
 - Installation, execution, production integration and spending: not approved.
+
+
+## 15. Third deep-dive research tranche — 16 new candidates
+
+Three independent research workstreams covered capability registry/discovery, identity/authority/policy, durable execution, model routing/serving, memory/knowledge, VISION/perception, isolated execution, independent evaluation and continuous evolution.
+
+The catalogue now contains **70 unique candidate IDs**; next ID is **UE-CAP-000071**. The newly discovered records are:
+
+| ID | Candidate | Primary capability |
+|---|---|---|
+| 055 | Apicurio Registry | Versioned API, agent-card, MCP and model-schema registry |
+| 056 | OpenFGA | Relationship-based fine-grained authorization |
+| 057 | SPIRE | Attested workload identity and SPIFFE SVIDs |
+| 058 | Cedar Policy | Typed authorization language and policy analysis |
+| 059 | Cadence | Durable workflow engine alternative |
+| 060 | Kestra | Declarative event-driven workflow orchestration |
+| 061 | Cognee | Graph/vector/code knowledge memory |
+| 062 | OpenVLHarness | Multimodal visual tool-use and memory harness |
+| 063 | vLLM Semantic Router | Policy-driven semantic model and compute routing |
+| 064 | SGLang | High-performance LLM/VLM/diffusion serving |
+| 065 | Inspect AI | Independent agent/model evaluation framework |
+| 066 | Harbor | Reproducible agent benchmark environments |
+| 067 | Tracekit Box | Auditable Firecracker microVM agent execution |
+| 068 | Tarit | KVM microVM checkpoint/restore/fork orchestration |
+| 069 | Octelium | Zero-trust identity-aware access and secretless gateway |
+| 070 | Plasm | Emerging typed capability graph and API execution DAGs |
+
+**Licence and maturity warnings:** Octelium has a split licence (cluster AGPLv3, client/SDK Apache-2.0); Tarit is AGPL-3.0-or-later; Plasm's core is dual MIT/Apache-2.0 but its trace sink is BUSL-1.1. Tracekit Box is v0 with documented missing controls; Plasm is very early; OpenVLHarness is new and its benchmark claims need reproduction. GroundingPI was examined but not added as a deployable free-model candidate because code licensing does not grant blanket rights to its third-party model weights and datasets.
+
+Full research, caveats and acceptance tests: [Three Deep-Dive Capability Research](../research/THREE_DEEP_DIVE_CAPABILITY_RESEARCH_2026-11-25.md).
+
+All new records remain **Discovered**, with null scores, unrun benchmarks and all approval flags false. Discovery is not integration approval.
