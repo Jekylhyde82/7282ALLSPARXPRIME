@@ -399,3 +399,17 @@ These are evaluation priorities, not winners or integration approvals:
 - Repository identity, package identity, model-weight licence and service terms are separate evidence fields.
 - Community-maintained indexes are discovery accelerators only. They cannot establish licence compliance, security, current maintenance, or suitability.
 - Candidate scores remain null until supported by evidence. Popularity, star counts and vendor claims are not substitutes for repeatable tests.
+
+
+### VISION-specific discovery additions
+
+Two additional candidates have been assigned permanent identities in the machine-readable catalogue:
+
+| Candidate ID | Candidate | VISION contribution | Important distinction |
+|---|---|---|---|
+| UE-CAP-000044 | [Microsoft OmniParser](https://github.com/microsoft/OmniParser) | Converts screen images into structured UI elements, identifies interactable regions and supports visual action grounding. | This is screen/UI perception, not general-purpose understanding of the physical world. Its repository describes mixed licensing across model components; each weight and detector lineage needs separate review. |
+| UE-CAP-000045 | [Meta Segment Anything 2 (SAM 2)](https://github.com/facebookresearch/sam2) | Promptable object segmentation in images and video, with object tracking across frames. | Segmentation and tracking are not object identity, semantic reasoning or scene understanding. The upstream README reports benchmark speeds on A100 hardware; these are not mobile performance claims. |
+
+Primary discovery sources: [OmniParser repository](https://github.com/microsoft/OmniParser), [OmniParser project page](https://microsoft.github.io/OmniParser/), [SAM 2 repository](https://github.com/facebookresearch/sam2), and [Meta SAM 2 project page](https://ai.meta.com/research/sam2/).
+
+The VISION capability must therefore be evaluated as a pipeline of distinct but composable skills: image/video input; screen parsing; OCR; object detection and segmentation; tracking across time; spatial and scene understanding; multimodal reasoning; confidence and uncertainty estimation; and temporal memory. No single model is assumed to provide all of these.
