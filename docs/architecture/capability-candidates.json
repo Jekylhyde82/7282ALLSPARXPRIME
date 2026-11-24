@@ -44,7 +44,7 @@
     "no_single_component_self_certifies": true
   },
   "catalogue_state": "Expanded discovery inventory; 54 candidate identities registered. Discovery pointers are not verification; no candidate is approved.",
-  "next_candidate_sequence": 55,
+  "next_candidate_sequence": 71,
   "candidates": [
     {
       "candidate_id": "UE-CAP-000001",
@@ -4661,6 +4661,1553 @@
         "approved_for_spending": false,
         "decision_record": null
       }
+    },
+    {
+      "candidate_id": "UE-CAP-000055",
+      "name": "Apicurio Registry",
+      "category": "agent_capability_registry",
+      "canonical_identity": {
+        "repository_url": "https://github.com/Apicurio/apicurio-registry",
+        "official_docs_url": "https://www.apicur.io/registry/ai/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Versioned registry for API schemas, agent cards, MCP tool/server definitions, prompt templates and model schemas; compatibility and discovery.",
+      "discovery": {
+        "discovered_at": "2026-11-25",
+        "discovery_source": "Third deep-dive research programme across official project repositories, documentation and research papers; discovery is not integration approval."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-25",
+        "license": {
+          "spdx_id": "Apache-2.0",
+          "source_url": "https://github.com/Apicurio/apicurio-registry",
+          "status": "Verified"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Requires release-history and maintainer review",
+        "security_status": "Requires independent security review",
+        "platform_support": "See candidate-specific risks and open questions",
+        "hardware_requirements": "Must be measured against target deployment profile",
+        "terms_and_data_handling": "Review dependencies, models, datasets, hosted services and all component-specific terms separately."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [
+          "UE-CAP-000001",
+          "UE-CAP-000028",
+          "UE-CAP-000016"
+        ],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": [
+          "UE-CAP-000001",
+          "UE-CAP-000038"
+        ]
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/Apicurio/apicurio-registry",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Repository identity, README, project features and licence metadata; full dependency and component-level licence review remains required."
+        },
+        {
+          "url": "https://www.apicur.io/registry/ai/",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Official documentation or research source for described capability; project claims remain to be independently tested."
+        }
+      ],
+      "risks": [
+        "A2A/MCP registry capabilities and AI catalog endpoints are experimental/disabled by default in some versions; registry quick-start demo is unauthenticated and must not be exposed as-is."
+      ],
+      "open_questions": [
+        "Recheck exact SPDX identifiers and all transitive/component/model/dataset licences before use",
+        "Verify release cadence, maintainers, open security advisories and support policy",
+        "Reproduce claimed functionality and benchmark results with fixed workloads and independent verifiers",
+        "Test interoperability, failure modes, resource use and target hardware compatibility",
+        "Review data handling, authentication, authorisation and threat model"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000056",
+      "name": "OpenFGA",
+      "category": "fine_grained_authorization",
+      "canonical_identity": {
+        "repository_url": "https://github.com/openfga/openfga",
+        "official_docs_url": "https://openfga.dev/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Zanzibar-inspired relationship-based fine-grained authorization service with HTTP/gRPC APIs and multiple storage backends.",
+      "discovery": {
+        "discovered_at": "2026-11-25",
+        "discovery_source": "Third deep-dive research programme across official project repositories, documentation and research papers; discovery is not integration approval."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-25",
+        "license": {
+          "spdx_id": "Apache-2.0",
+          "source_url": "https://github.com/openfga/openfga",
+          "status": "Verified"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Requires release-history and maintainer review",
+        "security_status": "Requires independent security review",
+        "platform_support": "See candidate-specific risks and open questions",
+        "hardware_requirements": "Must be measured against target deployment profile",
+        "terms_and_data_handling": "Review dependencies, models, datasets, hosted services and all component-specific terms separately."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [
+          "UE-CAP-000016",
+          "UE-CAP-000030",
+          "UE-CAP-000053"
+        ],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": [
+          "UE-CAP-000016"
+        ]
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/openfga/openfga",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Repository identity, README, project features and licence metadata; full dependency and component-level licence review remains required."
+        },
+        {
+          "url": "https://openfga.dev/",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Official documentation or research source for described capability; project claims remain to be independently tested."
+        }
+      ],
+      "risks": [
+        "Memory storage is development-only; authorization model design and consistency semantics require domain-specific testing."
+      ],
+      "open_questions": [
+        "Recheck exact SPDX identifiers and all transitive/component/model/dataset licences before use",
+        "Verify release cadence, maintainers, open security advisories and support policy",
+        "Reproduce claimed functionality and benchmark results with fixed workloads and independent verifiers",
+        "Test interoperability, failure modes, resource use and target hardware compatibility",
+        "Review data handling, authentication, authorisation and threat model"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000057",
+      "name": "SPIRE",
+      "category": "workload_identity_attestation",
+      "canonical_identity": {
+        "repository_url": "https://github.com/spiffe/spire",
+        "official_docs_url": "https://spiffe.io/docs/latest/spire-about/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "CNCF workload identity runtime that attests workloads and issues SPIFFE IDs/SVIDs for cryptographic service identity and mTLS/JWT trust.",
+      "discovery": {
+        "discovered_at": "2026-11-25",
+        "discovery_source": "Third deep-dive research programme across official project repositories, documentation and research papers; discovery is not integration approval."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-25",
+        "license": {
+          "spdx_id": "Apache-2.0",
+          "source_url": "https://github.com/spiffe/spire",
+          "status": "Verified"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Requires release-history and maintainer review",
+        "security_status": "Requires independent security review",
+        "platform_support": "See candidate-specific risks and open questions",
+        "hardware_requirements": "Must be measured against target deployment profile",
+        "terms_and_data_handling": "Review dependencies, models, datasets, hosted services and all component-specific terms separately."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [
+          "UE-CAP-000016",
+          "UE-CAP-000030",
+          "UE-CAP-000032",
+          "UE-CAP-000033"
+        ],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": [
+          "UE-CAP-000016"
+        ]
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/spiffe/spire",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Repository identity, README, project features and licence metadata; full dependency and component-level licence review remains required."
+        },
+        {
+          "url": "https://spiffe.io/docs/latest/spire-about/",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Official documentation or research source for described capability; project claims remain to be independently tested."
+        }
+      ],
+      "risks": [
+        "Requires an attestation and trust-domain design; workload selectors and node agents become critical security infrastructure."
+      ],
+      "open_questions": [
+        "Recheck exact SPDX identifiers and all transitive/component/model/dataset licences before use",
+        "Verify release cadence, maintainers, open security advisories and support policy",
+        "Reproduce claimed functionality and benchmark results with fixed workloads and independent verifiers",
+        "Test interoperability, failure modes, resource use and target hardware compatibility",
+        "Review data handling, authentication, authorisation and threat model"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000058",
+      "name": "Cedar Policy",
+      "category": "authorization_policy_language",
+      "canonical_identity": {
+        "repository_url": "https://github.com/cedar-policy/cedar",
+        "official_docs_url": "https://docs.cedarpolicy.com/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Purpose-built authorization policy language and evaluator with schema validation and automated reasoning/analyzer ecosystem.",
+      "discovery": {
+        "discovered_at": "2026-11-25",
+        "discovery_source": "Third deep-dive research programme across official project repositories, documentation and research papers; discovery is not integration approval."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-25",
+        "license": {
+          "spdx_id": "Apache-2.0",
+          "source_url": "https://github.com/cedar-policy/cedar",
+          "status": "Verified"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Requires release-history and maintainer review",
+        "security_status": "Requires independent security review",
+        "platform_support": "See candidate-specific risks and open questions",
+        "hardware_requirements": "Must be measured against target deployment profile",
+        "terms_and_data_handling": "Review dependencies, models, datasets, hosted services and all component-specific terms separately."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [
+          "UE-CAP-000016",
+          "UE-CAP-000056"
+        ],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": [
+          "UE-CAP-000016"
+        ]
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/cedar-policy/cedar",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Repository identity, README, project features and licence metadata; full dependency and component-level licence review remains required."
+        },
+        {
+          "url": "https://docs.cedarpolicy.com/",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Official documentation or research source for described capability; project claims remain to be independently tested."
+        }
+      ],
+      "risks": [
+        "A policy language/evaluator is not a complete identity provider, policy distribution service or enforcement point; integrate with runtime PEPs."
+      ],
+      "open_questions": [
+        "Recheck exact SPDX identifiers and all transitive/component/model/dataset licences before use",
+        "Verify release cadence, maintainers, open security advisories and support policy",
+        "Reproduce claimed functionality and benchmark results with fixed workloads and independent verifiers",
+        "Test interoperability, failure modes, resource use and target hardware compatibility",
+        "Review data handling, authentication, authorisation and threat model"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000059",
+      "name": "Cadence",
+      "category": "durable_workflows",
+      "canonical_identity": {
+        "repository_url": "https://github.com/cadence-workflow/cadence",
+        "official_docs_url": "https://cadenceworkflow.io/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Mature open-source durable workflow engine for scalable fault-tolerant long-running workflows with worker SDKs, histories and operational tooling.",
+      "discovery": {
+        "discovered_at": "2026-11-25",
+        "discovery_source": "Third deep-dive research programme across official project repositories, documentation and research papers; discovery is not integration approval."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-25",
+        "license": {
+          "spdx_id": "Apache-2.0",
+          "source_url": "https://github.com/cadence-workflow/cadence",
+          "status": "Verified"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Requires release-history and maintainer review",
+        "security_status": "Requires independent security review",
+        "platform_support": "See candidate-specific risks and open questions",
+        "hardware_requirements": "Must be measured against target deployment profile",
+        "terms_and_data_handling": "Review dependencies, models, datasets, hosted services and all component-specific terms separately."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [
+          "UE-CAP-000002",
+          "UE-CAP-000003",
+          "UE-CAP-000050",
+          "UE-CAP-000059"
+        ],
+        "overlaps": [
+          "UE-CAP-000002",
+          "UE-CAP-000003",
+          "UE-CAP-000050"
+        ],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/cadence-workflow/cadence",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Repository identity, README, project features and licence metadata; full dependency and component-level licence review remains required."
+        },
+        {
+          "url": "https://cadenceworkflow.io/",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Official documentation or research source for described capability; project claims remain to be independently tested."
+        }
+      ],
+      "risks": [
+        "Requires backend services and persistent database; overlap with Temporal/Restate means benchmark as an alternative, not an additional default."
+      ],
+      "open_questions": [
+        "Recheck exact SPDX identifiers and all transitive/component/model/dataset licences before use",
+        "Verify release cadence, maintainers, open security advisories and support policy",
+        "Reproduce claimed functionality and benchmark results with fixed workloads and independent verifiers",
+        "Test interoperability, failure modes, resource use and target hardware compatibility",
+        "Review data handling, authentication, authorisation and threat model"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000060",
+      "name": "Kestra",
+      "category": "event_driven_workflow_orchestration",
+      "canonical_identity": {
+        "repository_url": "https://github.com/kestra-io/kestra",
+        "official_docs_url": "https://kestra.io/docs/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Declarative, event-driven and scheduled workflow control plane with language-agnostic tasks, Git versioning, plugin ecosystem and AI/MCP integrations.",
+      "discovery": {
+        "discovered_at": "2026-11-25",
+        "discovery_source": "Third deep-dive research programme across official project repositories, documentation and research papers; discovery is not integration approval."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-25",
+        "license": {
+          "spdx_id": "Apache-2.0",
+          "source_url": "https://github.com/kestra-io/kestra",
+          "status": "Verified"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Requires release-history and maintainer review",
+        "security_status": "Requires independent security review",
+        "platform_support": "See candidate-specific risks and open questions",
+        "hardware_requirements": "Must be measured against target deployment profile",
+        "terms_and_data_handling": "Review dependencies, models, datasets, hosted services and all component-specific terms separately."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [
+          "UE-CAP-000002",
+          "UE-CAP-000003",
+          "UE-CAP-000050",
+          "UE-CAP-000055"
+        ],
+        "overlaps": [
+          "UE-CAP-000002",
+          "UE-CAP-000003",
+          "UE-CAP-000050"
+        ],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/kestra-io/kestra",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Repository identity, README, project features and licence metadata; full dependency and component-level licence review remains required."
+        },
+        {
+          "url": "https://kestra.io/docs/",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Official documentation or research source for described capability; project claims remain to be independently tested."
+        }
+      ],
+      "risks": [
+        "Broad platform with a larger operational footprint; advertised scale is a project claim; test its event model, persistence, plugin trust and resource usage."
+      ],
+      "open_questions": [
+        "Recheck exact SPDX identifiers and all transitive/component/model/dataset licences before use",
+        "Verify release cadence, maintainers, open security advisories and support policy",
+        "Reproduce claimed functionality and benchmark results with fixed workloads and independent verifiers",
+        "Test interoperability, failure modes, resource use and target hardware compatibility",
+        "Review data handling, authentication, authorisation and threat model"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000061",
+      "name": "Cognee",
+      "category": "knowledge_graph_memory",
+      "canonical_identity": {
+        "repository_url": "https://github.com/topoteretes/cognee",
+        "official_docs_url": "https://docs.cognee.ai/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Self-hostable persistent memory that extracts entities/relationships and combines graph, vector and code knowledge retrieval with remember/recall/improve/forget flows.",
+      "discovery": {
+        "discovered_at": "2026-11-25",
+        "discovery_source": "Third deep-dive research programme across official project repositories, documentation and research papers; discovery is not integration approval."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-25",
+        "license": {
+          "spdx_id": "Apache-2.0",
+          "source_url": "https://github.com/topoteretes/cognee",
+          "status": "Verified"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Requires release-history and maintainer review",
+        "security_status": "Requires independent security review",
+        "platform_support": "See candidate-specific risks and open questions",
+        "hardware_requirements": "Must be measured against target deployment profile",
+        "terms_and_data_handling": "Review dependencies, models, datasets, hosted services and all component-specific terms separately."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [
+          "UE-CAP-000007",
+          "UE-CAP-000008",
+          "UE-CAP-000009",
+          "UE-CAP-000037"
+        ],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": [
+          "UE-CAP-000007",
+          "UE-CAP-000008",
+          "UE-CAP-000037"
+        ]
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/topoteretes/cognee",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Repository identity, README, project features and licence metadata; full dependency and component-level licence review remains required."
+        },
+        {
+          "url": "https://docs.cognee.ai/",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Official documentation or research source for described capability; project claims remain to be independently tested."
+        }
+      ],
+      "risks": [
+        "Its published BEAM results use differing datasets/models/configurations and partly LLM-judge scoring; do not compare headline numbers directly. Local GLiNER path is described as a demo pipeline."
+      ],
+      "open_questions": [
+        "Recheck exact SPDX identifiers and all transitive/component/model/dataset licences before use",
+        "Verify release cadence, maintainers, open security advisories and support policy",
+        "Reproduce claimed functionality and benchmark results with fixed workloads and independent verifiers",
+        "Test interoperability, failure modes, resource use and target hardware compatibility",
+        "Review data handling, authentication, authorisation and threat model"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000062",
+      "name": "OpenVLHarness",
+      "category": "multimodal_visual_agent_harness",
+      "canonical_identity": {
+        "repository_url": "https://github.com/uclanlp/OpenVLHarness",
+        "official_docs_url": "https://openvlharness.github.io/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Composable visual-agent harness that combines grounding, OCR, depth, camera trajectory, zoom, multimodal memory, web evidence and code-based spatial calculations.",
+      "discovery": {
+        "discovered_at": "2026-11-25",
+        "discovery_source": "Third deep-dive research programme across official project repositories, documentation and research papers; discovery is not integration approval."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-25",
+        "license": {
+          "spdx_id": "MIT",
+          "source_url": "https://github.com/uclanlp/OpenVLHarness",
+          "status": "Verified"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Requires release-history and maintainer review",
+        "security_status": "Requires independent security review",
+        "platform_support": "See candidate-specific risks and open questions",
+        "hardware_requirements": "Must be measured against target deployment profile",
+        "terms_and_data_handling": "Review dependencies, models, datasets, hosted services and all component-specific terms separately."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [
+          "UE-CAP-000031",
+          "UE-CAP-000044",
+          "UE-CAP-000045",
+          "UE-CAP-000046",
+          "UE-CAP-000048",
+          "UE-CAP-000049",
+          "UE-CAP-000054"
+        ],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": [
+          "UE-CAP-000044",
+          "UE-CAP-000045",
+          "UE-CAP-000046"
+        ]
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/uclanlp/OpenVLHarness",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Repository identity, README, project features and licence metadata; full dependency and component-level licence review remains required."
+        },
+        {
+          "url": "https://openvlharness.github.io/",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Official documentation or research source for described capability; project claims remain to be independently tested."
+        }
+      ],
+      "risks": [
+        "Project is very new; reported gains are project-reported benchmark averages and require reproduction. Default stack needs separate GPU services and a Serper key for web search; third-party models/tools retain their own terms."
+      ],
+      "open_questions": [
+        "Recheck exact SPDX identifiers and all transitive/component/model/dataset licences before use",
+        "Verify release cadence, maintainers, open security advisories and support policy",
+        "Reproduce claimed functionality and benchmark results with fixed workloads and independent verifiers",
+        "Test interoperability, failure modes, resource use and target hardware compatibility",
+        "Review data handling, authentication, authorisation and threat model"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000063",
+      "name": "vLLM Semantic Router",
+      "category": "semantic_model_routing",
+      "canonical_identity": {
+        "repository_url": "https://github.com/vllm-project/semantic-router",
+        "official_docs_url": "https://vllm-sr.ai/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Policy-driven semantic decision layer that selects or combines model backends across local, private and cloud compute by task, quality, latency, cost and location.",
+      "discovery": {
+        "discovered_at": "2026-11-25",
+        "discovery_source": "Third deep-dive research programme across official project repositories, documentation and research papers; discovery is not integration approval."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-25",
+        "license": {
+          "spdx_id": "Apache-2.0",
+          "source_url": "https://github.com/vllm-project/semantic-router",
+          "status": "Verified"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Requires release-history and maintainer review",
+        "security_status": "Requires independent security review",
+        "platform_support": "See candidate-specific risks and open questions",
+        "hardware_requirements": "Must be measured against target deployment profile",
+        "terms_and_data_handling": "Review dependencies, models, datasets, hosted services and all component-specific terms separately."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [
+          "UE-CAP-000029",
+          "UE-CAP-000004",
+          "UE-CAP-000005",
+          "UE-CAP-000006"
+        ],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": [
+          "UE-CAP-000029"
+        ]
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/vllm-project/semantic-router",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Repository identity, README, project features and licence metadata; full dependency and component-level licence review remains required."
+        },
+        {
+          "url": "https://vllm-sr.ai/",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Official documentation or research source for described capability; project claims remain to be independently tested."
+        }
+      ],
+      "risks": [
+        "Routing models and policies need independent calibration; routing decisions can introduce bias, cost surprises or data-residency violations if policy is weak."
+      ],
+      "open_questions": [
+        "Recheck exact SPDX identifiers and all transitive/component/model/dataset licences before use",
+        "Verify release cadence, maintainers, open security advisories and support policy",
+        "Reproduce claimed functionality and benchmark results with fixed workloads and independent verifiers",
+        "Test interoperability, failure modes, resource use and target hardware compatibility",
+        "Review data handling, authentication, authorisation and threat model"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000064",
+      "name": "SGLang",
+      "category": "high_performance_multimodal_inference",
+      "canonical_identity": {
+        "repository_url": "https://github.com/sgl-project/sglang",
+        "official_docs_url": "https://sgl-project.github.io/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "High-performance serving framework for language, vision-language and diffusion models, including routing/gateway components and agentic workload optimisations.",
+      "discovery": {
+        "discovered_at": "2026-11-25",
+        "discovery_source": "Third deep-dive research programme across official project repositories, documentation and research papers; discovery is not integration approval."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-25",
+        "license": {
+          "spdx_id": "Apache-2.0",
+          "source_url": "https://github.com/sgl-project/sglang",
+          "status": "Verified"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Requires release-history and maintainer review",
+        "security_status": "Requires independent security review",
+        "platform_support": "See candidate-specific risks and open questions",
+        "hardware_requirements": "Must be measured against target deployment profile",
+        "terms_and_data_handling": "Review dependencies, models, datasets, hosted services and all component-specific terms separately."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [
+          "UE-CAP-000004",
+          "UE-CAP-000029",
+          "UE-CAP-000046",
+          "UE-CAP-000062"
+        ],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": [
+          "UE-CAP-000004"
+        ]
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/sgl-project/sglang",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Repository identity, README, project features and licence metadata; full dependency and component-level licence review remains required."
+        },
+        {
+          "url": "https://sgl-project.github.io/",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Official documentation or research source for described capability; project claims remain to be independently tested."
+        }
+      ],
+      "risks": [
+        "GPU-centric serving stack; performance depends heavily on accelerator, model and workload. Benchmark against vLLM on identical hardware rather than assuming a universal winner."
+      ],
+      "open_questions": [
+        "Recheck exact SPDX identifiers and all transitive/component/model/dataset licences before use",
+        "Verify release cadence, maintainers, open security advisories and support policy",
+        "Reproduce claimed functionality and benchmark results with fixed workloads and independent verifiers",
+        "Test interoperability, failure modes, resource use and target hardware compatibility",
+        "Review data handling, authentication, authorisation and threat model"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000065",
+      "name": "Inspect AI",
+      "category": "independent_agent_evaluation",
+      "canonical_identity": {
+        "repository_url": "https://github.com/UKGovernmentBEIS/inspect_ai",
+        "official_docs_url": "https://inspect.aisi.org.uk/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Composable evaluation framework for coding, agentic tasks, reasoning, behaviour, multimodal tasks and tool-using agents; includes many prebuilt evaluations and sandbox extensions.",
+      "discovery": {
+        "discovered_at": "2026-11-25",
+        "discovery_source": "Third deep-dive research programme across official project repositories, documentation and research papers; discovery is not integration approval."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-25",
+        "license": {
+          "spdx_id": "MIT",
+          "source_url": "https://github.com/UKGovernmentBEIS/inspect_ai",
+          "status": "Verified"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Requires release-history and maintainer review",
+        "security_status": "Requires independent security review",
+        "platform_support": "See candidate-specific risks and open questions",
+        "hardware_requirements": "Must be measured against target deployment profile",
+        "terms_and_data_handling": "Review dependencies, models, datasets, hosted services and all component-specific terms separately."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [
+          "UE-CAP-000010",
+          "UE-CAP-000011",
+          "UE-CAP-000012",
+          "UE-CAP-000064"
+        ],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": [
+          "UE-CAP-000010",
+          "UE-CAP-000011"
+        ]
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/UKGovernmentBEIS/inspect_ai",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Repository identity, README, project features and licence metadata; full dependency and component-level licence review remains required."
+        },
+        {
+          "url": "https://inspect.aisi.org.uk/",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Official documentation or research source for described capability; project claims remain to be independently tested."
+        }
+      ],
+      "risks": [
+        "Model-graded scoring can be gamed or correlated with the evaluated model; use deterministic task verifiers and separate independent reviewers for consequential claims."
+      ],
+      "open_questions": [
+        "Recheck exact SPDX identifiers and all transitive/component/model/dataset licences before use",
+        "Verify release cadence, maintainers, open security advisories and support policy",
+        "Reproduce claimed functionality and benchmark results with fixed workloads and independent verifiers",
+        "Test interoperability, failure modes, resource use and target hardware compatibility",
+        "Review data handling, authentication, authorisation and threat model"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000066",
+      "name": "Harbor",
+      "category": "agent_benchmark_harness",
+      "canonical_identity": {
+        "repository_url": "https://github.com/harbor-framework/harbor",
+        "official_docs_url": "https://harborframework.com/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Framework for evaluating arbitrary agents in reproducible environments, authoring benchmarks, parallel experiments and RL rollouts; official Terminal-Bench harness.",
+      "discovery": {
+        "discovered_at": "2026-11-25",
+        "discovery_source": "Third deep-dive research programme across official project repositories, documentation and research papers; discovery is not integration approval."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-25",
+        "license": {
+          "spdx_id": "Apache-2.0",
+          "source_url": "https://github.com/harbor-framework/harbor",
+          "status": "Verified"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Requires release-history and maintainer review",
+        "security_status": "Requires independent security review",
+        "platform_support": "See candidate-specific risks and open questions",
+        "hardware_requirements": "Must be measured against target deployment profile",
+        "terms_and_data_handling": "Review dependencies, models, datasets, hosted services and all component-specific terms separately."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [
+          "UE-CAP-000010",
+          "UE-CAP-000011",
+          "UE-CAP-000013",
+          "UE-CAP-000014",
+          "UE-CAP-000015"
+        ],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": [
+          "UE-CAP-000010",
+          "UE-CAP-000011",
+          "UE-CAP-000012"
+        ]
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/harbor-framework/harbor",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Repository identity, README, project features and licence metadata; full dependency and component-level licence review remains required."
+        },
+        {
+          "url": "https://harborframework.com/",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Official documentation or research source for described capability; project claims remain to be independently tested."
+        }
+      ],
+      "risks": [
+        "Requires Python >=3.12 in current project metadata; benchmark outcomes depend on environment images, agent/model versions and paid provider keys when proprietary models are selected."
+      ],
+      "open_questions": [
+        "Recheck exact SPDX identifiers and all transitive/component/model/dataset licences before use",
+        "Verify release cadence, maintainers, open security advisories and support policy",
+        "Reproduce claimed functionality and benchmark results with fixed workloads and independent verifiers",
+        "Test interoperability, failure modes, resource use and target hardware compatibility",
+        "Review data handling, authentication, authorisation and threat model"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000067",
+      "name": "Tracekit Box",
+      "category": "auditable_microvm_agent_sandbox",
+      "canonical_identity": {
+        "repository_url": "https://github.com/Cygnux-Labs/Tracekit-box",
+        "official_docs_url": "https://arxiv.org/abs/2610.38458v1",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Firecracker microVM sandbox with host-mediated command/network/secret/patch doors, signer decisions and offline-verifiable evidence bundles.",
+      "discovery": {
+        "discovered_at": "2026-11-25",
+        "discovery_source": "Third deep-dive research programme across official project repositories, documentation and research papers; discovery is not integration approval."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-25",
+        "license": {
+          "spdx_id": "MIT",
+          "source_url": "https://github.com/Cygnux-Labs/Tracekit-box",
+          "status": "Verified"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Requires release-history and maintainer review",
+        "security_status": "Requires independent security review",
+        "platform_support": "See candidate-specific risks and open questions",
+        "hardware_requirements": "Must be measured against target deployment profile",
+        "terms_and_data_handling": "Review dependencies, models, datasets, hosted services and all component-specific terms separately."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [
+          "UE-CAP-000017",
+          "UE-CAP-000032",
+          "UE-CAP-000033",
+          "UE-CAP-000039",
+          "UE-CAP-000040",
+          "UE-CAP-000041",
+          "UE-CAP-000042",
+          "UE-CAP-000053"
+        ],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": [
+          "UE-CAP-000032",
+          "UE-CAP-000033",
+          "UE-CAP-000040"
+        ]
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/Cygnux-Labs/Tracekit-box",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Repository identity, README, project features and licence metadata; full dependency and component-level licence review remains required."
+        },
+        {
+          "url": "https://arxiv.org/abs/2610.38458v1",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Official documentation or research source for described capability; project claims remain to be independently tested."
+        }
+      ],
+      "risks": [
+        "Version 0; paper reports 13 KVM end-to-end checks and fuzzing, but no Firecracker jailer, remote signer, snapshot/restore or GPU support; host trust assumptions and egress relay risks remain."
+      ],
+      "open_questions": [
+        "Recheck exact SPDX identifiers and all transitive/component/model/dataset licences before use",
+        "Verify release cadence, maintainers, open security advisories and support policy",
+        "Reproduce claimed functionality and benchmark results with fixed workloads and independent verifiers",
+        "Test interoperability, failure modes, resource use and target hardware compatibility",
+        "Review data handling, authentication, authorisation and threat model"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000068",
+      "name": "Tarit",
+      "category": "kvm_microvm_sandbox_orchestration",
+      "canonical_identity": {
+        "repository_url": "https://github.com/instavm/tarit",
+        "official_docs_url": "https://instavm.io/blog/introducing-tarit",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "KVM microVM monitor and orchestration service with warm pools, snapshots, checkpoint/restore/fork, networking, workload placement and audit records.",
+      "discovery": {
+        "discovered_at": "2026-11-25",
+        "discovery_source": "Third deep-dive research programme across official project repositories, documentation and research papers; discovery is not integration approval."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-25",
+        "license": {
+          "spdx_id": "AGPL-3.0-or-later",
+          "source_url": "https://github.com/instavm/tarit",
+          "status": "Verified"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Requires release-history and maintainer review",
+        "security_status": "Requires independent security review",
+        "platform_support": "See candidate-specific risks and open questions",
+        "hardware_requirements": "Must be measured against target deployment profile",
+        "terms_and_data_handling": "Review dependencies, models, datasets, hosted services and all component-specific terms separately."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [
+          "UE-CAP-000017",
+          "UE-CAP-000032",
+          "UE-CAP-000039",
+          "UE-CAP-000040",
+          "UE-CAP-000041",
+          "UE-CAP-000042",
+          "UE-CAP-000067"
+        ],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": [
+          "UE-CAP-000032",
+          "UE-CAP-000039",
+          "UE-CAP-000040",
+          "UE-CAP-000042"
+        ]
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/instavm/tarit",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Repository identity, README, project features and licence metadata; full dependency and component-level licence review remains required."
+        },
+        {
+          "url": "https://instavm.io/blog/introducing-tarit",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Official documentation or research source for described capability; project claims remain to be independently tested."
+        }
+      ],
+      "risks": [
+        "Requires x86_64 Linux with KVM for execution; ARM64 guests not yet implemented in inspected docs; AGPL obligations and host hardening need review."
+      ],
+      "open_questions": [
+        "Recheck exact SPDX identifiers and all transitive/component/model/dataset licences before use",
+        "Verify release cadence, maintainers, open security advisories and support policy",
+        "Reproduce claimed functionality and benchmark results with fixed workloads and independent verifiers",
+        "Test interoperability, failure modes, resource use and target hardware compatibility",
+        "Review data handling, authentication, authorisation and threat model"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000069",
+      "name": "Octelium",
+      "category": "zero_trust_workload_access_gateway",
+      "canonical_identity": {
+        "repository_url": "https://github.com/octelium/octelium",
+        "official_docs_url": "https://octelium.com/docs",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Self-hosted identity-aware zero-trust access platform for human and workload identities, per-request ABAC, secretless L7 access, API/AI/MCP gateways and OTel audit export.",
+      "discovery": {
+        "discovered_at": "2026-11-25",
+        "discovery_source": "Third deep-dive research programme across official project repositories, documentation and research papers; discovery is not integration approval."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-25",
+        "license": {
+          "spdx_id": "AGPL-3.0 (cluster); Apache-2.0 (client/SDK)",
+          "source_url": "https://github.com/octelium/octelium",
+          "status": "Split / verified"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Requires release-history and maintainer review",
+        "security_status": "Requires independent security review",
+        "platform_support": "See candidate-specific risks and open questions",
+        "hardware_requirements": "Must be measured against target deployment profile",
+        "terms_and_data_handling": "Review dependencies, models, datasets, hosted services and all component-specific terms separately."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [
+          "UE-CAP-000016",
+          "UE-CAP-000027",
+          "UE-CAP-000030",
+          "UE-CAP-000033",
+          "UE-CAP-000056",
+          "UE-CAP-000057"
+        ],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": [
+          "UE-CAP-000016",
+          "UE-CAP-000029",
+          "UE-CAP-000038"
+        ]
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/octelium/octelium",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Repository identity, README, project features and licence metadata; full dependency and component-level licence review remains required."
+        },
+        {
+          "url": "https://octelium.com/docs",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Official documentation or research source for described capability; project claims remain to be independently tested."
+        }
+      ],
+      "risks": [
+        "Cluster-side code is AGPLv3 while client/SDK components are Apache-2.0; Kubernetes-based deployment adds operational complexity; verify v1 stability and threat model."
+      ],
+      "open_questions": [
+        "Recheck exact SPDX identifiers and all transitive/component/model/dataset licences before use",
+        "Verify release cadence, maintainers, open security advisories and support policy",
+        "Reproduce claimed functionality and benchmark results with fixed workloads and independent verifiers",
+        "Test interoperability, failure modes, resource use and target hardware compatibility",
+        "Review data handling, authentication, authorisation and threat model"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000070",
+      "name": "Plasm",
+      "category": "typed_capability_graph",
+      "canonical_identity": {
+        "repository_url": "https://github.com/PlasmTools/plasm-core",
+        "official_docs_url": "https://plasm.tools/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Emerging typed capability graph and wire mapping layer with Python DSL for typed DAGs, validation before transport, HTTP/MCP hosts and curated API catalogs.",
+      "discovery": {
+        "discovered_at": "2026-11-25",
+        "discovery_source": "Third deep-dive research programme across official project repositories, documentation and research papers; discovery is not integration approval."
+      },
+      "verification": {
+        "last_checked_at": "2026-11-25",
+        "license": {
+          "spdx_id": "MIT OR Apache-2.0 (core); BUSL-1.1 trace sink",
+          "source_url": "https://github.com/PlasmTools/plasm-core",
+          "status": "Split / verified"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Requires release-history and maintainer review",
+        "security_status": "Requires independent security review",
+        "platform_support": "See candidate-specific risks and open questions",
+        "hardware_requirements": "Must be measured against target deployment profile",
+        "terms_and_data_handling": "Review dependencies, models, datasets, hosted services and all component-specific terms separately."
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [
+          "UE-CAP-000055",
+          "UE-CAP-000001",
+          "UE-CAP-000028"
+        ],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": [
+          "UE-CAP-000055"
+        ]
+      },
+      "evidence": [
+        {
+          "url": "https://github.com/PlasmTools/plasm-core",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Repository identity, README, project features and licence metadata; full dependency and component-level licence review remains required."
+        },
+        {
+          "url": "https://plasm.tools/",
+          "observed_at": "2026-11-25",
+          "type": "primary_source",
+          "claim_scope": "Official documentation or research source for described capability; project claims remain to be independently tested."
+        }
+      ],
+      "risks": [
+        "Very early project with small contributor footprint; trace sink remains BUSL-1.1; imported API specifications/data retain their own terms; maturity and security unproven."
+      ],
+      "open_questions": [
+        "Recheck exact SPDX identifiers and all transitive/component/model/dataset licences before use",
+        "Verify release cadence, maintainers, open security advisories and support policy",
+        "Reproduce claimed functionality and benchmark results with fixed workloads and independent verifiers",
+        "Test interoperability, failure modes, resource use and target hardware compatibility",
+        "Review data handling, authentication, authorisation and threat model"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
     }
   ],
   "integration_model": {
@@ -4774,6 +6321,80 @@
         "UE-CAP-000052",
         "UE-CAP-000053",
         "UE-CAP-000032"
+      ],
+      "capability_registry": [
+        "UE-CAP-000055",
+        "UE-CAP-000070"
+      ],
+      "authorization_identity": [
+        "UE-CAP-000056",
+        "UE-CAP-000057",
+        "UE-CAP-000058",
+        "UE-CAP-000069"
+      ],
+      "durable_orchestration": [
+        "UE-CAP-000002",
+        "UE-CAP-000003",
+        "UE-CAP-000050",
+        "UE-CAP-000059",
+        "UE-CAP-000060"
+      ],
+      "model_serving_routing": [
+        "UE-CAP-000004",
+        "UE-CAP-000029",
+        "UE-CAP-000046",
+        "UE-CAP-000062",
+        "UE-CAP-000064"
+      ],
+      "unified_memory": [
+        "UE-CAP-000007",
+        "UE-CAP-000008",
+        "UE-CAP-000009",
+        "UE-CAP-000037",
+        "UE-CAP-000061"
+      ],
+      "vision_pipeline": [
+        "UE-CAP-000031",
+        "UE-CAP-000044",
+        "UE-CAP-000045",
+        "UE-CAP-000046",
+        "UE-CAP-000047",
+        "UE-CAP-000048",
+        "UE-CAP-000049",
+        "UE-CAP-000054",
+        "UE-CAP-000062"
+      ],
+      "isolated_execution": [
+        "UE-CAP-000017",
+        "UE-CAP-000032",
+        "UE-CAP-000033",
+        "UE-CAP-000039",
+        "UE-CAP-000040",
+        "UE-CAP-000041",
+        "UE-CAP-000042",
+        "UE-CAP-000053",
+        "UE-CAP-000067",
+        "UE-CAP-000068"
+      ],
+      "independent_evaluation": [
+        "UE-CAP-000010",
+        "UE-CAP-000011",
+        "UE-CAP-000012",
+        "UE-CAP-000063",
+        "UE-CAP-000064"
+      ],
+      "continuous_evolution": [
+        "UE-CAP-000018",
+        "UE-CAP-000019",
+        "UE-CAP-000020",
+        "UE-CAP-000021",
+        "UE-CAP-000022",
+        "UE-CAP-000013",
+        "UE-CAP-000014",
+        "UE-CAP-000015",
+        "UE-CAP-000055",
+        "UE-CAP-000063",
+        "UE-CAP-000064"
       ]
     },
     "integration_invariants": [
@@ -4787,6 +6408,6 @@
       "graceful degradation",
       "no discovery-to-approval shortcut"
     ],
-    "note": "Candidate relationships are architecture-level hypotheses pending repository, API, licence, security and benchmark verification."
+    "note": "Candidate relationships are architecture-level hypotheses pending repository, API, licence, security and benchmark verification. Updated 2026-11-25 with three deep-dive research workstreams and 16 new candidate records. Candidate relationships remain hypotheses pending tests."
   }
 }
