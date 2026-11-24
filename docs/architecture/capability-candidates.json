@@ -1,0 +1,2240 @@
+{
+  "schema_version": "1.0.0",
+  "register": "Universal Engine / Engineer — Universal Capability Acquisition Register",
+  "architecture_focus": "NINEFOLD INTRINSIC",
+  "generated_at": "2026-11-24",
+  "identity_policy": {
+    "id_format": "UE-CAP-NNNNNN",
+    "immutability": "candidate_id is immutable and never recycled",
+    "allocation": "allocate the next unused sequence under a single-writer/PR-serialized process; reserve the number before publishing a record",
+    "identity_separation": "candidate_id identifies the register record, not a repository URL, package, vendor, release, fork, or implementation",
+    "rename_policy": "retain candidate_id; append former names to canonical_identity.aliases",
+    "fork_policy": "register a fork as a distinct candidate with its own ID and forked_from reference",
+    "replacement_policy": "retain retired candidate and set replaced_by; never transfer its ID",
+    "deduplication": "compare canonical repository, package coordinates, maintainer and lineage before creating a new record; merge duplicate records only through an auditable redirect, never by reusing an ID"
+  },
+  "lifecycle": [
+    "Discovered",
+    "Proposed",
+    "Under Evaluation",
+    "Approved",
+    "Integrated",
+    "Rejected",
+    "Retired"
+  ],
+  "evaluation_dimensions": [
+    "capability",
+    "intelligence",
+    "performance",
+    "reliability",
+    "security",
+    "interoperability",
+    "autonomy",
+    "evolution",
+    "value"
+  ],
+  "scoring_policy": "0–5 only when evidence exists; null means Unknown, never zero or a favourable assumption",
+  "governance": {
+    "discovery_is_approval": false,
+    "installation_requires_explicit_approval": true,
+    "execution_requires_explicit_approval": true,
+    "integration_requires_explicit_approval": true,
+    "spending_requires_explicit_approval": true,
+    "independent_verification_required": true,
+    "no_single_component_self_certifies": true
+  },
+  "catalogue_state": "Initial candidate set; no candidate has been licence-, security-, maintenance-, compatibility- or benchmark-verified by this catalogue",
+  "next_candidate_sequence": 31,
+  "candidates": [
+    {
+      "candidate_id": "UE-CAP-000001",
+      "name": "LangGraph",
+      "category": "agent_orchestration",
+      "canonical_identity": {
+        "repository_url": "https://github.com/langchain-ai/langgraph",
+        "official_docs_url": "https://docs.langchain.com/oss/python/langgraph",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Stateful graph-based agent orchestration",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000002",
+      "name": "Temporal",
+      "category": "durable_workflows",
+      "canonical_identity": {
+        "repository_url": "https://github.com/temporalio/temporal",
+        "official_docs_url": "https://docs.temporal.io/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Durable workflow execution and recovery",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000003",
+      "name": "Restate",
+      "category": "durable_workflows",
+      "canonical_identity": {
+        "repository_url": "https://github.com/restatedev/restate",
+        "official_docs_url": "https://docs.restate.dev/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Durable execution runtime for workflows and agents",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000004",
+      "name": "llama.cpp",
+      "category": "local_inference",
+      "canonical_identity": {
+        "repository_url": "https://github.com/ggml-org/llama.cpp",
+        "official_docs_url": "https://github.com/ggml-org/llama.cpp",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Portable local LLM inference",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000005",
+      "name": "LiteRT-LM",
+      "category": "edge_inference",
+      "canonical_identity": {
+        "repository_url": "https://github.com/google-ai-edge/LiteRT-LM",
+        "official_docs_url": "https://developers.google.com/edge/litert-lm",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Edge LLM inference across supported devices",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000006",
+      "name": "ExecuTorch",
+      "category": "edge_inference",
+      "canonical_identity": {
+        "repository_url": "https://github.com/pytorch/executorch",
+        "official_docs_url": "https://docs.pytorch.org/executorch/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "PyTorch-native on-device inference runtime",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000007",
+      "name": "Qdrant",
+      "category": "vector_retrieval",
+      "canonical_identity": {
+        "repository_url": "https://github.com/qdrant/qdrant",
+        "official_docs_url": "https://qdrant.tech/documentation/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Vector and hybrid retrieval database",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000008",
+      "name": "Graphiti",
+      "category": "temporal_memory",
+      "canonical_identity": {
+        "repository_url": "https://github.com/getzep/graphiti",
+        "official_docs_url": "https://help.getzep.com/graphiti",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Temporal knowledge graph for evolving context",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000009",
+      "name": "LlamaIndex",
+      "category": "retrieval_orchestration",
+      "canonical_identity": {
+        "repository_url": "https://github.com/run-llama/llama_index",
+        "official_docs_url": "https://docs.llamaindex.ai/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Data ingestion and retrieval orchestration",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000010",
+      "name": "Promptfoo",
+      "category": "llm_evaluation",
+      "canonical_identity": {
+        "repository_url": "https://github.com/promptfoo/promptfoo",
+        "official_docs_url": "https://www.promptfoo.dev/docs/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Prompt, model and application evaluation",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000011",
+      "name": "DeepEval",
+      "category": "llm_evaluation",
+      "canonical_identity": {
+        "repository_url": "https://github.com/confident-ai/deepeval",
+        "official_docs_url": "https://docs.confident-ai.com/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "LLM evaluation and testing framework",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000012",
+      "name": "AgentCompass",
+      "category": "agent_benchmarking",
+      "canonical_identity": {
+        "repository_url": "https://github.com/open-compass/AgentCompass",
+        "official_docs_url": "https://github.com/open-compass/AgentCompass",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Agent benchmark and harness evaluation infrastructure",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000013",
+      "name": "OpenHands",
+      "category": "software_engineering_agents",
+      "canonical_identity": {
+        "repository_url": "https://github.com/All-Hands-AI/OpenHands",
+        "official_docs_url": "https://docs.openhands.dev/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Autonomous software engineering platform",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000014",
+      "name": "SWE-agent",
+      "category": "software_engineering_agents",
+      "canonical_identity": {
+        "repository_url": "https://github.com/SWE-agent/SWE-agent",
+        "official_docs_url": "https://swe-agent.com/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Repository issue resolution agent",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000015",
+      "name": "Goose",
+      "category": "software_engineering_agents",
+      "canonical_identity": {
+        "repository_url": "https://github.com/block/goose",
+        "official_docs_url": "https://block.github.io/goose/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Extensible coding and task agent",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000016",
+      "name": "Open Policy Agent",
+      "category": "policy_authorization",
+      "canonical_identity": {
+        "repository_url": "https://github.com/open-policy-agent/opa",
+        "official_docs_url": "https://www.openpolicyagent.org/docs/latest/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Policy-as-code decision engine",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000017",
+      "name": "gVisor",
+      "category": "execution_isolation",
+      "canonical_identity": {
+        "repository_url": "https://github.com/google/gvisor",
+        "official_docs_url": "https://gvisor.dev/docs/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Application-kernel sandboxing",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000018",
+      "name": "OpenSSF Scorecard",
+      "category": "supply_chain_security",
+      "canonical_identity": {
+        "repository_url": "https://github.com/ossf/scorecard",
+        "official_docs_url": "https://scorecard.dev/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Automated open-source security health signals",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000019",
+      "name": "OpenSSF OSPS Baseline",
+      "category": "security_baseline",
+      "canonical_identity": {
+        "repository_url": "https://github.com/ossf/security-baseline",
+        "official_docs_url": "https://baseline.openssf.org/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Versioned open-source project security controls",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000020",
+      "name": "GUAC",
+      "category": "supply_chain_graph",
+      "canonical_identity": {
+        "repository_url": "https://github.com/guacsec/guac",
+        "official_docs_url": "https://guac.sh/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Graph of software supply-chain security metadata",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000021",
+      "name": "ScanCode Toolkit",
+      "category": "license_analysis",
+      "canonical_identity": {
+        "repository_url": "https://github.com/aboutcode-org/scancode-toolkit",
+        "official_docs_url": "https://scancode-toolkit.readthedocs.io/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Licence and provenance identification",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000022",
+      "name": "OSS Review Toolkit",
+      "category": "license_analysis",
+      "canonical_identity": {
+        "repository_url": "https://github.com/oss-review-toolkit/ort",
+        "official_docs_url": "https://oss-review-toolkit.org/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Dependency and licence compliance analysis",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000023",
+      "name": "Playwright",
+      "category": "browser_automation",
+      "canonical_identity": {
+        "repository_url": "https://github.com/microsoft/playwright",
+        "official_docs_url": "https://playwright.dev/docs/intro",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Browser automation and end-to-end testing",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000024",
+      "name": "Crawl4AI",
+      "category": "permitted_data_extraction",
+      "canonical_identity": {
+        "repository_url": "https://github.com/unclecode/crawl4ai",
+        "official_docs_url": "https://docs.crawl4ai.com/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Web content extraction subject to source permissions",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000025",
+      "name": "Scrapy",
+      "category": "permitted_data_extraction",
+      "canonical_identity": {
+        "repository_url": "https://github.com/scrapy/scrapy",
+        "official_docs_url": "https://docs.scrapy.org/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Structured web crawling and extraction",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000026",
+      "name": "Docling",
+      "category": "document_processing",
+      "canonical_identity": {
+        "repository_url": "https://github.com/docling-project/docling",
+        "official_docs_url": "https://docling-project.github.io/docling/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Document conversion and structured extraction",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000027",
+      "name": "OpenTelemetry",
+      "category": "observability",
+      "canonical_identity": {
+        "repository_url": "https://github.com/open-telemetry/opentelemetry-specification",
+        "official_docs_url": "https://opentelemetry.io/docs/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Vendor-neutral telemetry instrumentation",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000028",
+      "name": "NATS",
+      "category": "messaging",
+      "canonical_identity": {
+        "repository_url": "https://github.com/nats-io/nats-server",
+        "official_docs_url": "https://docs.nats.io/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Messaging and event distribution",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000029",
+      "name": "LiteLLM",
+      "category": "model_gateway",
+      "canonical_identity": {
+        "repository_url": "https://github.com/BerriAI/litellm",
+        "official_docs_url": "https://docs.litellm.ai/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Model/provider gateway and routing",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    },
+    {
+      "candidate_id": "UE-CAP-000030",
+      "name": "OpenBao",
+      "category": "secrets_management",
+      "canonical_identity": {
+        "repository_url": "https://github.com/openbao/openbao",
+        "official_docs_url": "https://openbao.org/docs/",
+        "aliases": [],
+        "forked_from": null,
+        "replaced_by": null
+      },
+      "lifecycle_state": "Discovered",
+      "proposed_role": "Secrets management and key lifecycle",
+      "discovery": {
+        "discovered_at": "2026-11-24",
+        "discovery_source": "Initial Universal Engine capability research; primary project URL recorded; discovery is not verification"
+      },
+      "verification": {
+        "last_checked_at": null,
+        "license": {
+          "spdx_id": null,
+          "source_url": null,
+          "status": "Unknown"
+        },
+        "latest_release": null,
+        "latest_release_date": null,
+        "last_commit_date": null,
+        "maintenance_status": "Unknown",
+        "security_status": "Unknown",
+        "platform_support": "Unverified",
+        "hardware_requirements": "Unknown",
+        "terms_and_data_handling": "Unknown"
+      },
+      "evaluation": {
+        "scores": {
+          "capability": null,
+          "intelligence": null,
+          "performance": null,
+          "reliability": null,
+          "security": null,
+          "interoperability": null,
+          "autonomy": null,
+          "evolution": null,
+          "value": null
+        },
+        "confidence": "Not assessed",
+        "benchmark_status": "Not run"
+      },
+      "relationships": {
+        "dependencies": [],
+        "complements": [],
+        "overlaps": [],
+        "conflicts": [],
+        "alternatives": []
+      },
+      "evidence": [],
+      "risks": [],
+      "open_questions": [
+        "Verify official licence and exact SPDX identifier",
+        "Verify release and maintenance activity from primary sources",
+        "Review security advisories and dependency exposure",
+        "Verify platform and hardware support",
+        "Benchmark against identical workload where applicable"
+      ],
+      "decision": {
+        "status": "Pending",
+        "approved_for_installation": false,
+        "approved_for_execution": false,
+        "approved_for_integration": false,
+        "approved_for_spending": false,
+        "decision_record": null
+      }
+    }
+  ]
+}
