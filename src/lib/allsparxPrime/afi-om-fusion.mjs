@@ -180,6 +180,25 @@ export function recordAfiOmSynthesis({ packet, synthesis }) {
     throw new TypeError("Unsupported or malformed AFI OM fusion packet.");
   }
 
+  const validatedPacket = buildAfiOmFusionPacket({
+    task_id: validatedPacket.task_id,
+    objective: packet.objective,
+    contributions: packet.contributions,
+    required_identities: packet.coverage?.required_identities,
+  });
+  const stableSerialize = (value) => {
+    if (Array.isArray(value)) return "[" + value.map(stableSerialize).join(",") + "]";
+    if (value && typeof value === "object") {
+      return "{" + Object.keys(value).sort().map((key) =>
+        JSON.stringify(key) + ":" + stableSerialize(value[key]),
+      ).join(",") + "}";
+    }
+    return JSON.stringify(value);
+  };
+  if (stableSerialize(validatedPacket) !== stableSerialize(packet)) {
+    throw new TypeError("Fusion packet integrity validation failed.");
+  }
+
   assertPlainObject(synthesis, "Synthesis");
   assertOnlyKeys(synthesis, SYNTHESIS_KEYS, "Synthesis");
   const summary = requireText(synthesis.summary, "synthesis summary", 8000);
@@ -187,9 +206,9 @@ export function recordAfiOmSynthesis({ packet, synthesis }) {
     throw new TypeError("Synthesis decision must remain advisory.");
   }
 
-  const knownContributionIds = new Set(packet.contributions.map(({ contribution_id }) => contribution_id));
+  const knownContributionIds = new Set(validatedPacket.contributions.map(({ contribution_id }) => contribution_id));
   const knownEvidenceRefs = new Set();
-  for (const contribution of packet.contributions) {
+  for (const contribution of validatedPacket.contributions) {
     for (const claim of contribution.claims ?? []) {
       for (const ref of claim.evidence_refs ?? []) knownEvidenceRefs.add(ref);
     }
@@ -219,7 +238,7 @@ export function recordAfiOmSynthesis({ packet, synthesis }) {
     };
   });
 
-  const disagreementTopics = new Set((packet.disagreements ?? []).map(({ topic }) => topic));
+  const disagreementTopics = new Set(validatedPacket.disagreements.map(({ topic }) => topic));
   const unresolved = synthesis.unresolved_disagreements ?? [];
   if (!Array.isArray(unresolved) ||
       unresolved.some((topic) => typeof topic !== "string" || !disagreementTopics.has(topic))) {
@@ -229,7 +248,7 @@ export function recordAfiOmSynthesis({ packet, synthesis }) {
   return deepFreeze({
     contract: "afi-om-synthesis-record",
     contract_version: AFI_OM_CONTRACT_VERSION,
-    task_id: packet.task_id,
+    task_id: validatedPacket.task_id,
     summary,
     conclusions: normalizedConclusions,
     unresolved_disagreements: [...new Set(unresolved)],
