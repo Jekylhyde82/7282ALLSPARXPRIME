@@ -8,6 +8,8 @@ on:
       - "schemas/afi-om-fusion-packet.schema.json"
       - "tests/afi-om-fusion.test.mjs"
       - "tests/capability-registry-chain.test.mjs"
+      - "docs/architecture/universal-engine-engineer-master-blueprint-v2.1.md"
+      - "docs/audits/2026-11-25-stage-a-ninefold-afi-om-audit.md"
       - ".github/workflows/afi-om-fusion.yml"
   workflow_dispatch:
 
