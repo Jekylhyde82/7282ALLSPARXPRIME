@@ -368,8 +368,8 @@ The cycle is continuous but not self-authorising. Discovery is not proof; an AFI
 ### 12.3 Relationship to existing STARWIRE responsibilities
 
 - **AFI PRIME evaluation remains distinct:** AFI PRIME performs the established candidate-value and suitability assessment. AFI OM coordinates and synthesises intelligence around that assessment; it does not silently replace or collapse AFI PRIME's specialist evaluation responsibility.
-- **UAIE PRIME remains the independent governance authority:** policy, permissions, security, privacy, licence, evidence sufficiency and approval controls remain independent. AFI OM and EVO PRIME cannot override them.
-- **SYPHON remains the bounded evidence-capture boundary:** AFI OM may use captured evidence, but cannot bypass source access policy, capture controls or provenance requirements.
+- **UAIE PRIME is intrinsically fused within AFI OM:** governance, policy, permissions, security, privacy, licence, evidence sufficiency and approval controls are coordinated within AFI OM while UAIE PRIME retains its distinct specialist identity, decision criteria and protected governance authority. Intelligence synthesis, evaluation and evolutionary proposals cannot override governance decisions.
+- **SYPHON is intrinsically fused within AFI OM:** bounded source retrieval, extraction, evidence capture and provenance controls operate as an integrated specialist responsibility. SYPHON retains its distinct capture boundary and cannot be bypassed by other AFI OM responsibilities.
 - **Human approval remains mandatory** for applications, account creation, terms acceptance, credential use, purchases/spending/redemption, external writes, code installation, deployment and production configuration changes.
 - **LM Studio remains an interchangeable local inference provider:** it can support AFI OM synthesis and EVO PRIME analysis where approved and technically suitable. It is not AFI OM, EVO PRIME or STARWIRE itself, and its outputs remain untrusted until checked.
 
@@ -398,3 +398,47 @@ Evaluate the integrated capability using measurable outcomes including discovery
 **Current disposition:** AFI OM and EVO PRIME are now explicitly integrated into the STARWIRE architecture as intrinsic, coordinated specialist identities. This is an architecture decision recorded in the repository; it does not claim that their runtime implementations, autonomous workflows or production deployment are complete.
 
 **Governing invariant:** STARWIRE discovers; AFI OM fuses intelligence; AFI PRIME evaluates; EVO PRIME engineers governed evolution; UAIE PRIME governs authority; evidence and verified outcomes determine success.
+
+
+## 13. Intrinsic UAIE PRIME + SYPHON fusion into AFI OM
+
+**Architecture decision:** UAIE PRIME and SYPHON are fused intrinsically into AFI OM as coordinated specialist responsibilities. AFI OM becomes the unified intelligence and operational coordination core that contains and coordinates intelligence synthesis, governed evidence acquisition and independent governance enforcement. This is one integrated AFI OM capability, not three detached systems or a parallel governance/capture architecture.
+
+### 13.1 Preserved specialist identities inside AFI OM
+
+- **AFI OM — Unified Intelligence Core:** integrates and coordinates the specialist responsibilities, shared context, evidence relationships, intelligence synthesis, governance decisions and controlled operational flow. It maintains end-to-end traceability without collapsing specialist authority.
+- **SYPHON — Evidence Acquisition and Capture Specialist:** performs bounded, policy-controlled source retrieval, extraction, parsing and evidence capture. It preserves raw captures, source identity, source revision, retrieval time, hashes, response metadata, parser versions and provenance. It enforces host allowlists, public-IP egress restrictions, DNS-rebinding and redirect protections, request/response limits, timeouts, rate limits, content validation and credential isolation. SYPHON does not certify captured claims as true.
+- **UAIE PRIME — Governance and Assurance Specialist:** enforces policy, permissions, security, privacy, licensing, data classification, evidence sufficiency, approval requirements and fail-closed decisions. It independently evaluates whether a proposed source access, data use, acquisition, integration or action is permitted. It cannot be overridden by AFI OM synthesis, AFI PRIME scoring, EVO PRIME proposals or SYPHON capture success.
+
+The specialist identities remain explicit, auditable and functionally separated inside AFI OM. Their fusion is intrinsic integration and coordinated execution, not removal of separation-of-duties safeguards.
+
+### 13.2 Unified operating sequence
+
+AFI OM coordinates the following governed sequence:
+
+DISCOVERY → UAIE PRIME POLICY/AUTHORITY CHECK → SYPHON BOUNDED CAPTURE → EVIDENCE VALIDATION AND PROVENANCE → AFI OM INTELLIGENCE FUSION → AFI PRIME CANDIDATE EVALUATION → EVO PRIME IMPROVEMENT/ACQUISITION PROPOSAL → UAIE PRIME GOVERNANCE DECISION → HUMAN APPROVAL WHEN REQUIRED → AUTHORISED IMPLEMENTATION → INDEPENDENT VERIFICATION → VERIFIED LEARNING RETURN.
+
+The initial UAIE check authorises whether and how evidence may be acquired. The later UAIE decision governs what may be done with the resulting candidate. These are distinct checkpoints, not duplicate paperwork. If policy, permission or required evidence is missing, ambiguous or contradictory, the applicable operation fails closed or is routed for human review.
+
+### 13.3 Separation of duties and non-bypass invariants
+
+1. SYPHON may retrieve and preserve evidence only within the permissions and technical boundaries set by UAIE PRIME.
+2. A successful capture proves retrieval under a stated policy; it does not prove the captured claim.
+3. AFI OM may correlate, summarise and synthesise evidence but may not promote a source assertion into verified fact without the required verification process.
+4. AFI PRIME may assess value and suitability but cannot grant policy permission.
+5. EVO PRIME may propose evolution and improvement but cannot self-authorise code installation, deployment, external writes or production changes.
+6. UAIE PRIME governance outcomes remain independently identifiable and auditable even though the specialist is intrinsically part of AFI OM.
+7. Human approval remains mandatory for consequential actions including applications, account creation, terms acceptance, credential use, purchases/spending/redemption, external writes, code installation, deployment and production configuration changes.
+8. No single specialist may create, approve and independently certify the same consequential action.
+
+### 13.4 Shared evidence, governance and audit record
+
+AFI OM maintains one traceable context linking source and revision, UAIE pre-access decision, SYPHON capture record, raw evidence hash, parser/extractor version, evidence state, AFI OM synthesis, AFI PRIME assessment, EVO PRIME proposal, UAIE final decision, human approval, implementation revision and independently verified outcome.
+
+Every governance decision and evidence capture records its responsible specialist identity, policy/rule version, actor or service identity, timestamp, decision/reason, scope, evidence references and any limitations. This makes the unified capability auditable without sacrificing separation of duties.
+
+### 13.5 Updated responsibility invariant
+
+**STARWIRE discovers and manages opportunities; AFI OM is the intrinsically unified intelligence core containing AFI OM synthesis, SYPHON evidence acquisition and UAIE PRIME governance specialists; AFI PRIME evaluates candidate value; EVO PRIME engineers governed evolution; human approval and independent verification remain mandatory at their defined gates.**
+
+**Current disposition:** this is an architecture integration recorded in the STARWIRE architecture document. It does not claim that SYPHON capture services, UAIE policy enforcement, AFI OM orchestration or production workflows have been implemented or deployed.
