@@ -283,3 +283,63 @@ These are responsibility mappings, not fabricated register IDs. The canonical ni
 The recursive tree inventory is complete. The 15 repository-control/documentation files have been identified; the core boundary, licence, contribution, workflow and representative record materials have been inspected. Five representative Entity records were read at field level. The other 618 Entity YAML records are inventoried by path/blob identity but have not yet each received semantic field-level review. Hosted API, MCP, JSON datasets, change feed and external verifier implementation remain separate audit targets.
 
 Next Sourcey batch: process Entity YAML records in bounded parallel chunks to extract schema variants, field coverage, eligibility operators, benefit types, lifecycle states, source-domain patterns, anomalies and duplicate candidates. Record exact per-file coverage and preserve every blob SHA. Do not claim full semantic audit until all 623 records have been processed.
+
+
+## 11. Intrinsic local-model execution integration — LM Studio
+
+**Architecture decision:** integrate LM Studio as a local model-execution provider available to STARWIRE's intelligence workflows. It is a supporting execution capability inside the existing STARWIRE architecture, not a new system, division, discovery source, governance authority or parallel AI architecture.
+
+### 11.1 Placement and responsibilities
+
+- **STARWIRE orchestration:** selects an approved model-execution route for a task and records the task, provider, model identity, configuration and outcome.
+- **Local model provider adapter:** uses the official `@lmstudio/sdk` package to communicate with a running LM Studio service where the host environment supports it.
+- **AFI PRIME:** evaluates model suitability, capability, latency, resource cost, quality and task-specific evidence. Provider selection remains explainable and replaceable.
+- **UAIE PRIME:** governs model permissions, data classification, network access, tool permissions, policy compliance and approval gates.
+- **SYPHON:** remains responsible for bounded external-source acquisition and evidence capture; LM Studio does not bypass those controls.
+- **Universal Capability Acquisition Register:** records the SDK/provider candidate, version, approval, integration state, tests, measured outcomes and any replacement decision.
+
+### 11.2 Provider-independent execution contract
+
+STARWIRE must call a provider-neutral internal interface rather than importing LM Studio throughout business logic. The interface should cover, where supported and verified:
+
+1. model discovery and availability;
+2. model loading and unloading;
+3. chat/inference requests;
+4. structured output and streaming;
+5. embeddings for retrieval workflows;
+6. tool/function calling where supported by the selected model and runtime;
+7. cancellation, timeout and resource/error reporting;
+8. health checks and capability reporting.
+
+The LM Studio adapter implements only the capabilities actually supported by the installed SDK version, server version and selected model. Unsupported capabilities must be reported explicitly, not simulated or silently assumed.
+
+### 11.3 Local-first routing and resilience
+
+- Prefer an approved local model when it meets the task's quality, latency, privacy and hardware requirements.
+- Permit separately approved remote providers as alternatives or fallbacks; do not hard-code LM Studio as the only provider.
+- Make fallback explicit, policy-checked and auditable. Never send private or restricted data to a remote provider merely because local inference fails.
+- Record model identifier, runtime/SDK versions, inference settings, timestamps, latency, token/resource usage when available, errors and evaluation outcome.
+- Treat model output as untrusted data. Tool execution, repository writes, external requests and consequential actions remain behind authorization and validation boundaries.
+- Keep credentials and local service endpoints out of public client bundles, logs and committed configuration.
+
+### 11.4 Dependency placement — do not install into the wrong package
+
+The inspected `package.json` on this branch identifies the package as `cloudcredits.io`, an Astro website. It is not evidence of a STARWIRE backend or model-orchestration runtime. Therefore, do **not** add `@lmstudio/sdk` to that website package merely to claim integration.
+
+Install `@lmstudio/sdk` in the actual STARWIRE server/worker package that owns model execution, after its runtime location and package manager are identified. Pin and lock the dependency using that package's existing package manager. If no such runtime package exists yet, create the provider adapter in the approved STARWIRE runtime workspace rather than coupling it to the public website.
+
+### 11.5 Verification gates
+
+Before declaring the integration operational:
+
+1. confirm the target runtime and supported Node.js version;
+2. pin the SDK version and retain the lockfile;
+3. test connection and health-check behavior against the intended LM Studio server;
+4. test model listing, loading, inference, streaming and unload behavior as applicable;
+5. test timeouts, unavailable server, unavailable model, malformed output and cancellation;
+6. verify data-boundary enforcement and that no prohibited remote fallback occurs;
+7. run model/provider compatibility tests and record hardware/resource limits;
+8. pass security review and UAIE approval;
+9. record reproducible test evidence and measured outcomes.
+
+**Current disposition:** architecture integrated; package installation, adapter implementation, runtime tests and deployment are not claimed complete. This preserves the distinction between an approved architecture decision and a verified working integration.
