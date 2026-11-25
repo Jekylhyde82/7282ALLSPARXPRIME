@@ -181,7 +181,7 @@ export function recordAfiOmSynthesis({ packet, synthesis }) {
   }
 
   const validatedPacket = buildAfiOmFusionPacket({
-    task_id: validatedPacket.task_id,
+    task_id: packet.task_id,
     objective: packet.objective,
     contributions: packet.contributions,
     required_identities: packet.coverage?.required_identities,
