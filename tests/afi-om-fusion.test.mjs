@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import {
   AFI_OM_CONTRACT_VERSION,
   OMNI_IDENTITIES,
@@ -168,4 +169,32 @@ test("rejects an approval or execution decision disguised as synthesis", () => {
       decision: "approved",
     },
   }), /remain advisory/);
+});
+
+test("rejects a tampered fusion packet before recording synthesis", () => {
+  const packet = buildAfiOmFusionPacket({
+    task_id: "task-009",
+    objective: "Detect packet tampering.",
+    contributions: [contribution()],
+  });
+  const tampered = structuredClone(packet);
+  tampered.coverage.complete = true;
+  assert.throws(() => recordAfiOmSynthesis({
+    packet: tampered,
+    synthesis: {
+      summary: "Must not accept altered coverage.",
+      conclusions: [],
+      unresolved_disagreements: [],
+      decision: "requires_review",
+    },
+  }), /integrity validation failed/);
+});
+
+test("schema declares the same nine canonical identities and fail-closed authority", async () => {
+  const schema = JSON.parse(await readFile("schemas/afi-om-fusion-packet.schema.json", "utf8"));
+  const identities = schema.$defs.identities.items.enum;
+  assert.deepEqual(identities, OMNI_IDENTITIES.map(({ identity }) => identity));
+  assert.equal(schema.properties.execution_authorized.const, false);
+  assert.equal(schema.properties.approval_authorized.const, false);
+  assert.equal(schema.properties.verification_state.const, "NOT_VERIFIED");
 });
