@@ -60,6 +60,12 @@ Repository inspected: `Jekylhyde82/7282ALLSPARXPRIME`.
 - PR #31 explicitly records that canonical nine-division / 90-system / 184-architecture register files were not present in the inspected repository tree.
 - Master Blueprint v2.0 is available in the Library (3,489 lines; 220,153 bytes) but is not present as a consolidated v2.0 file in the inspected repository branch.
 
+## 3.1 Recovered historical System 01–60 archive
+
+The Library contains `SYSTEMS_01-60_INDIVIDUAL_ENGINEERING_RECORDS_v1.zip`. Inspection confirmed exactly 60 Markdown records with continuous IDs SYSTEM-01 through SYSTEM-60. Each record uses a common engineering-record structure covering identity/specialist role, Universal GENESIS integration, dedicated DFGCE, inputs/outputs, interfaces/dependencies, safeguards/failure handling, compatibility verdicts, testing/acceptance, status/next actions and change history.
+
+This archive is a valuable historical source for reconciling the first 60 System identities and responsibilities. It does not contain SYSTEM-61 through SYSTEM-90 and therefore cannot establish the current 90-System register by itself. Its contents must be reconciled against later approved decisions before any IDs or responsibilities are carried forward.
+
 ## 4. Findings and discrepancies
 
 | ID | Finding | Severity | Required treatment |
