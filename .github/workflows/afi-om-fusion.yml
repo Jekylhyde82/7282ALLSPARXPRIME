@@ -1,0 +1,36 @@
+name: AFI OM fusion contract
+
+on:
+  pull_request:
+    paths:
+      - "src/lib/allsparxPrime/afi-om-fusion.mjs"
+      - "schemas/afi-om-fusion-packet.schema.json"
+      - "tests/afi-om-fusion.test.mjs"
+      - ".github/workflows/afi-om-fusion.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: afi-om-fusion-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract-tests:
+    name: AFI OM contract and regression tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run AFI OM tests
+        run: node --test tests/afi-om-fusion.test.mjs
+      - name: Check patch whitespace
+        run: git diff --check
