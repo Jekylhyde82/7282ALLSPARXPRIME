@@ -343,3 +343,58 @@ Before declaring the integration operational:
 9. record reproducible test evidence and measured outcomes.
 
 **Current disposition:** architecture integrated; package installation, adapter implementation, runtime tests and deployment are not claimed complete. This preserves the distinction between an approved architecture decision and a verified working integration.
+
+
+## 12. Intrinsic AFI OM + EVO PRIME fusion within STARWIRE
+
+**Architecture decision:** AFI OM and EVO PRIME are fused intrinsically into STARWIRE's core intelligence and evolutionary-engineering capability. They are not separate STARWIRE add-ons, parallel systems, new divisions or detached services. Their specialist identities, responsibilities and decision boundaries remain explicit inside one coordinated STARWIRE architecture.
+
+### 12.1 Preserved specialist identities
+
+- **STARWIRE — Opportunity Discovery and Acquisition Intelligence:** discovers, classifies, investigates and tracks opportunities, technologies, resources, tools, models, infrastructure, research and other useful capabilities. STARWIRE owns the opportunity-discovery lifecycle and its evidence/provenance trail.
+- **AFI OM — Unified Intelligence Fusion:** coordinates and synthesises intelligence across STARWIRE; correlates discoveries, evidence, context, specialist findings and capability relationships; orchestrates the appropriate intelligence responsibilities; produces coherent, traceable assessments and recommendations. AFI OM does not turn unverified claims into facts and does not grant permissions.
+- **EVO PRIME — Governed Evolutionary Engineering:** converts verified learning, evaluated opportunities, measured outcomes, capability gaps and validated discoveries into controlled adaptation and improvement proposals; identifies obsolescence, duplication, emerging capability and improvement paths; tracks whether changes actually improve capability, reliability, efficiency or value. EVO PRIME does not self-authorise consequential changes or bypass lifecycle and governance gates.
+
+These identities operate as one intrinsically coordinated capability while retaining their specialist purposes. Fusion means coordinated operation and shared context, not erasure of identity or unrestricted authority.
+
+### 12.2 Integrated intelligence and evolution cycle
+
+STARWIRE's intrinsic operating cycle is:
+
+DISCOVER → CAPTURE EVIDENCE → CLASSIFY → CORRELATE AND SYNTHESISE (AFI OM) → EVALUATE → PROPOSE ADAPTATION OR ACQUISITION (EVO PRIME) → GOVERNANCE REVIEW → HUMAN APPROVAL WHEN REQUIRED → IMPLEMENT THROUGH AUTHORISED ENGINEERING → VERIFY OUTCOME → FEED VERIFIED LEARNING BACK INTO STARWIRE.
+
+The cycle is continuous but not self-authorising. Discovery is not proof; an AFI OM synthesis is not independent verification; an EVO PRIME proposal is not approval; and an implemented change is not successful until its outcome is measured and verified.
+
+### 12.3 Relationship to existing STARWIRE responsibilities
+
+- **AFI PRIME evaluation remains distinct:** AFI PRIME performs the established candidate-value and suitability assessment. AFI OM coordinates and synthesises intelligence around that assessment; it does not silently replace or collapse AFI PRIME's specialist evaluation responsibility.
+- **UAIE PRIME remains the independent governance authority:** policy, permissions, security, privacy, licence, evidence sufficiency and approval controls remain independent. AFI OM and EVO PRIME cannot override them.
+- **SYPHON remains the bounded evidence-capture boundary:** AFI OM may use captured evidence, but cannot bypass source access policy, capture controls or provenance requirements.
+- **Human approval remains mandatory** for applications, account creation, terms acceptance, credential use, purchases/spending/redemption, external writes, code installation, deployment and production configuration changes.
+- **LM Studio remains an interchangeable local inference provider:** it can support AFI OM synthesis and EVO PRIME analysis where approved and technically suitable. It is not AFI OM, EVO PRIME or STARWIRE itself, and its outputs remain untrusted until checked.
+
+### 12.4 Intrinsic shared context and traceability
+
+AFI OM and EVO PRIME share STARWIRE's governed knowledge context from inception: source records and revisions, captures, evidence states, provider/programme/offer relationships, eligibility uncertainty, project fingerprints, match explanations, AFI PRIME assessments, UAIE decisions, human approvals, implementation records and measured outcomes.
+
+Every synthesis, proposal and evolution decision must retain:
+- originating discovery and source revision;
+- evidence and uncertainty references;
+- specialist identity and responsibility that produced the result;
+- model/provider and configuration where AI inference contributed;
+- assumptions, exclusions, confidence limitations and alternatives;
+- governance decision, approval and authorised actor where applicable;
+- implementation revision and reproducible test evidence;
+- measured outcome, verification status and follow-up learning.
+
+No specialist may certify its own output as independently verified merely because it generated or coordinated it.
+
+### 12.5 Evolution safeguards and success criteria
+
+EVO PRIME continuously identifies improvement opportunities but advances them through the existing lifecycle and governance controls. Preserve rejected, deferred, experimental, superseded and unsuccessful proposals with rationale and evidence. Avoid automatic adoption, uncontrolled self-modification, duplicate capability creation and complexity without demonstrated value.
+
+Evaluate the integrated capability using measurable outcomes including discovery coverage, evidence quality, assessment accuracy, useful-opportunity yield, time-to-detection, time-to-decision, acquisition success, integration reliability, verified capability gain, operating cost, false-positive rate and maintenance burden.
+
+**Current disposition:** AFI OM and EVO PRIME are now explicitly integrated into the STARWIRE architecture as intrinsic, coordinated specialist identities. This is an architecture decision recorded in the repository; it does not claim that their runtime implementations, autonomous workflows or production deployment are complete.
+
+**Governing invariant:** STARWIRE discovers; AFI OM fuses intelligence; AFI PRIME evaluates; EVO PRIME engineers governed evolution; UAIE PRIME governs authority; evidence and verified outcomes determine success.
