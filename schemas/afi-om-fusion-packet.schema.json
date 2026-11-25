@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://allsparx.prime/schemas/afi-om-fusion-packet.schema.json",
+  "title": "AFI OM Fusion Packet",
+  "description": "Provider-neutral, attributed fusion packet. This contract preserves source contributions and dissent; it does not authorize execution or approval.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "contract_version",
+    "task_id",
+    "objective",
+    "contributions",
+    "coverage",
+    "disagreements",
+    "authority",
+    "execution_authorized",
+    "approval_authorized",
+    "verification_state",
+    "status"
+  ],
+  "properties": {
+    "contract": { "const": "afi-om-fusion-packet" },
+    "contract_version": { "const": "1.0.0" },
+    "task_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "objective": { "type": "string", "minLength": 1, "maxLength": 4000 },
+    "contributions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 81,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["contribution_id", "identity", "source_ref", "summary", "confidence", "claims"],
+        "properties": {
+          "contribution_id": { "type": "string", "minLength": 1, "maxLength": 160 },
+          "identity": {
+            "enum": [
+              "EB9 PRIME",
+              "OMNI GENIUS",
+              "OMNI BRAINSTORM",
+              "OMNI CRITIC",
+              "OMNI ENGINEER",
+              "OMNIVELOCITY PRIME",
+              "OMNIGENESIS PRIME",
+              "OMNIEVOLUTION PRIME",
+              "AFI PRIME"
+            ]
+          },
+          "source_ref": { "type": "string", "minLength": 1, "maxLength": 1000 },
+          "summary": { "type": "string", "minLength": 1, "maxLength": 8000 },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "claims": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["claim_id", "topic", "position", "statement", "evidence_refs"],
+              "properties": {
+                "claim_id": { "type": "string", "minLength": 1, "maxLength": 160 },
+                "topic": { "type": "string", "minLength": 1, "maxLength": 240 },
+                "position": { "type": "string", "minLength": 1, "maxLength": 240 },
+                "statement": { "type": "string", "minLength": 1, "maxLength": 4000 },
+                "evidence_refs": {
+                  "type": "array",
+                  "maxItems": 100,
+                  "uniqueItems": true,
+                  "items": { "type": "string", "minLength": 1 }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_identities", "present_identities", "missing_identities", "complete"],
+      "properties": {
+        "required_identities": { "$ref": "#/$defs/identities" },
+        "present_identities": { "$ref": "#/$defs/identities" },
+        "missing_identities": { "$ref": "#/$defs/identities" },
+        "complete": { "type": "boolean" }
+      }
+    },
+    "disagreements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["topic", "positions"],
+        "properties": {
+          "topic": { "type": "string", "minLength": 1 },
+          "positions": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["position", "contributions"],
+              "properties": {
+                "position": { "type": "string", "minLength": 1 },
+                "contributions": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["contribution_id", "identity", "statement", "evidence_refs"],
+                    "properties": {
+                      "contribution_id": { "type": "string" },
+                      "identity": { "enum": ["EB9 PRIME", "OMNI GENIUS", "OMNI BRAINSTORM", "OMNI CRITIC", "OMNI ENGINEER", "OMNIVELOCITY PRIME", "OMNIGENESIS PRIME", "OMNIEVOLUTION PRIME", "AFI PRIME"] },
+                      "statement": { "type": "string" },
+                      "evidence_refs": { "type": "array", "items": { "type": "string" } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "authority": { "const": "ADVISORY_ONLY" },
+    "execution_authorized": { "const": false },
+    "approval_authorized": { "const": false },
+    "verification_state": { "const": "NOT_VERIFIED" },
+    "status": { "const": "READY_FOR_SYNTHESIS" }
+  },
+  "$defs": {
+    "identities": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 9,
+      "items": {
+        "enum": [
+          "EB9 PRIME",
+          "OMNI GENIUS",
+          "OMNI BRAINSTORM",
+          "OMNI CRITIC",
+          "OMNI ENGINEER",
+          "OMNIVELOCITY PRIME",
+          "OMNIGENESIS PRIME",
+          "OMNIEVOLUTION PRIME",
+          "AFI PRIME"
+        ]
+      }
+    }
+  }
+}
