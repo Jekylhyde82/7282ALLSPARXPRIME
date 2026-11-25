@@ -96,7 +96,20 @@ These are reused as surrounding infrastructure only. AFI OM must not duplicate c
 
 No missing register entries have been fabricated. No production branch, deployed service, credentials or runtime were changed.
 
-## 7. Required Stage B and C treatment
+## 7. Additional recovered artifact — 8,100-pair fusion matrix
+
+A Library workbook, `universal_engine_fusion_matrix_8100.xlsx`, was recovered and inspected:
+
+- Two sheets: `All 8100 Pairings` and `Combination Summary`.
+- Exactly 8,100 pair records, representing 90 × 90 candidate pairings.
+- Side A contains 90 placeholder components: 9 Master Core IDs (`A-MC01`–`A-MC09`) and 81 Specialist Core IDs (`A-SC01`–`A-SC81`).
+- Side B contains 90 placeholder components: 9 AFI IDs (`B-AFI01`–`B-AFI09`) and 81 Engine Core IDs (`B-EC01`–`B-EC81`).
+- All score fields are blank; all records are `PENDING`, `UNASSESSED` and `NOT TESTED`.
+- Every record explicitly notes that its component IDs are placeholders to be replaced with confirmed architecture registry identities before testing.
+
+**Disposition:** retain this workbook as an unverified candidate compatibility/fusion matrix. It is not the 90-System Register, not proof of 8,100 viable fusions, and not evidence that any pairing has been tested. It is also distinct from the 81-cell UMIC × specialist-domain coordination model. Do not substitute its placeholder IDs for canonical UMIC, Core, AFI or Engine identities.
+
+## 8. Required Stage B and C treatment
 
 1. Publish an additive Master Blueprint v2.1 amendment that preserves v2.0 and establishes the exact nine identities, AFI fusion contracts and authority boundaries.
 2. Implement a deterministic, provider-neutral AFI fusion coordinator that preserves specialist contributions, provenance, uncertainty and dissent.
