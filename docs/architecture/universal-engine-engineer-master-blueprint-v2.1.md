@@ -70,6 +70,8 @@ The nine registers remain: Major Division; System; Architecture; Responsibility 
 
 The 81-cell model is nine UMICs × nine specialist capability domains. Each cell is a relationship contract, not an additional agent or runtime process. The 90 System records, 90 Core Nodes, 81 Engines and 81 coordination relationships have different grains and must be cross-referenced rather than conflated.
 
+A separate Library workbook, `universal_engine_fusion_matrix_8100.xlsx`, contains 8,100 candidate pairings (90 × 90): nine Master Core placeholders plus 81 Specialist Core placeholders on one side, and nine AFI placeholders plus 81 Engine Core placeholders on the other. All component IDs are explicitly placeholders; all scores are blank and every pairing is pending, unassessed and not tested. This is a candidate compatibility matrix only. It is not the System Register, not the 81-cell UMIC/domain matrix, and not proof of tested or viable fusions. It may be reconciled into the architecture only after canonical IDs, pair semantics and ownership are verified.
+
 The authoritative names of the nine Major Divisions and the complete 90-System list must be imported from their canonical registers. Until those sources are recovered and reconciled, no missing names, System IDs 61–90, Architecture IDs or Responsibility Layer IDs may be invented.
 
 ## 3. AFI OM — intrinsic fusion foundation
