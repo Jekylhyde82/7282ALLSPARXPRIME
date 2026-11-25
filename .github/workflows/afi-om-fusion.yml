@@ -4,8 +4,10 @@ on:
   pull_request:
     paths:
       - "src/lib/allsparxPrime/afi-om-fusion.mjs"
+      - "src/lib/allsparxPrime/capability-registry-chain.mjs"
       - "schemas/afi-om-fusion-packet.schema.json"
       - "tests/afi-om-fusion.test.mjs"
+      - "tests/capability-registry-chain.test.mjs"
       - ".github/workflows/afi-om-fusion.yml"
   workflow_dispatch:
 
