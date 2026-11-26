@@ -17,8 +17,11 @@ const EVENT_TYPES = new Set([
 
 function assertOnlyKeys(value, allowed, label) {
   if (!value || typeof value !== "object" || Array.isArray(value) ||
-      Object.keys(value).some((key) => !allowed.has(key))) {
-    throw new TypeError(label + " contains an unknown field or is not an object.");
+      Object.getPrototypeOf(value) !== Object.prototype) {
+    throw new TypeError(label + " must be a plain object.");
+  }
+  if (Object.keys(value).some((key) => !allowed.has(key))) {
+    throw new TypeError(label + " contains an unknown field.");
   }
 }
 
