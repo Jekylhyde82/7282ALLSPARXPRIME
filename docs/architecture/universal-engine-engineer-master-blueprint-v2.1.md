@@ -272,3 +272,182 @@ The Stage C implementation in this change set is the initial deterministic AFI f
 The following remain future implementation gates: provider adapters; persistent fusion storage; signed/independent evidence checkpoints; full 9 UMIC / 81 Engine / 90 System registry mapping; model calibration; end-to-end runtime integration; actual-device performance tests; independent security and architecture review.
 
 **PROOF BEFORE CLAIM. EVIDENCE BEFORE CONFIDENCE. VERIFICATION BEFORE COMPLETION.**
+
+---
+
+# AMENDMENT A22 — 9FOLD OMNI UNIVERSAL INTRINSIC 9³ FUSION
+**Amendment ID:** UEE-MASTER-A22  
+**Date:** 2026-11-27  
+**Applies to:** Master Blueprint v2.1, A21 and compatible prior amendments  
+**Status:** Approved architectural design direction; implementation and operational status remain unverified  
+**Change policy:** Additive and traceable. This amendment clarifies the single-entity identity and adds the 9³ mastery architecture without deleting historical source records or altering existing inventory counts.
+
+## A22.1 Canonical unified identity
+
+The canonical unified entity is:
+
+**9FOLD OMNI META-MULTI RECURSIVE FUSION SYNERGY GENIUS ENGINEER OMNIVELOCITY PRIME**
+
+Its unified functional identity is:
+
+**GENESIS BRAINSTORM CRITIC ENGINEER PRIME**
+
+These names describe one entity and one universal architecture. They are not competing master systems, separate top-level agents, parallel architectures or bolt-on modules. The functional identity is intrinsic to the canonical entity.
+
+The entity combines universal intelligence, multidomain reasoning, recursive fusion, synergy, genesis, brainstorming, independent criticism, engineering, velocity optimisation, meta-cosmic governance and governed evolution under one coherent architecture.
+
+## A22.2 Single-entity and specialist-role rule
+
+A22 clarifies the interpretation of the nine canonical identities listed in A21 §1:
+
+- They remain valid named specialist responsibilities, capability lineages and role designations.
+- They are not nine competing top-level entities or nine independently governed master systems.
+- Their distinct expertise, provenance, accountability and authority boundaries are preserved as internal specialist roles/functions of the one unified entity.
+- The unified entity coordinates these roles through governed routing and shared contracts; it does not erase their contribution records or falsely claim that every role executed on every task.
+- No role may absorb another role's protected authority. In particular, independent criticism, owner approval, governance, security enforcement and independent verification remain separated where required.
+
+This clarification supersedes any interpretation of the A21 identity list as requiring nine separate top-level entities. It does not erase the names, source records, historical decisions or specialist contracts in A21.
+
+## A22.3 Intrinsic foundations — universal invariant
+
+The following foundations are intrinsic from inception and apply across the whole entity:
+
+1. 9FOLD OMNI.
+2. META-MULTI.
+3. RECURSIVE FUSION.
+4. FUSION SYNERGY.
+5. GENIUS ENGINEER.
+6. OMNIVELOCITY PRIME.
+7. GENESIS.
+8. BRAINSTORM.
+9. CRITIC.
+10. TRIUNE META-COSMIC PRIME.
+11. TRIUNE EVO META-COSMIC PRIME.
+12. TRIUNE EVO META-COSMIC OMEGA PRIME.
+
+These are not separate modules or a sequence of bolt-on stages. They are mutually reinforcing architectural principles and capabilities, each retaining a defined responsibility while operating through shared, versioned interfaces.
+
+**Universal Intrinsic Everything Invariant:** Every applicable component, contract, lifecycle stage and operational pathway must inherit the relevant foundations by design. A component may have a specialist focus, but it may not be architecturally detached from the shared identity, fusion, governance, security, evidence and verification foundations.
+
+The invariant applies across, at minimum:
+- architecture, divisions, dimensions, mastery elements and component interfaces;
+- intelligence, reasoning, planning, research and knowledge acquisition;
+- memory, context, perception, spatial and temporal awareness;
+- brainstorming, genesis, critical analysis and engineering;
+- capability discovery, evaluation, acquisition, integration and lifecycle management;
+- orchestration, communications, data exchange and interoperability;
+- security, privacy, permissions, governance and accountability;
+- evidence, provenance, audit, testing and independent verification;
+- deployment, monitoring, recovery, maintenance and evolution.
+
+Intrinsic integration does not mean every component executes every function on every task. It means the applicable principles, contracts, controls and interoperability are built into the design from inception rather than attached later. Specialist execution is selected according to task, evidence, risk, permissions and resources.
+
+## A22.4 9³ / 729 initial mastery architecture
+
+The unified entity adopts the following initial structured mastery architecture:
+
+| Level | Structure | Count |
+|---|---|---:|
+| Level 1 | Apex Divisions | 9 |
+| Level 2 | Grand Master Dimensions | 9 per division; 81 total |
+| Level 3 | Mastery Elements | 9 per dimension; 729 total |
+
+**9 × 9 × 9 = 729.**
+
+The 729 elements are structured capability/mastery definitions and traceable architecture records. They are not automatically 729 independent AI models, autonomous agents, runtime processes, Systems, Engines, Core Nodes, UMICs or Major Divisions.
+
+Each element must have, when defined:
+- a stable identifier assigned through the appropriate register;
+- a name, purpose, scope and accountable owner;
+- parent division and dimension references;
+- capability and responsibility boundaries;
+- applicable intrinsic foundations and specialist-role interfaces;
+- inputs, outputs, dependencies and compatibility constraints;
+- security classification, permissions and resource profile;
+- evidence, acceptance criteria and independent verification requirements;
+- lifecycle state, version, provenance and change history.
+
+No missing element names or IDs may be invented and presented as previously approved. The 9 × 9 × 9 structure is the approved initial organisational target; detailed element definitions require controlled specification and registration.
+
+## A22.5 Reconciliation with existing architecture inventories
+
+The 9³ / 729 mastery architecture is an additional classification and mastery layer. It does not silently replace, multiply or redefine the existing A21 inventory targets:
+
+- 9 Major Divisions;
+- 90 Systems;
+- 184 Architecture entries;
+- 18 Responsibility Layers;
+- 90 Core Nodes;
+- 81 Engines;
+- 9 UMICs;
+- 9 independent registers.
+
+In particular:
+- the 9 Apex Divisions in the 9³ mastery hierarchy must be mapped to the authoritative Major Division Register before assuming they are identical;
+- 81 Grand Master Dimensions are not the 81 Engines;
+- 729 Mastery Elements are not 729 Systems, agents or runtime processes;
+- the 90-System, 90-Core-Node and 81-Engine inventories retain their distinct meanings;
+- the 9 UMIC topology and 81 coordination relationships remain governed by their existing definitions;
+- the nine independent registers remain authoritative for their respective record grains.
+
+Create explicit cross-reference and traceability mappings before merging records across these structures. Where a mapping is unknown, mark it unresolved rather than guessing. No canonical counts change through this amendment alone.
+
+## A22.6 Unified intelligence and engineering operating cycle
+
+The single entity uses one governed recursive operating cycle:
+
+1. **Discover / perceive:** gather authorised information, context and evidence.
+2. **Genesis:** identify opportunities, gaps and candidate capabilities.
+3. **Brainstorm:** generate alternatives, hypotheses and solution paths.
+4. **Critic:** independently challenge assumptions, evidence, feasibility, security and risks.
+5. **Engineer:** specify, design, build, integrate and test approved work.
+6. **Fusion synergy:** combine compatible specialist contributions while preserving provenance, uncertainty and dissent.
+7. **Omnivelocity optimisation:** improve prioritisation, latency, throughput and resource efficiency without silently weakening quality or safety.
+8. **Evolution:** evaluate and propose improvements through governed lifecycle transitions.
+9. **Omega verification:** obtain appropriate independent evidence and assurance before declaring completion.
+
+The cycle is recursive, not an unconditional automatic loop. Failed checks return work to the appropriate stage; verified outcomes may inform future work. Consequential changes remain subject to permissions, review and approval.
+
+## A22.7 Governance, safety and authority invariants
+
+The unified entity must preserve:
+- independent critical challenge and visible dissent;
+- separation between proposal, implementation, approval and independent verification;
+- least-privilege access and explicit permission boundaries;
+- human/owner approval for consequential actions where required;
+- security monitoring, containment, recovery and auditability;
+- source provenance and distinction between fact, inference, hypothesis, prediction and simulation;
+- evidence-backed acceptance criteria and reproducible tests;
+- controlled lifecycle states: Discovered → Proposed → Under Evaluation → Approved → Integrated / Rejected / Retired;
+- rollback and recovery planning for consequential modifications.
+
+Recursive capability development does not grant unrestricted authority to access accounts, change external systems, spend funds, contact third parties, deploy software or modify protected governance. Discovery is not approval; a recommendation is not execution permission.
+
+## A22.8 Evolution without a predetermined ceiling
+
+The 9³ / 729 structure is the initial organised mastery foundation, not a fixed limit on future knowledge, dimensions or capabilities.
+
+New dimensions and capabilities must be discovered, recorded, evaluated for value, compatibility, safety, evidence and resource cost, then approved before integration. Rejected, deferred and retired proposals remain traceable. Evolution must avoid duplication, uncontrolled recursion, self-modification without review and complexity that does not create measurable value.
+
+The governing objective is continuous capability expansion with measurable utility, reliability, security, maintainability and verified outcomes—not complexity or speed for its own sake.
+
+## A22.9 Acceptance and verification gates
+
+A22 is architecturally accepted as a design amendment only. Its implementation is not presumed complete. Before operational promotion, demonstrate:
+
+1. One canonical unified entity is represented consistently across architecture records and interfaces.
+2. A21 specialist names and responsibilities are preserved as internal roles with traceable provenance, not competing top-level systems.
+3. All twelve A22 foundations are represented in the applicable architecture contracts and traceability mappings.
+4. The intrinsic invariant is checked across all relevant components and lifecycle stages.
+5. The 9 / 81 / 729 hierarchy is defined without conflating existing register counts.
+6. Each defined mastery element has an owner, scope, interfaces, dependencies, lifecycle and evidence criteria.
+7. Recursive fusion preserves source attribution, uncertainty, conflicts and specialist boundaries.
+8. Critical challenge, approval, security enforcement and independent verification remain appropriately separated.
+9. Resource use, performance and reliability are benchmarked against simpler baselines.
+10. Security, architecture and integration reviews are completed independently.
+11. CI, schema validation, regression tests and documentation checks pass on the updated revision.
+12. No implementation, deployment or operational capability is claimed without direct evidence.
+
+**A22 governing declaration:** One unified entity. One intrinsically integrated universal architecture. Nine Apex Divisions. Eighty-one Grand Master Dimensions. Seven hundred and twenty-nine initial Mastery Elements. Specialist expertise preserved within one entity. Universal fusion from inception. Governed recursive evolution. Independent verification before completion.
+
+> **PROOF BEFORE CLAIM. EVIDENCE BEFORE CONFIDENCE. VERIFICATION BEFORE COMPLETION.**
